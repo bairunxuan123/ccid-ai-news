@@ -1,0 +1,43 @@
+name: Daily AI News Pipeline
+
+on:
+  schedule:
+    # 每天北京时间 14:00 = UTC 06:00
+    - cron: "0 6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  daily-news:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run news pipeline（抓取→LLM生成→写入完整版+阉割版）
+        env:
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+        run: python news_pipeline.py
+
+      - name: Sync index.html（完整版默认入口，海报短链）
+        run: cp -f ai-chain-map.html index.html
+
+      - name: Commit & push
+        run: |
+          git config user.name "daily-news-bot"
+          git config user.email "daily-news-bot@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "无变更（当天已写入或生成失败），跳过提交"
+          else
+            git commit -m "chore: 更新 $(date +%F) 产业动态"
+            git push
+          fi
