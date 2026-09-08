@@ -41,3 +41,18 @@ jobs:
             git commit -m "chore: 更新 $(date +%F) 产业动态"
             git push
           fi
+
+      - name: Notify WeChat via PushPlus（推送到用户手机微信）
+        if: always()
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+        run: |
+          LATEST_DATE=$(grep -m1 -oE 'date: "2026-[0-9]{2}-[0-9]{2}"' ai-chain-map.html | sed 's/date: "//;s/"//' || echo "未知")
+          TITLE="赛迪AI产业动态 · ${LATEST_DATE} 已上线"
+          CONTENT="今日产业动态已更新至 ${LATEST_DATE}。<br>完整版：https://bairunxuan123.github.io/ccid-ai-news/<br>阉割版：https://bairunxuan123.github.io/ccid-ai-news/ai-chain-map-lite.html"
+          if [ -n "${PUSHPLUS_TOKEN}" ]; then
+            RESP=$(curl -s -X POST "https://www.pushplus.plus/send" -H "Content-Type: application/json" -d "{\"token\":\"${PUSHPLUS_TOKEN}\",\"title\":\"${TITLE}\",\"content\":\"${CONTENT}\",\"template\":\"html\"}")
+            echo "PushPlus 响应: ${RESP}"
+          else
+            echo "PUSHPLUS_TOKEN 未配置，跳过微信通知"
+          fi
