@@ -5,6 +5,10 @@ name: Probe GLM model capability (manual, diagnostic)
 on:
   workflow_dispatch:
     inputs:
+      script:
+        description: "要运行的诊断脚本"
+        required: false
+        default: "probe_model.py"
       day:
         description: "诊断用的日期（YYYY-MM-DD），留空用今天"
         required: false
@@ -30,9 +34,11 @@ jobs:
         env:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
           DAY: ${{ inputs.day }}
+          SCRIPT: ${{ inputs.script }}
         run: |
+          S="${SCRIPT:-probe_model.py}"
           if [ -n "$DAY" ]; then
-            python probe_model.py "$DAY"
+            python "$S" "$DAY"
           else
-            python probe_model.py
+            python "$S"
           fi
