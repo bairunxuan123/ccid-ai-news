@@ -413,6 +413,33 @@ def clean_for_js(value):
     return value.replace('"', "“").strip()
 
 
+# 分类纠偏关键词
+POLICY_HINTS = ["政策", "监管", "法规", "法案", "立法", "政府", "部委", "标准",
+                "合规", "备案", "条例", "管理办法", "管理局", "指导意见", "规划",
+                "扶持", "补贴", "政府采购", "市级", "省级"]
+CAPITAL_HINTS = ["融资", "并购", "收购", "ipo", "上市", "估值", "投资", "注资",
+                 "增资", "参股", "领投", "跟投", "募资", "轮"]
+NEGATIVE_HINTS = ["黑客", "攻击", "入侵", "罚款", "起诉", "诉讼", "争议", "泄露",
+                  "宕机", "故障", "被罚", "违规", "反垄断", "泄密"]
+
+
+def normalize_category(cat, title, desc):
+    """分类确定性纠偏。
+
+    模型常为了让各分类数量好看而错标（例如把"某公司陷入安全争议"标成政策发布）。
+    这里按关键词兜底校正：政策发布必须有政策类词汇，投融资必须有资本类词汇，
+    技术突破不得用于负面事件。
+    """
+    text = (str(title or "") + str(desc or "")).lower()
+    if cat == "policy" and not any(k in text for k in POLICY_HINTS):
+        return "industry"
+    if cat == "capital" and not any(k in text for k in CAPITAL_HINTS):
+        return "industry"
+    if cat == "tech" and any(k in text for k in NEGATIVE_HINTS):
+        return "industry"
+    return cat
+
+
 # 摘要校验时豁免的通用词
 _SUMMARY_OK = {"ai", "openai", "chatgpt", "api", "gpt", "ceo", "ipo", "llm", "it"}
 
@@ -477,6 +504,11 @@ def generate_news(material, today_cn):
         if stray_english_count(desc) >= 3:
             log(f"  丢弃英文残留的条目: {title[:30]}")
             continue
+        # 分类确定性纠偏（模型常为"四类均衡"而错标）
+        fixed = normalize_category(cat, title, desc)
+        if fixed != cat:
+            log(f"  分类纠偏: {cat}→{fixed}  {title[:24]}")
+            cat = fixed
         out.append({
             "cat": cat,
             "catLabel": CAT_LABELS[cat],
