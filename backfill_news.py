@@ -151,6 +151,11 @@ def gen_day(material, day_str):
             if np.stray_english_count(desc) >= 3:
                 np.log(f"  丢弃英文残留的条目: {title[:26]}")
                 continue
+            # 分类确定性纠偏
+            fixed = np.normalize_category(cat, title, desc)
+            if fixed != cat:
+                np.log(f"  分类纠偏: {cat}→{fixed}  {title[:24]}")
+                cat = fixed
             items.append({
                 "cat": cat, "catLabel": np.CAT_LABELS[cat],
                 "title": title, "desc": desc, "source": src, "url": url,
