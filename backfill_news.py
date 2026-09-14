@@ -101,9 +101,9 @@ def build_day_prompt(material, day_str, attempt=0):
     if attempt == 0:
         temp_note = ""
     elif attempt == 1:
-        temp_note = "\n\n【提示】请仔细检查素材池，从更广的范围挑选 10 条候选 AI 产业新闻，包括但不限于：芯片厂商（英伟达/AMD/华为海思/联发科）、云厂商（阿里云/腾讯云/华为云/AWS/Azure）、机器人厂商、模型厂商、算力/数据中心、AI 应用、AI 监管政策、AI 投融资事件。即使素材标题看起来边缘，只要实际反映 AI 产业变化都可选用。\n\n【上一轮被丢弃的主因是字数不达标】标题须 20-30 字，正文 desc 须 100-160 字，正文不足 80 字一律作废。请把每条正文写足信息量：谁做了什么 + 金额/数量/时间等具体细节 + 影响或后续计划。"
+        temp_note = "\n\n【提示】请仔细检查素材池，从更广的范围挑选 10 条候选 AI 产业新闻，包括但不限于：芯片厂商（英伟达/AMD/华为海思/联发科）、云厂商（阿里云/腾讯云/华为云/AWS/Azure）、机器人厂商、模型厂商、算力/数据中心、AI 应用、AI 监管政策、AI 投融资事件。即使素材标题看起来边缘，只要实际反映 AI 产业变化都可选用。\n\n【上一轮被丢弃的主因是标题不达标或素材摘要太空】标题须 20-30 字（低于 15 字一律作废）。请优先挑选摘要中含具体数字与事实的新闻——正文由后续步骤逐条撰写，需要可核验的细节支撑。"
     else:
-        temp_note = "\n\n【末次硬性要求】必须输出 10 条候选。素材池已包含 ±1 天共 " + str(len(material)) + " 条，请务必从 AI 相关（含 AI 邻域）中挑出 10 条候选，覆盖 4 类各 2-3 条。\n**同时务必保证字数：标题 20-30 字、正文 100-160 字（正文不足 80 字一律作废）**，宁可少写几条也不要写短文案。若确实凑不齐 10 条，可优先扩大到 AI 邻域（芯片/算力/数据中心/机器人/智能驾驶/语音识别/视觉识别/数字人等）补足；**即使候选数不足，也绝不允许用短文案充数——字数优先于条数**，但绝对不得收录消费电子（手机/相机/耳机/显示器/家电）、汽车新品（新车/试驾/MPV/SUV）、操作系统更新（Windows/iOS/安卓/鸿蒙）、政治人物。系统会硬过滤。"
+        temp_note = "\n\n【末次硬性要求】必须输出 10 条候选。素材池已包含 ±1 天共 " + str(len(material)) + " 条，请务必从 AI 相关（含 AI 邻域）中挑出 10 条候选，覆盖 4 类各 2-3 条。\n**同时务必保证标题质量：20-30 字、三要素齐全（主体+动作+结果）**，宁可少出几条候选，也不要出丢主体的空泛标题。若确实凑不齐 10 条，可优先扩大到 AI 邻域（芯片/算力/数据中心/机器人/智能驾驶/语音识别/视觉识别/数字人等）补足；**即使候选数不足，也绝不允许用空泛标题充数——质量优先于条数**，但绝对不得收录消费电子（手机/相机/耳机/显示器/家电）、汽车新品（新车/试驾/MPV/SUV）、操作系统更新（Windows/iOS/安卓/鸿蒙）、政治人物。系统会硬过滤。"
     return f"""下面是{day_str}（{weekday}）当天及前后共 {len(material)} 条的宽口径新闻素材（编号+标题+URL）。
 
 素材：
@@ -149,29 +149,27 @@ def build_day_prompt(material, day_str, attempt=0):
 - 宇树科技科创板挂牌，人形机器人第一股诞生
 ❌ 禁用写法："AI政策窗口开放"、"Nvidia解释增长原因"、"某公司面临挑战"（均丢了主体或事件信息）。
 
-【正文 desc：100-160 字，不得少于 80 字】
-按"事实 → 细节 → 意义"三层写成一段完整陈述：
-- 第一层｜谁做了什么：写全具体机构名、文件名（加书名号）、产品名、模型名。
-- 第二层｜关键细节：从素材摘要中提取可核验的数字——金额、规模、数量、时间、占比、技术规格、覆盖范围。
-- 第三层｜影响、对比或后续计划：用事实表达（如"较此前2.8万台的预测近乎翻倍"），禁止"意义重大""里程碑式"这类空泛评价。
-
-✅ 正文范例（定版实际写法，请对齐字数与信息密度）：
-「市场监管总局与国家发改委联合印发《人工智能计量体系和能力建设指引（2026版）》，围绕基础支撑、通用技术、核心技术等六大板块系统布局，聚焦算法黑箱和决策可解释性等痛点部署关键技术攻关，推动AI性能可测量、可比较、可追溯，并支持构建国家级计量技术研发应用中心，打通实验室到行业应用的最后一公里。」（156 字）
-❌ 禁用写法：仅十几个字的短语（实测出现过 11 字正文），系统会直接丢弃。
+【正文：本轮不用写，但选题要为其负责】
+正文 desc 由后续步骤单独逐条撰写（本步只出选题与标题）。
+因此选题时请**优先挑选"摘要里含具体事实与数字"的新闻**（金额、数量、时间、占比、
+技术规格、合作方数量）——正文必须有可核验的细节支撑，摘要空洞的素材写不出合规正文。
+✅ 参考：定版正文平均 119 字，写法是"谁做了什么 → 关键细节（含数字）→ 影响或后续计划"。
+❌ 禁用：仅十几个字的短语（实测出现过 11 字正文），系统会直接丢弃。
 
 硬性要求：
 1. 只输出一个 JSON 对象，不要任何其他文字、不要 markdown 代码块标记。
 2. 对象格式严格为：
-{{"summary":"一句话概括当日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题20-30字","desc":"正文100-160字","source":"媒体名","url":"https://原文链接"}},...]}}
-3. source 填媒体简称（如 IT之家、TechCrunch、The Verge），url 必须从上方素材中挑选真实 URL，禁止编造、拼接或改写。
-4. title 用中文，控制在 30 字内，须是新闻事实的准确概括，不要加评价性形容词；desc 用中文书面语客观陈述，不要口语和感叹号。
+{{"summary":"一句话概括当日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题20-30字","source":"媒体名","url":"https://原文链接"}},...]}}
+   **注意：items 里不要写 desc 字段**，正文留待后续步骤生成。
+3. source 填媒体简称（如 IT之家、TechCrunch、The Verge），url 必须从上方素材中挑选真实 URL，禁止编造、拼接或改写。**同一条素材只能出现一次**。
+4. title 用中文，控制在 20-30 字，须是新闻事实的准确概括，不要加评价性形容词。
 5. **不要为了凑齐"每类 2 条"而错标分类**。若某一类当日实在没有对应新闻（极少），该类可以为 1 条，但其它类补足 8 条总数；不要硬塞错标条目充数。错标分类比数量不均衡严重得多。
 6. 输出前逐条自查：这条新闻的实质与所标分类是否一致？不一致就改正分类或换掉该条。
 7. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、操作系统更新（Windows/iOS/安卓的系统或功能更新）、产品与发布会预告、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
 8. 选题限于产业与技术范畴：判断标准是"这条新闻是否直接反映 AI 产业或技术本身的变化"。凡属个人公开表态、社会活动、与产业无关的公共事务，一律不选。
-9. **数字必须来自素材**：素材标题与摘要中出现的金额、估值、百分比、增长倍数、技术规格可以放心使用，这正是正文该有的信息密度；**素材中没有的数字一律不得出现**。摘要缺失时改用定性描述（如"大幅增长""估值处于高位"）。系统会校验并丢弃含无法核实数字的条目。
+9. **数字必须来自素材**：素材标题与摘要中出现的金额、估值、百分比、增长倍数、技术规格可以放心使用，这正是正文该有的信息密度；**素材中没有的数字一律不得出现**（后续步骤写正文时会校验并丢弃含无法核实数字的条目）。摘要缺失时改用定性描述（如"大幅增长""估值处于高位"）。
 10. **标题必须忠实于原文事实**：素材多为英文，须准确理解后再译为中文，不得截取英文原句、不得把原文没有的判断归纳进标题。例如原文讲"为 AI 供电是架构问题"，就不能写成"AI 在音频内容中的应用"。
-11. **desc 以中文书面语为主**，不得残留整句英文；但公司名、产品名、模型名与技术术语（OpenAI、Apache Fluss、TPU、token）保留英文原名，不要生硬音译。系统会校验并丢弃英文残留过多的条目。
+11. **标题以中文书面语为主**，不得残留整句英文；但公司名、产品名、模型名与技术术语（OpenAI、Apache Fluss、TPU、token）保留英文原名，不要生硬音译。
 12. 不要选用"早报/日报/盘点/汇总/速览"这类聚合内容，也不要选消费电子（iOS/iPhone/手机/相机/耳机）与汽车新品——素材里出现也不要选。
 13. **标题不得泛化**：必须保留原文的核心主体与事件（谁做了什么）。反面示例（实测出现过，一律禁止）："AI政策窗口开放"（没说是谁提的什么政策）、"Meta调整AI建议功能"（没说调整什么、为什么）、"Nvidia解释增长原因"（没说是谁问的、解释了哪项增长）、"发布脑机接口标准"（丢了主体"我国"）。
 14. **summary 只能概括本次 items 里实际收录的条目**，不得提及未收录的新闻。系统会核对，出现未收录内容视为错误。
@@ -203,7 +201,8 @@ def gen_day(material, day_str):
             np.log(f"  {day_str} 第{attempt+1}次生成失败: {e}")
             time.sleep(3)
             continue
-        items = []
+        # —— 阶段 A 过滤：分类 / URL 白名单 / 标题长度 / 硬拦截 ——
+        cands, seen = [], set()
         for it in (obj.get("items") or []):
             cat = str(it.get("cat", "")).strip().lower()
             url = str(it.get("url", "")).strip()
@@ -212,40 +211,69 @@ def gen_day(material, day_str):
             if url not in valid_urls:
                 np.log(f"  丢弃编造 URL: {str(it.get('title',''))[:26]}")
                 continue
-            title = np.clean_for_js(it.get("title", ""))[:60]
-            desc = np.clean_for_js(it.get("desc", ""))[:400]
-            src = np.clean_for_js(it.get("source", ""))[:30]
-            if not (title and desc and src):
+            if url in seen:
+                np.log(f"  丢弃重复素材: {str(it.get('title',''))[:26]}")
                 continue
-            # 8 月定版标准：标题 20-30 字、正文 100-160 字。低于下限视为
-            # 丢信息的空泛写法（9 月实测出现过 8 字标题与 11 字正文），直接丢弃。
+            seen.add(url)
+            title = np.clean_for_js(it.get("title", ""))[:60]
+            if not title:
+                continue
+            # 8 月定版标准：标题 20-30 字（9 月实测出现过 8 字标题），低于下限直接丢弃
             if len(title) < np.MIN_TITLE_LEN:
                 np.log(f"  丢弃标题过短（{len(title)}字）: {title}")
-                continue
-            if len(desc) < np.MIN_DESC_LEN:
-                np.log(f"  丢弃正文过短（{len(desc)}字）: {title[:26]}")
                 continue
             # 硬拦截：消费电子/汽车新品/系统更新/政治人物（与 daily pipeline 保持一致）
             if np.hard_blocked(title):
                 np.log(f"  硬拦截: {title[:26]}")
                 continue
-            if not np.numbers_grounded(title, material_text) or not np.numbers_grounded(desc, material_text):
-                np.log(f"  丢弃数字不可核实的条目: {title[:26]}")
-                continue
             if np.title_blocked(title):
                 np.log(f"  丢弃聚合或消费电子类条目: {title[:26]}")
                 continue
+            cands.append({
+                "cat": cat, "title": title,
+                "source": np.clean_for_js(it.get("source", ""))[:30],
+                "url": url,
+            })
+
+        # —— 阶段 B：逐条素材单独撰写 110-150 字正文 ——
+        # [2026-09-14] 与 news_pipeline 同步：免费模型 glm-4-flash 在批量任务里
+        # 会把每条正文压到 50 字上下（实测批量 3 条 → 均 63 字），
+        # 拆成单条窄任务后可稳定产出 170-210 字，才能达到 8 月定版的 118.9 字。
+        np.log(f"  {day_str} 阶段A {len(cands)} 条候选，开始逐条写正文")
+        by_url = {m["url"]: m for m in material}
+        items = []
+        for ci, c in enumerate(cands):
+            if ci:
+                time.sleep(1.0)
+            m = by_url[c["url"]]
+            desc = ""
+            for b in range(2):
+                try:
+                    got = np.call_glm(np.build_desc_prompt(m, attempt=b), temperature=0.5)
+                except Exception as e:
+                    np.log(f"  正文生成失败（{c['title'][:18]}）: {e}")
+                    continue
+                desc = np.clean_for_js(np.clean_desc_output(got))[:400]
+                if len(desc) >= np.MIN_DESC_LEN:
+                    break
+                np.log(f"  正文过短（{len(desc)}字）重写: {c['title'][:22]}")
+            if len(desc) < np.MIN_DESC_LEN:
+                np.log(f"  丢弃正文始终过短的条目: {c['title'][:26]}")
+                continue
+            if not np.numbers_grounded(c["title"], material_text) or not np.numbers_grounded(desc, material_text):
+                np.log(f"  丢弃数字不可核实的条目: {c['title'][:26]}")
+                continue
             if np.stray_english_count(desc) >= 3:
-                np.log(f"  丢弃英文残留的条目: {title[:26]}")
+                np.log(f"  丢弃英文残留的条目: {c['title'][:26]}")
                 continue
             # 分类确定性纠偏
-            fixed = np.normalize_category(cat, title, desc)
-            if fixed != cat:
-                np.log(f"  分类纠偏: {cat}→{fixed}  {title[:24]}")
-                cat = fixed
+            fixed = np.normalize_category(c["cat"], c["title"], desc)
+            if fixed != c["cat"]:
+                np.log(f"  分类纠偏: {c['cat']}→{fixed}  {c['title'][:24]}")
             items.append({
-                "cat": cat, "catLabel": np.CAT_LABELS[cat],
-                "title": title, "desc": desc, "source": src, "url": url,
+                "cat": fixed, "catLabel": np.CAT_LABELS[fixed],
+                "title": c["title"], "desc": desc,
+                "source": c["source"] or m["source"], "url": c["url"],
             })
         if len(items) >= 6:
             # 候选 → 最终 8 条：四类均衡选取（须在摘要校验前）
