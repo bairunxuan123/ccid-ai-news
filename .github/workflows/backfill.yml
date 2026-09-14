@@ -9,6 +9,10 @@ on:
         description: "要补齐的日期（空格分隔，YYYY-MM-DD）"
         required: true
         default: "2026-09-09 2026-09-10 2026-09-11 2026-09-12 2026-09-13 2026-09-14"
+      replace:
+        description: "是否覆盖已有同日期内容（true=重生成并替换）"
+        required: false
+        default: "false"
 
 permissions:
   contents: write
@@ -37,9 +41,14 @@ jobs:
         env:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
           DAYS: ${{ inputs.days }}
+          REPLACE: ${{ inputs.replace }}
         run: |
-          echo "目标日期：$DAYS"
-          python backfill_news.py $DAYS
+          echo "目标日期：$DAYS | 覆盖重生成：$REPLACE"
+          if [ "$REPLACE" = "true" ]; then
+            python backfill_news.py --replace $DAYS
+          else
+            python backfill_news.py $DAYS
+          fi
 
       - name: Show resulting dates
         if: always()
