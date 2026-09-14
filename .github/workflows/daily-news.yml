@@ -12,7 +12,10 @@ permissions:
 jobs:
   daily-news:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # [2026-09-14] 由 20 放宽到 40。改成两阶段后每天调用次数从 1-2 次
+    # 升到 25-45 次（14 条候选 × 逐条写正文 + 不合格定向重写），
+    # 单次调用 12-15s，最坏情况需要 12-15 分钟，留足余量避免被超时掐断。
+    timeout-minutes: 40
     steps:
       - name: Checkout
         uses: actions/checkout@v4
