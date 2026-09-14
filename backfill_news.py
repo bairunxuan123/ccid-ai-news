@@ -142,7 +142,9 @@ def build_day_prompt(material, day_str, attempt=0):
 
 分类规则细节：
 - 不要为了凑数收录与 AI 产业无关的内容（消费电子/汽车新品/系统更新/政治人物等）——系统会硬过滤拦截。
-- 若某一类当日实在没有对应新闻，该类允许为 1 条，其它类补足候选总数。
+- **四类缺一不可**：实测最容易漏的是 industry 产业动态（企业合作、新品上市、产能订单、行业数据这类
+  新闻），请专门去素材里找几条。若某类当日素材确实太少，也至少要给 2 条候选；
+  绝对不要整类不写——系统按类均衡选取，缺了哪一类最终成品就会缺哪一类。
 
 分类口径（必须严格按新闻实质判断，宁缺勿错）：
 - policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
@@ -245,6 +247,12 @@ def gen_day(material, day_str):
             if np.title_english_residue(title):
                 np.log(f"  丢弃标题未翻译: {title[:26]}")
                 continue
+            # [2026-09-14 同步] 标题混入提示词指令的候选必须拦下。
+            # 真实复验（run 34819377914）里模型把"上一轮不合格，本次必须逐条修正"
+            # 当正文抄进了成品，标题侧同样可能被污染，与日常流水线口径保持一致。
+            if np.prompt_leak(title):
+                np.log(f"  丢弃标题混入提示词的条目: {title[:26]}")
+                continue
             # 硬拦截：消费电子/汽车新品/系统更新/政治人物（与 daily pipeline 保持一致）
             if np.hard_blocked(title):
                 np.log(f"  硬拦截: {title[:26]}")
@@ -265,13 +273,20 @@ def gen_day(material, day_str):
         # 拆成单条窄任务后可稳定产出 170-210 字，才能达到 8 月定版的 118.9 字。
         # 同时把"一次不成即丢弃"改为"定向重写至多 3 轮"（见 np.desc_issues）。
         np.log(f"  {day_str} 阶段A {len(cands)} 条候选，开始逐条写正文"
-               f"（写满 {np.DESC_TARGET} 条即停）")
+               f"（四类各满 {np.MIN_PER_CAT_DESC} 条才收工，上限 {np.DESC_TARGET} 条）")
         by_url = {m["url"]: m for m in material}
-        cands = np.interleave_by_category(cands)   # 按类轮转，保证四类都覆盖到
+        # 按类轮转，保证无论写到哪里停手四类都是齐的
+        cands = np.interleave_by_category(cands, prefer=np.MIN_PER_CAT_DESC)
         items = []
         for ci, c in enumerate(cands):
             if len(items) >= np.DESC_TARGET:
-                np.log(f"  已写满 {np.DESC_TARGET} 条合格正文，其余候选不再调用")
+                np.log(f"  已达上限 {np.DESC_TARGET} 条，其余候选不再调用")
+                break
+            # [2026-09-14 同步] 收工条件不只是"凑够条数"，还要四类都各有
+            # MIN_PER_CAT_DESC 条供 select_balanced 均衡选取 —— 否则回填出来的
+            # 某天会出现四类缺项（真实复验 run 34819377914 缺的就是"产业动态"）。
+            if len(items) >= np.MAX_ITEMS and np._cat_ready(items, np.MIN_PER_CAT_DESC):
+                np.log(f"  已写满 {len(items)} 条且四类齐备，其余候选不再调用")
                 break
             if ci:
                 time.sleep(1.0)
@@ -293,14 +308,9 @@ def gen_day(material, day_str):
                 issues = np.desc_issues(desc, material_text)
                 if not issues:
                     break
-                why = []
-                if issues.get("short"):
-                    why.append(f"过短{len(desc)}字")
-                if issues.get("numbers"):
-                    why.append("数字对不上:" + ",".join(sorted(issues["numbers"])))
-                if issues.get("english"):
-                    why.append("英文残留")
-                np.log(f"  正文待修（第{b+1}轮）{'｜'.join(why)}: {c['title'][:20]}")
+                # 用公共函数汇总原因：5 项体检（长度/数字/英文/混入指令/空泛表述）
+                # 任何一项漏打印，日志就会指向"无理由地重写"
+                np.log(f"  正文待修（第{b+1}轮）{np.issues_brief(issues)}: {c['title'][:20]}")
             if not got_any or issues:
                 np.log(f"  丢弃重写仍不合格的条目: {c['title'][:26]}")
                 continue
@@ -318,10 +328,19 @@ def gen_day(material, day_str):
                 "_rank": c.get("_rank", 999),
             })
         if len(items) >= 6:
-            # 先还原阶段 A 的价值序，再四类均衡选取（须在摘要校验前）
+            # 各类实际写出多少条合格正文（排查"四类缺项"的分界信息，与日常流水线一致）
+            _dist = {}
+            for x in items:
+                _dist[x["cat"]] = _dist.get(x["cat"], 0) + 1
+            np.log(f"  {day_str} 阶段B 合格正文：" + " ".join(
+                f"{np.CAT_LABELS[k]}{_dist.get(k, 0)}" for k in np.CAT_LABELS))
+            # 先还原阶段 A 的价值序，再去话题重复项、最后四类均衡选取（须在摘要校验前）
             items.sort(key=lambda x: x.get("_rank", 999))
             for x in items:
                 x.pop("_rank", None)
+            # [2026-09-14 同步] 同主体同类的重复话题只留价值序靠前的一条
+            # （真实复验里 OpenAI 上市/控速两条白占了两个名额）
+            items = np.dedupe_similar(items)
             items = np.select_balanced(items)
             summary = np.clean_for_js(obj.get("summary", ""))[:120]
             if not np.summary_consistent(summary, items):
