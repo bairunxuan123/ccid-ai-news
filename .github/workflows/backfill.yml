@@ -1,0 +1,73 @@
+name: Backfill AI News (manual)
+
+# 仅手动触发：补齐某段日期内缺失的产业动态
+# 例：days = 2026-09-09 2026-09-10 2026-09-11 2026-09-12 2026-09-13 2026-09-14
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "要补齐的日期（空格分隔，YYYY-MM-DD）"
+        required: true
+        default: "2026-09-09 2026-09-10 2026-09-11 2026-09-12 2026-09-13 2026-09-14"
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node（用于 NEWS_DATA 的 JS 语法校验）
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run backfill
+        id: backfill
+        continue-on-error: true
+        env:
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+          DAYS: ${{ inputs.days }}
+        run: |
+          echo "目标日期：$DAYS"
+          python backfill_news.py $DAYS
+
+      - name: Show resulting dates
+        if: always()
+        run: |
+          echo "完整版前 10 个日期："
+          grep -oE 'date: "[0-9-]+"' ai-chain-map.html | head -10
+          echo "阉割版前 10 个日期："
+          grep -oE 'date: "[0-9-]+"' ai-chain-map-lite.html | head -10
+
+      - name: Sync index.html（完整版默认入口）
+        if: steps.backfill.outcome == 'success'
+        run: cp -f ai-chain-map.html index.html
+
+      - name: Commit & push
+        if: steps.backfill.outcome == 'success'
+        run: |
+          git config user.name "daily-news-bot"
+          git config user.email "daily-news-bot@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "无变更，跳过提交"
+          else
+            git commit -m "chore: 补齐产业动态 ${{ inputs.days }}"
+            git push
+          fi
+
+      - name: Fail if backfill failed
+        if: steps.backfill.outcome != 'success'
+        run: |
+          echo "回溯未成功（outcome=${{ steps.backfill.outcome }}）"
+          exit 1

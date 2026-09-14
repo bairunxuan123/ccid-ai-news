@@ -59,16 +59,15 @@ def collect_all():
 
 
 def day_material(all_items, day):
-    """取某天的 AI 相关素材；不足 6 条时放宽（保留非消费电子噪声）"""
+    """取某天的 AI 相关素材；不足 6 条时放宽到"AI 邻域"（仍有明确口径，不放行消费电子噪声）"""
     same_day = [it for it in all_items if it["day"] == day]
     strict = [it for it in same_day if np.is_ai_related(it["title"])]
     if len(strict) >= 6:
         return strict, len(same_day)
-    relaxed = strict + [
-        it for it in same_day
-        if it not in strict and not any(b in it["title"].lower() for b in np.BLOCK_CN)
-    ]
-    return relaxed, len(same_day)
+    adjacent = [it for it in same_day if np.is_ai_adjacent(it["title"])]
+    # 邻域集合至少不劣于 strict
+    merged = strict + [it for it in adjacent if it not in strict]
+    return merged, len(same_day)
 
 
 def build_day_prompt(material, day_str):
@@ -82,35 +81,51 @@ def build_day_prompt(material, day_str):
 素材：
 {lines}
 
-请从中挑选 8 条最有产业价值的新闻，整理成"人工智能产业动态"，四类各 2 条：
-- policy 政策发布：政府/监管/标准相关
-- tech 技术突破：模型/算法/芯片/算力技术进展
-- industry 产业动态：企业合作/产品发布/行业趋势
-- capital 投融资：融资/并购/IPO
+请从中挑选 4-8 条当日最有产业价值的 AI 新闻，整理成"人工智能产业动态"。**质量优先于数量：当日 AI 素材少就少写几条（4 条即可），绝不要为凑数收录无关新闻。**
+
+分类口径（必须严格按新闻实质判断，宁缺勿错）：
+- policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
+- tech 技术突破：模型/算法/芯片/算力/产品技术本身的进展
+- industry 产业动态：企业合作、产品上市、产能布局、行业趋势、企业业绩
+- capital 投融资：融资、并购、IPO、估值变化
 
 硬性要求：
 1. 只输出一个 JSON 对象，不要任何其他文字、不要 markdown 代码块标记。
 2. 对象格式严格为：
 {{"summary":"一句话概括当日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题不超过30字","desc":"简述80-120字，客观专业","source":"媒体名","url":"https://原文链接"}},...]}}
-3. source 填媒体简称（如 IT之家、TechCrunch、OpenAI），url 必须从上方素材中挑选真实 URL，禁止编造。
-4. title 用中文，控制在 30 字内；desc 用中文书面语，不要口语和感叹号。
-5. 四类（policy/tech/industry/capital）各 2 条左右，总数尽量接近 8。
-6. 若某类素材确实不足可少于此数，不要硬凑编造；宁少勿假。
-7. 描述不得出现未在素材中体现的具体数字，避免张冠李戴。"""
+3. source 填媒体简称（如 IT之家、TechCrunch、The Verge），url 必须从上方素材中挑选真实 URL，禁止编造、拼接或改写。
+4. title 用中文，控制在 30 字内，须是新闻事实的准确概括，不要加评价性形容词；desc 用中文书面语客观陈述，不要口语和感叹号。
+5. **不要为了凑齐"每类 2 条"而错标分类**。若某一类当日确实没有对应新闻，该类可以为 0 条，四类数量允许不均衡（例如 3/3/2/0）。错标分类比数量不均衡严重得多。
+6. 输出前逐条自查：这条新闻的实质与所标分类是否一致？不一致就改正分类或换掉该条。
+7. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
+8. 选题限于产业与技术范畴：不收录人物言论、集会活动、非产业类社会话题等与 AI 产业价值无关的内容。
+9. 素材只有标题（没有正文），因此 title 与 desc 中**不得出现素材里没有的金额、估值、百分比、增长倍数**（如"50亿美元""2万亿美元""增长70%"）。需要表达程度时改用定性描述（如"大幅增长""估值处于高位"）。系统会校验并丢弃含无法核实数字的条目。
+10. **标题必须忠实于原文事实**：素材多为英文，须准确理解后再译为中文，不得截取英文原句、不得把原文没有的判断归纳进标题。例如原文讲"为 AI 供电是架构问题"，就不能写成"AI 在音频内容中的应用"。
+11. **desc 必须全部使用中文**（OpenAI、ChatGPT 等专有名词除外），不得残留英文句子或英文短语。系统会校验并丢弃英文残留过多的条目。
+12. 不要选用"早报/日报/盘点/汇总/速览"这类聚合内容，也不要选消费电子（iOS/iPhone/手机/相机/耳机）与汽车新品——素材里出现也不要选。"""
 
 
 def gen_day(material, day_str):
-    """某天生成，最多重试 2 次"""
+    """某天生成，最多重试 3 次；后两次逐步收紧（禁数字 → 只取最稳妥的条目）"""
     valid_urls = {m["url"] for m in material}
+    material_text = " ".join(m.get("title", "") for m in material)
     for attempt in range(3):
         try:
-            raw = np.call_glm(build_day_prompt(material, day_str))
+            prompt = build_day_prompt(material, day_str)
+            if attempt == 2:
+                # 末次尝试：允许放宽数字口径（中英文金额换算已归一化，此处仅提示更保守）
+                prompt += (
+                    "\n\n【本次为最后一次尝试，请务必满足条数要求】"
+                    "请优先挑选不涉及金额、估值、百分比的新闻，"
+                    "若确实需要提及金额请使用素材中的原始写法（如 $500M 写作 5亿美元）。"
+                )
+            raw = np.call_glm(prompt)
             obj = np.parse_llm_json(raw)
         except Exception as e:
             np.log(f"  {day_str} 第{attempt+1}次生成失败: {e}")
             time.sleep(3)
             continue
-        items, ok = [], True
+        items = []
         for it in (obj.get("items") or []):
             cat = str(it.get("cat", "")).strip().lower()
             url = str(it.get("url", "")).strip()
@@ -124,11 +139,20 @@ def gen_day(material, day_str):
             src = np.clean_for_js(it.get("source", ""))[:30]
             if not (title and desc and src):
                 continue
+            if not np.numbers_grounded(title, material_text) or not np.numbers_grounded(desc, material_text):
+                np.log(f"  丢弃数字不可核实的条目: {title[:26]}")
+                continue
+            if np.title_blocked(title):
+                np.log(f"  丢弃聚合或消费电子类条目: {title[:26]}")
+                continue
+            if np.stray_english_count(desc) >= 3:
+                np.log(f"  丢弃英文残留的条目: {title[:26]}")
+                continue
             items.append({
                 "cat": cat, "catLabel": np.CAT_LABELS[cat],
                 "title": title, "desc": desc, "source": src, "url": url,
             })
-        if len(items) >= 4:
+        if len(items) >= 3:
             summary = np.clean_for_js(obj.get("summary", ""))[:120]
             return summary, items
         np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条，重试")
@@ -159,26 +183,54 @@ def js_block(day_str, weekday, summary, items):
     )
 
 
+# 匹配每个日期块的起始（"  {" + 下一行的 date），数组第一个块同样能命中
+BLOCK_START_RE = re.compile(r'  \{\n    date: "(\d{4}-\d{2}-\d{2})"')
+# NEWS_DATA 数组的结束位置
+ARRAY_END_RE = re.compile(r"\n\];")
+
+
 def insert_blocks(html_path, blocks, days):
+    """把若干天条目按日期倒序插入 NEWS_DATA 的正确位置。
+
+    不能一律插到数组最前：当回溯日期中存在缺口（例如 9-11 无内容）时，
+    盲目前插会破坏"新→旧"顺序。这里按日期找到第一个更早的块，插到它前面；
+    若目标日期比现有全部更早，则追加到数组末尾（并补上必要的逗号）。
+    """
     with open(html_path, "r", encoding="utf-8") as f:
         content = f.read()
     anchor = "var NEWS_DATA = [\n"
     idx = content.find(anchor)
     if idx == -1:
         raise RuntimeError(f"{html_path} 未找到 NEWS_DATA 锚点")
-    new_blocks = []
+    head = idx + len(anchor)
+
+    written = 0
     for day, blk in zip(days, blocks):
         if f'date: "{day}"' in content:
             np.log(f"  {day} 已存在，跳过")
             continue
-        new_blocks.append(blk)
-    if not new_blocks:
+        # 现有块位置（按文中顺序＝日期倒序）
+        entries = [(m.start(), m.group(1)) for m in BLOCK_START_RE.finditer(content, head)]
+        pos = None
+        for off, d in entries:
+            if d < day:          # 第一个比目标日期更早的块 → 插到它前面
+                pos = off
+                break
+        if pos is None:
+            # 目标日期比现有全部更早：追加到数组末尾（末块需补逗号）
+            me = ARRAY_END_RE.search(content, head)
+            if me is None:
+                raise RuntimeError(f"{html_path} 未找到 NEWS_DATA 结束标记")
+            ins = "," + blk.rstrip("\n").rstrip(",") + "\n"
+            content = content[:me.start()] + ins + content[me.start():]
+        else:
+            content = content[:pos] + blk + content[pos:]
+        written += 1
+    if written == 0:
         return False
-    insert_at = idx + len(anchor)
-    content = content[:insert_at] + "".join(new_blocks) + content[insert_at:]
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(content)
-    np.log(f"  已写入 {html_path}（{len(new_blocks)} 天）")
+    np.log(f"  已写入 {html_path}（{written} 天）")
     return True
 
 
@@ -198,11 +250,11 @@ def main():
     for day in days:
         material, raw_n = day_material(all_items, day)
         np.log(f"{day}: 当日原始 {raw_n} 条，可用素材 {len(material)} 条")
-        if len(material) < 4:
+        if len(material) < 3:
             np.log(f"  素材不足，跳过 {day}")
             continue
         summary, items = gen_day(material, day)
-        if len(items) < 4:
+        if len(items) < 3:
             np.log(f"  生成失败，跳过 {day}")
             continue
         weekday = np.WEEKDAYS[datetime.strptime(day, "%Y-%m-%d").weekday()]

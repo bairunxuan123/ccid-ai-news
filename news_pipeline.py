@@ -59,19 +59,31 @@ STRONG_EN = [
 STRONG_CN = [
     "人工智能", "大模型", "大语言模型", "智能体", "多模态", "自动驾驶", "智驾",
     "算力", "数据中心", "英伟达", "深度学习", "机器学习", "神经网络", "生成式",
-    "大模型公司", "ai大模型",
+    "大模型公司", "ai大模型", "具身智能", "智算", "aigc", "ai服务器", "ai芯片",
+    "ai应用", "ai安全", "ai治理", "ai眼镜", "ai手机", "ai pc",
 ]
 WEAK_CN = ["芯片", "机器人", "gpu", "智能"]
+# 兜底放宽时使用的"AI 邻域"词：只有命中这些才允许把弱相关新闻纳入
+ADJACENT_CN = [
+    "芯片", "半导体", "算力", "数据中心", "云服务", "机器人", "自动驾驶",
+    "智能驾驶", "语音", "模型", "算法", "具身", "数据库", "数字人", "视觉识别",
+]
 BLOCK_CN = [
     "相机", "手机", "镜头", "耳机", "电视", "扫地", "戒指", "手表", "键盘",
     "鼠标", "显示器", "爆料", "评测", "显卡", "笔记本", "平板", "手机壳",
     "充电", "家电", "彩电", "空调", "冰箱", "洗衣机", "家居",
+    "官图", "试驾", "新车", "mpv", "suv", "座舱", "灯效", "rgb", "影音",
+    "装机", "散热", "跑分", "屏幕", "电池", "发布会预告", "渲染图",
 ]
 
 
 def is_ai_related(title):
+    """标题是否为 AI 相关。
+
+    英文 ai 用前后非字母判定（避免 "email"/"said" 误伤，也兼容 "AI行业" 这类中英混排）。
+    """
     t = title.lower()
-    if re.search(r"\bai\b", t):
+    if re.search(r"(?<![a-z])ai(?![a-z])", t):
         return True
     if any(k in t for k in STRONG_EN):
         return True
@@ -80,6 +92,133 @@ def is_ai_related(title):
     if any(k in t for k in WEAK_CN):
         return not any(b in t for b in BLOCK_CN)
     return False
+
+
+def is_ai_adjacent(title):
+    """AI 邻域（弱相关）：用于素材不足时的兜底，比 is_ai_related 宽松但仍有明确口径。"""
+    t = title.lower()
+    if is_ai_related(title):
+        return True
+    if any(b in t for b in BLOCK_CN):
+        return False
+    return any(k in t for k in ADJACENT_CN)
+
+
+# 易失真的数字表达：金额 / 估值 / 百分比 / 增长倍数
+RISKY_NUM_RE = re.compile(
+    r"\d+(?:\.\d+)?(?:\s*(?:亿|万|千))*\s*(?:美元|美金|元|人民币|港币|倍|%)"
+)
+
+
+def risky_number_phrases(text):
+    """抽取文本中的金额/百分比/倍数表达（去空格归一化，仅用于日志展示）"""
+    if not text:
+        return set()
+    return {re.sub(r"\s+", "", m.group(0)) for m in RISKY_NUM_RE.finditer(text)}
+
+
+# 英文金额简写：$500M / 500 million / 1.5 billion / $2B
+_EN_MONEY_RE = re.compile(
+    r"\$?\s*(\d+(?:\.\d+)?)\s*(thousand|million|billion|bn|k|m|b)(?![a-zA-Z])", re.I
+)
+_MAG = {"k": 1e3, "thousand": 1e3, "m": 1e6, "million": 1e6,
+        "b": 1e9, "bn": 1e9, "billion": 1e9}
+
+
+def risky_tokens(text):
+    """把金额/百分比/倍数统一换算成可跨中英文比对的规范 token。
+
+    素材多为英文（"$500M"），生成结果是中文（"5亿美元"），
+    直接做子串匹配会误杀，因此统一折算为绝对数值再比对。
+    同时对金额额外发放 "mag:" 别名，使 "$2B" 能匹配中文的"20亿"（未带币种）。
+    """
+    if not text:
+        return set()
+    raw = text
+    s = re.sub(r"\s+", "", text)
+    toks = set()
+
+    def money(n):
+        toks.add("amt:%d" % round(n))
+        toks.add("mag:%d" % round(n))
+
+    # 中文口径金额：5亿 / 5亿美元 / 500万美元 / 2000万元
+    for m in re.finditer(r"(\d+(?:\.\d+)?)(亿|万|千)?(美元|美金|元|人民币|港币)", s):
+        num = float(m.group(1))
+        mult = {"亿": 1e8, "万": 1e4, "千": 1e3}.get(m.group(2), 1.0)
+        money(num * mult)
+    # 中文裸量级（无币种）：20亿 / 500万
+    for m in re.finditer(r"(\d+(?:\.\d+)?)(亿|万|千)(?![美元人民币港])", s):
+        num = float(m.group(1))
+        mult = {"亿": 1e8, "万": 1e4, "千": 1e3}[m.group(2)]
+        toks.add("mag:%d" % round(num * mult))
+    # 英文口径金额：$500M / 2 billion / 500M
+    # 必须在原文本（保留空格）上匹配：去空格会把 "M valuation" 粘成 "Mvaluation"，
+    # 词边界失效导致英文金额整体漏检。
+    for m in re.finditer(_EN_MONEY_RE.pattern, raw, re.I):
+        num = float(m.group(1))
+        money(num * _MAG[m.group(2).lower()])
+    # 百分比
+    for m in re.finditer(r"(\d+(?:\.\d+)?)%", s):
+        toks.add("pct:%g" % float(m.group(1)))
+    # 倍数
+    for m in re.finditer(r"(\d+(?:\.\d+)?)倍", s):
+        toks.add("x:%g" % float(m.group(1)))
+    return toks
+
+
+def numbers_grounded(text, material_text):
+    """文本里的金额/百分比/倍数必须在素材中真实出现过，否则视为不可核实。
+
+    素材只有标题、没有正文，LLM 一旦"推算"金额或估值就会失真（例如
+    "估值约2万亿美元"），因此这类数字必须能被素材标题支持。
+    比对时统一折算口径，避免 "$500M" 与 "5亿美元" 被误判为不匹配。
+    """
+    toks = risky_tokens(text)
+    if not toks:
+        return True
+    return toks <= risky_tokens(material_text)
+
+
+# 允许在中文文本中直接出现的英文专有名词 / 技术缩写
+_EN_ALLOW = {
+    "openai", "anthropic", "chatgpt", "gpt", "nvidia", "microsoft", "windows",
+    "google", "alphabet", "deepmind", "gemini", "meta", "facebook", "apple",
+    "amazon", "aws", "intel", "amd", "qualcomm", "arm", "tesla", "spacex",
+    "xai", "grok", "claude", "llama", "mistral", "deepseek", "kimi", "moonshot",
+    "qwen", "doubao", "baidu", "alibaba", "tencent", "huawei", "bytedance",
+    "musk", "altman", "huang", "siri", "copilot", "office", "cloudflare",
+    "sequoia", "venturebeat", "techcrunch", "verge", "wired", "reuters",
+    "gpu", "cpu", "tpu", "npu", "llm", "api", "sdk", "ipo", "ceo", "cto",
+    "hbm", "ipo", "rag", "agc", "aigc", "saas", "tiktok", "youtube", "x",
+    "ios", "macos", "iphone", "ipad", "macbook", "android", "linux", "python",
+}
+
+
+def stray_english_count(text):
+    """统计文本中"不应残留"的英文单词数（长度≥4 且非专有名词白名单）"""
+    if not text:
+        return 0
+    n = 0
+    for w in re.findall(r"[A-Za-z]{4,}", text):
+        if w.lower() not in _EN_ALLOW:
+            n += 1
+    return n
+
+
+# 聚合类 / 消费电子类标题拦截（即使含 AI 字样也不属于"AI 产业动态"）
+TITLE_BLOCK = [
+    "早报", "日报", "晚报", "周报", "月报", "盘点", "汇总", "速览", "一周要闻",
+    "时事", "寻求胜利", "官图", "试驾", "新车", "座舱", "续航", "渲染图",
+    "ios", "iphone", "ipad", "macbook", "airpods", "apple watch", "鸿蒙",
+    "手机", "相机", "镜头", "耳机", "显示器", "笔记本", "平板", "家电",
+]
+
+
+def title_blocked(title):
+    """标题是否为应当排除的类型（聚合汇总 / 消费电子 / 汽车新品）"""
+    t = (title or "").lower()
+    return any(b in t for b in TITLE_BLOCK)
 
 CAT_LABELS = {
     "policy": "政策发布",
@@ -200,20 +339,28 @@ def build_prompt(material, today_cn):
 素材：
 {lines}
 
-请从中挑选 8 条最有产业价值的新闻，整理成"人工智能产业动态"，四类各 2 条：
-- policy 政策发布：政府/监管/标准相关
-- tech 技术突破：模型/算法/芯片/算力技术进展
-- industry 产业动态：企业合作/产品发布/行业趋势
-- capital 投融资：融资/并购/IPO
+请从中挑选 4-8 条当日最有产业价值的 AI 新闻，整理成"人工智能产业动态"。**质量优先于数量：当日 AI 素材少就少写几条（4 条即可），绝不要为凑数收录无关新闻。**
+
+分类口径（必须严格按新闻实质判断，宁缺勿错）：
+- policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
+- tech 技术突破：模型/算法/芯片/算力/产品技术本身的进展
+- industry 产业动态：企业合作、产品上市、产能布局、行业趋势、企业业绩
+- capital 投融资：融资、并购、IPO、估值变化
 
 硬性要求：
 1. 只输出一个 JSON 对象，不要任何其他文字、不要 markdown 代码块标记。
 2. 对象格式严格为：
 {{"summary":"一句话概括今日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题不超过30字","desc":"简述80-120字，客观专业","source":"媒体名","url":"https://原文链接"}},...]}}
-3. source 填媒体简称（如 36氪、IT之家、VentureBeat），url 必须从上方素材中挑选真实 URL，禁止编造。
-4. title 用中文，控制在 30 字内；desc 用中文书面语，不要口语和感叹号。
-5. 四类（policy/tech/industry/capital）各 2 条左右，总数尽量接近 8。
-6. 若某类素材确实不足可少于此数，不要硬凑编造。"""
+3. source 填媒体简称（如 IT之家、TechCrunch、The Verge），url 必须从上方素材中挑选真实 URL，禁止编造、拼接或改写。
+4. title 用中文，控制在 30 字内，须是新闻事实的准确概括，不要加评价性形容词；desc 用中文书面语客观陈述，不要口语和感叹号。
+5. **不要为了凑齐"每类 2 条"而错标分类**。若某一类当日确实没有对应新闻，该类可以为 0 条，四类数量允许不均衡（例如 3/3/2/0）。错标分类比数量不均衡严重得多。
+6. 输出前逐条自查：这条新闻的实质与所标分类是否一致？不一致就改正分类或换掉该条。
+7. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
+8. 选题限于产业与技术范畴：不收录人物言论、集会活动、非产业类社会话题等与 AI 产业价值无关的内容。
+9. 素材只有标题（没有正文），因此 title 与 desc 中**不得出现素材里没有的金额、估值、百分比、增长倍数**（如"50亿美元""2万亿美元""增长70%"）。需要表达程度时改用定性描述（如"大幅增长""估值处于高位"）。系统会校验并丢弃含无法核实数字的条目。
+10. **标题必须忠实于原文事实**：素材多为英文，须准确理解后再译为中文，不得截取英文原句、不得把原文没有的判断归纳进标题。例如原文讲"为 AI 供电是架构问题"，就不能写成"AI 在音频内容中的应用"。
+11. **desc 必须全部使用中文**（OpenAI、ChatGPT 等专有名词除外），不得残留英文句子或英文短语。系统会校验并丢弃英文残留过多的条目。
+12. 不要选用"早报/日报/盘点/汇总/速览"这类聚合内容，也不要选消费电子（iOS/iPhone/手机/相机/耳机）与汽车新品——素材里出现也不要选。"""
 
 
 def parse_llm_json(content):
@@ -242,6 +389,7 @@ def generate_news(material, today_cn):
     raw_items = obj.get("items", []) if isinstance(obj, dict) else []
 
     valid_urls = {m["url"] for m in material}
+    material_text = " ".join(m.get("title", "") for m in material)
     out = []
     for it in raw_items:
         cat = str(it.get("cat", "")).strip().lower()
@@ -255,6 +403,18 @@ def generate_news(material, today_cn):
         desc = clean_for_js(it.get("desc", ""))[:400]
         src = clean_for_js(it.get("source", ""))[:30]
         if not title or not desc or not url:
+            continue
+        # 数字溯源：金额/估值/百分比/倍数必须能在素材里找到，否则丢弃该条
+        if not numbers_grounded(title, material_text) or not numbers_grounded(desc, material_text):
+            log(f"  丢弃数字不可核实的条目: {title[:30]}")
+            continue
+        # 聚合类 / 消费电子类标题
+        if title_blocked(title):
+            log(f"  丢弃聚合或消费电子类条目: {title[:30]}")
+            continue
+        # desc 残留英文句子 → 翻译未完成
+        if stray_english_count(desc) >= 3:
+            log(f"  丢弃英文残留的条目: {title[:30]}")
             continue
         out.append({
             "cat": cat,
