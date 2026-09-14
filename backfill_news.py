@@ -59,29 +59,65 @@ def collect_all():
 
 
 def day_material(all_items, day):
-    """取某天的 AI 相关素材；不足 6 条时放宽到"AI 邻域"（仍有明确口径，不放行消费电子噪声）"""
-    same_day = [it for it in all_items if it["day"] == day]
-    strict = [it for it in same_day if np.is_ai_related(it["title"])]
-    if len(strict) >= 6:
-        return strict, len(same_day)
-    adjacent = [it for it in same_day if np.is_ai_adjacent(it["title"])]
-    # 邻域集合至少不劣于 strict
-    merged = strict + [it for it in adjacent if it not in strict]
-    return merged, len(same_day)
+    """取某天及其前后 ±1 天内的所有素材，让 LLM 自己在更宽池子里挑 AI 相关。
+
+    真实情况：很多 RSS 源的 published 日期不准（例如 IT之家常把今天发生的标昨天），
+    严格按当天分会导致素材严重不足（9-14 当日 AI 强相关只有 4 条），LLM 无法凑够 8 条。
+    这里放宽到 ±1 天邻域的全部素材，让 LLM 自己判断筛选；硬过滤交给 hard_blocked/title_blocked。
+    """
+    from datetime import datetime
+    target = datetime.strptime(day, "%Y-%m-%d")
+    near = [it for it in all_items if it.get("day") and
+            abs((datetime.strptime(it["day"], "%Y-%m-%d") - target).days) <= 1]
+    same_day = [it for it in near if it["day"] == day]
+    # AI 相关性预过滤 + 消费电子剔除：与日常流水线口径一致
+    near = [it for it in near
+            if np.is_ai_related(it["title"]) and not np.title_blocked(it["title"])]
+    # 按源轮转交错：build_day_prompt 只截取前 N 条，不重排则列表前部会被 IT之家 占满
+    buckets = {}
+    for m in near:
+        buckets.setdefault(m["source"], []).append(m)
+    inter, i = [], 0
+    while any(len(v) > i for v in buckets.values()):
+        for v in buckets.values():
+            if len(v) > i:
+                inter.append(v[i])
+        i += 1
+    np.log(f"  {day}: 当日 {len(same_day)} 条 → ±1 邻域 AI 相关 {len(inter)} 条（已按源轮转）")
+    return inter, len(same_day)
 
 
-def build_day_prompt(material, day_str):
+def build_day_prompt(material, day_str, attempt=0):
     weekday = np.WEEKDAYS[datetime.strptime(day_str, "%Y-%m-%d").weekday()]
     lines = "\n".join(
         f"{i+1}. {m['title']} ｜来源:{m['source']} ｜URL:{m['url']}"
-        for i, m in enumerate(material[:30])
+        for i, m in enumerate(material[:np.PROMPT_MATERIAL_CAP])
     )
-    return f"""下面是{day_str}（{weekday}）当天各大科技媒体发布的 AI 相关新闻素材（编号+标题+URL）。
+    if attempt == 0:
+        temp_note = ""
+    elif attempt == 1:
+        temp_note = "\n\n【提示】请仔细检查素材池，从更广的范围挑选 8 条 AI 产业新闻，包括但不限于：芯片厂商（英伟达/AMD/华为海思/联发科）、云厂商（阿里云/腾讯云/华为云/AWS/Azure）、机器人厂商、模型厂商、算力/数据中心、AI 应用、AI 监管政策、AI 投融资事件。即使素材标题看起来边缘，只要实际反映 AI 产业变化都可选用。"
+    else:
+        temp_note = "\n\n【末次硬性要求】必须输出 8 条。素材池已包含 ±1 天共 " + str(len(material)) + " 条，请务必从 AI 相关（含 AI 邻域）中挑出 8 条覆盖 4 类各 2 条。若确实凑不齐，宁可扩大到 AI 邻域（芯片/算力/数据中心/机器人/智能驾驶/语音识别/视觉识别/数字人等）也不要少于 8 条，但绝对不得收录消费电子（手机/相机/耳机/显示器/家电）、汽车新品（新车/试驾/MPV/SUV）、操作系统更新（Windows/iOS/安卓/鸿蒙）、政治人物。系统会硬过滤。"
+    return f"""下面是{day_str}（{weekday}）当天及前后共 {len(material)} 条的宽口径新闻素材（编号+标题+URL）。
 
 素材：
 {lines}
 
-请从中挑选 4-8 条当日最有产业价值的 AI 新闻，整理成"人工智能产业动态"。**质量优先于数量：当日 AI 素材少就少写几条（4 条即可），绝不要为凑数收录无关新闻。** 若当日确实素材稀少（例如周末），可以少于 4 条，最少 2 条；但任何情况下都不得为了凑数收录与 AI 产业无关的内容。
+请从中挑选 AI 产业相关的新闻，整理成"人工智能产业动态"。{temp_note}
+
+**目标数量：8 条，覆盖 4 类各 2 条**：
+- policy 政策发布 2 条：政府部门、监管机构、行业标准、法律法规相关
+- tech 技术突破 2 条：模型/算法/芯片/算力/产品技术本身的进展
+- industry 产业动态 2 条：企业合作、产品上市、产能布局、行业趋势、企业业绩
+- capital 投融资 2 条：融资、并购、IPO、估值变化
+
+**重要：素材含 ±1 天邻域和非 AI 内容**。优先用当天素材；当天不足时可选用邻日（昨天/今天）的重大新闻，但 desc 中要按事件实际日期表述（"昨日/今日..."）。
+
+分类规则细节：
+- 8 条总数是硬要求；不要为了凑数收录与 AI 产业无关的内容（消费电子/汽车新品/系统更新/政治人物等）——系统会硬过滤拦截。
+- 若某一类当日实在没有对应新闻，该类允许为 1 条，其它类补足 8 条总数。
+- 若实在凑不齐 8 条高质量新闻，可放宽到 6-7 条，但不得少于 6 条。
 
 分类口径（必须严格按新闻实质判断，宁缺勿错）：
 - policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
@@ -95,7 +131,7 @@ def build_day_prompt(material, day_str):
 {{"summary":"一句话概括当日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题不超过30字","desc":"简述80-120字，客观专业","source":"媒体名","url":"https://原文链接"}},...]}}
 3. source 填媒体简称（如 IT之家、TechCrunch、The Verge），url 必须从上方素材中挑选真实 URL，禁止编造、拼接或改写。
 4. title 用中文，控制在 30 字内，须是新闻事实的准确概括，不要加评价性形容词；desc 用中文书面语客观陈述，不要口语和感叹号。
-5. **不要为了凑齐"每类 2 条"而错标分类**。若某一类当日确实没有对应新闻，该类可以为 0 条，四类数量允许不均衡（例如 3/3/2/0）。错标分类比数量不均衡严重得多。
+5. **不要为了凑齐"每类 2 条"而错标分类**。若某一类当日实在没有对应新闻（极少），该类可以为 1 条，但其它类补足 8 条总数；不要硬塞错标条目充数。错标分类比数量不均衡严重得多。
 6. 输出前逐条自查：这条新闻的实质与所标分类是否一致？不一致就改正分类或换掉该条。
 7. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、操作系统更新（Windows/iOS/安卓的系统或功能更新）、产品与发布会预告、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
 8. 选题限于产业与技术范畴：判断标准是"这条新闻是否直接反映 AI 产业或技术本身的变化"。凡属个人公开表态、社会活动、与产业无关的公共事务，一律不选。
@@ -114,7 +150,7 @@ def gen_day(material, day_str):
     material_text = " ".join(m.get("title", "") for m in material)
     for attempt in range(3):
         try:
-            prompt = build_day_prompt(material, day_str)
+            prompt = build_day_prompt(material, day_str, attempt=attempt)
             if attempt == 2:
                 # 末次尝试：允许放宽数字口径（中英文金额换算已归一化，此处仅提示更保守）
                 prompt += (
@@ -122,7 +158,8 @@ def gen_day(material, day_str):
                     "请优先挑选不涉及金额、估值、百分比的新闻，"
                     "若确实需要提及金额请使用素材中的原始写法（如 $500M 写作 5亿美元）。"
                 )
-            raw = np.call_glm(prompt)
+            # 重试时把 temperature 从 0.4 提到 0.6，扩大选题多样性
+            raw = np.call_glm(prompt, temperature=0.4 if attempt == 0 else 0.6)
             obj = np.parse_llm_json(raw)
         except Exception as e:
             np.log(f"  {day_str} 第{attempt+1}次生成失败: {e}")
@@ -142,6 +179,10 @@ def gen_day(material, day_str):
             src = np.clean_for_js(it.get("source", ""))[:30]
             if not (title and desc and src):
                 continue
+            # 硬拦截：消费电子/汽车新品/系统更新/政治人物（与 daily pipeline 保持一致）
+            if np.hard_blocked(title):
+                np.log(f"  硬拦截: {title[:26]}")
+                continue
             if not np.numbers_grounded(title, material_text) or not np.numbers_grounded(desc, material_text):
                 np.log(f"  丢弃数字不可核实的条目: {title[:26]}")
                 continue
@@ -160,13 +201,13 @@ def gen_day(material, day_str):
                 "cat": cat, "catLabel": np.CAT_LABELS[cat],
                 "title": title, "desc": desc, "source": src, "url": url,
             })
-        if len(items) >= 2:
+        if len(items) >= 6:
             summary = np.clean_for_js(obj.get("summary", ""))[:120]
             if not np.summary_consistent(summary, items):
                 np.log("  摘要提及了未收录内容，改用条目标题兜底摘要")
                 summary = np.clean_for_js(np.fallback_summary(items))
             return summary, items
-        np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条，重试")
+        np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条（<6 硬底线），重试")
         time.sleep(2)
     return "", []
 
@@ -289,13 +330,15 @@ def main():
     for day in days:
         material, raw_n = day_material(all_items, day)
         np.log(f"{day}: 当日原始 {raw_n} 条，可用素材 {len(material)} 条")
-        if len(material) < 2:
-            np.log(f"  素材不足，跳过 {day}")
+        if len(material) < 6:
+            np.log(f"  素材不足 6 条（含邻域），放弃 {day}")
             continue
         summary, items = gen_day(material, day)
-        if len(items) < 2:
-            np.log(f"  生成失败，跳过 {day}")
+        if len(items) < 6:
+            np.log(f"  生成失败（<6 条），跳过 {day}")
             continue
+        if len(items) < 8:
+            np.log(f"  ⚠ 仅 {len(items)} 条（<8 目标），仍写入")
         weekday = np.WEEKDAYS[datetime.strptime(day, "%Y-%m-%d").weekday()]
         results.append((day, js_block(day, weekday, summary, items), len(items)))
         np.log(f"  ✓ {day} 生成 {len(items)} 条 | {summary[:40]}")
