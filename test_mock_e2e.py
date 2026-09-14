@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""端到端 mock 演练（不打真实 API）：验证 8 月标准的过滤链与重试修正路径。
+"""端到端 mock 演练（不打真实 API）：验证两阶段生成链与 8 月标准的过滤/重试路径。
 
-场景设计（模拟真实会发生的失败）：
-  第 1 轮：模型只写了短文案（正文约 30 字）→ 应被字数硬校验全部丢弃 → 触发重试
-  第 2 轮：模型按重试提示词修正，写足字数 → 应稳定产出 8 条
+链路已改为两阶段（2026-09-14）：
+  阶段 A 选题：一次调用产出 10 条候选（只含 cat/title/source/url，不写正文）
+  阶段 B 写正文：逐条素材单独调用，产出 100-160 字 desc；单条不合格再重写一次
+
+两个场景（都模拟真实会发生的失败）：
+  [主场景] 阶段 B 首次写得太短 → 按"太短"提示重写 → 达标 → 稳定产出 8 条
+  [外环]   阶段 B 两次都太短（模型完全不改）→ 0 条 → 触发选题重试（attempt=1）
 
 断言重点：
-  A. 第 1 轮确实因"正文过短"被丢弃，且条数不足触发重试
-  B. 第 2 轮拿到的 prompt 里必须含新增的"字数不达标"修正提示
-     （若没有，说明重试是空转 —— 这正是本轮修复的缺陷）
-  C. 最终 8 条、四类均衡、标题与正文均落在 8 月标准区间
+  A. 阶段 A 的短标题/编排类候选被拦下，长标题候选全部进入阶段 B
+  B. 阶段 B 单条重写时，prompt 必须含"太短"修正提示（否则重写是空转）
+  C. 阶段 B 写不出合格正文时该条被丢弃，且不影响其它条目
+  D. 外环重试 prompt 必须含"标题字数不达标"提示
+  E. 最终 8 条、四类均衡、标题与正文均落在 8 月标准区间
 """
 import json
 import os
-import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -52,76 +56,86 @@ MATERIAL = [
 ]
 VALID = {m["url"] for m in MATERIAL}
 
-
-def _mk(cat, title, desc, src, url):
-    return {"cat": cat, "title": title, "desc": desc, "source": src, "url": url}
-
-
-# ---------- 第 1 轮：短文案（模拟 9 月的退化写法）----------
-SHORT_ITEMS = [
-    _mk("policy", "AI政策窗口开放", "相关部门发布了新的政策文件。", "IT之家", "https://www.ithome.com/a1"),
-    _mk("policy", "发布脑机接口标准", "有关部门发布了标准。", "IT之家", "https://www.ithome.com/a2"),
-    _mk("tech", "Nvidia解释增长原因", "公司解释了业绩增长的原因。", "量子位", "https://www.qbitai.com/b1"),
-    _mk("tech", "新模型开源", "某公司开源了新模型。", "量子位", "https://www.qbitai.com/b2"),
-    _mk("industry", "某公司面临挑战", "该公司当前面临一些挑战。", "IT之家", "https://www.ithome.com/c1"),
-    _mk("industry", "厂商发布新品", "厂商发布了新的产品。", "IT之家", "https://www.ithome.com/c2"),
-    _mk("capital", "企业完成融资", "企业完成了新一轮融资。", "TechCrunch", "https://techcrunch.com/d1"),
-    _mk("capital", "AI公司获得投资", "该公司获得了投资。", "TechCrunch", "https://techcrunch.com/d2"),
-    _mk("tech", "AI供电架构问题", "供电架构存在一些问题。", "The Verge", "https://www.theverge.com/e1"),
-    _mk("industry", "企业达成合作", "双方达成了合作协议。", "IT之家", "https://www.ithome.com/e3"),
+# ---------- 阶段 A 返回：10 条候选（含 2 条应被拦下的坏标题 + 1 条编造 URL）----------
+SEL_ITEMS = [
+    {"cat": "policy", "title": "两部门联合发布AI计量体系指引，破解测不准与数据荒",
+     "source": "IT之家", "url": "https://www.ithome.com/a1"},
+    {"cat": "policy", "title": "交通部发布AI+交通场景方案41个，覆盖公路铁路水运",
+     "source": "IT之家", "url": "https://www.ithome.com/a2"},
+    {"cat": "tech", "title": "国产数据中心芯片发布，1024卡集群训练效率提升3倍",
+     "source": "量子位", "url": "https://www.qbitai.com/b1"},
+    {"cat": "tech", "title": "开源大模型新版本发布，上下文扩展至200万token",
+     "source": "量子位", "url": "https://www.qbitai.com/b2"},
+    {"cat": "industry", "title": "阿里云推出制造业行业大模型，已服务1200家企业",
+     "source": "IT之家", "url": "https://www.ithome.com/c1"},
+    {"cat": "industry", "title": "宇树科技科创板挂牌，人形机器人第一股诞生",
+     "source": "IT之家", "url": "https://www.ithome.com/c2"},
+    {"cat": "capital", "title": "Stripe 75亿美元收购OpenRouter，AI基础设施最大并购",
+     "source": "TechCrunch", "url": "https://techcrunch.com/d1"},
+    {"cat": "capital", "title": "Anthropic完成130亿美元新融资，估值达1830亿美元",
+     "source": "TechCrunch", "url": "https://techcrunch.com/d2"},
+    {"cat": "capital", "title": "国内具身智能创企完成B轮，募集8亿元估值60亿元",
+     "source": "量子位", "url": "https://www.qbitai.com/d3"},
+    {"cat": "tech", "title": "数据中心液冷规模化落地，PUE降至1.08节电25%",
+     "source": "The Verge", "url": "https://www.theverge.com/e1"},
+    # ↓ 以下 3 条应被阶段 A 拦下（不进入阶段 B，不消耗写正文的调用）
+    {"cat": "policy", "title": "AI政策窗口开放",                      # 太短(8字)
+     "source": "IT之家", "url": "https://www.ithome.com/e2"},
+    {"cat": "industry", "title": "早报：今日AI行业新闻汇总",           # 聚合类
+     "source": "IT之家", "url": "https://www.ithome.com/e3"},
+    {"cat": "capital", "title": "消息称某AI公司完成新一轮大额融资",
+     "source": "TechCrunch", "url": "https://techcrunch.com/fake"},    # 编造 URL
 ]
 
-# ---------- 第 2 轮：按 8 月标准修正后的文案 ----------
-LONG_ITEMS = [
-    _mk("policy", "两部门联合发布AI计量体系指引，破解测不准与数据荒",
-        "市场监管总局与国家发改委联合印发《人工智能计量体系和能力建设指引（2026版）》，围绕基础支撑、通用技术、核心技术等六大板块系统布局，"
-        "聚焦算法黑箱和决策可解释性等痛点部署关键技术攻关，推动AI性能可测量、可比较、可追溯。指引提出到2027年建成国家级计量技术研发应用中心，"
-        "打通实验室到行业应用的最后一公里。",
-        "IT之家", "https://www.ithome.com/a1"),
-    _mk("policy", "交通部发布AI+交通场景方案41个，覆盖公路铁路水运",
-        "交通运输部发布人工智能应用场景方案，共涉及41个具体场景，覆盖公路、铁路、水运等重点领域，并明确了分阶段推进目标。"
-        "方案要求加快智能感知、车路协同等技术在典型场景落地，同步完善数据安全与责任认定规则，为后续规模化推广提供依据。",
-        "IT之家", "https://www.ithome.com/a2"),
-    _mk("tech", "国产数据中心芯片发布，1024卡集群训练效率提升3倍",
+# ---------- 阶段 B 返回：短文案（模拟免费模型写成 20-30 字）----------
+SHORT_DESC = "相关部门发布了新的政策文件，涉及多项内容。"
+# ---------- 阶段 B 返回：8 月标准正文（100-160 字，数字全部取自摘要）----------
+LONG_DESC = {
+    "https://www.ithome.com/a1":
+        "市场监管总局与国家发改委联合印发《人工智能计量体系和能力建设指引（2026版）》，"
+        "围绕基础支撑、通用技术、核心技术等六大板块系统布局，聚焦算法黑箱和决策可解释性等痛点部署关键技术攻关，"
+        "推动AI性能可测量、可比较、可追溯，并提出到2027年建成国家级计量技术研发应用中心。",
+    "https://www.ithome.com/a2":
+        "交通运输部发布人工智能应用场景方案，共涉及41个具体场景，覆盖公路、铁路、水运等重点领域，"
+        "并明确了分阶段推进目标。方案要求加快智能感知、车路协同等技术在典型场景落地，"
+        "同步完善数据安全与责任认定规则，为后续规模化推广提供依据。",
+    "https://www.qbitai.com/b1":
         "该芯片面向数据中心推理场景发布，1024卡集群训练效率提升3倍，功耗较上代下降40%，目前已开始批量供货。"
-        "厂商同步开放了配套软件栈，支持主流深度学习框架迁移，可降低存量集群的改造成本，进一步压缩单位算力的部署门槛。",
-        "量子位", "https://www.qbitai.com/b1"),
-    _mk("tech", "开源大模型新版本发布，上下文扩展至200万token",
+        "厂商同步开放了配套软件栈，支持主流深度学习框架迁移，可降低存量集群的改造成本，"
+        "进一步压缩单位算力的部署门槛。",
+    "https://www.qbitai.com/b2":
         "新版本上下文窗口扩展至200万token，推理成本下降80%，在权威评测中综合得分提升12%，权重与技术报告同步开源。"
-        "长上下文能力提升后，可直接处理完整代码仓库与长篇文档，减少分块拼接带来的信息损耗，为智能体类应用提供更稳定的基础。",
-        "量子位", "https://www.qbitai.com/b2"),
-    _mk("industry", "阿里云推出制造业行业大模型，已服务1200家企业",
+        "长上下文能力提升后，可直接处理完整代码仓库与长篇文档，减少分块拼接带来的信息损耗，"
+        "为智能体类应用提供更稳定的基础。",
+    "https://www.ithome.com/c1":
         "阿里云宣布面向制造业推出行业大模型服务，目前已服务1200家企业客户，平均交付周期缩短30%。"
-        "服务覆盖设备预测性维护、工艺参数优化、质检等环节，并以订阅方式提供，降低中小制造企业的初始投入门槛。",
-        "IT之家", "https://www.ithome.com/c1"),
-    _mk("industry", "宇树科技科创板挂牌，人形机器人第一股诞生",
+        "服务覆盖设备预测性维护、工艺参数优化、质检等环节，并以订阅方式提供，"
+        "降低中小制造企业的初始投入门槛。",
+    "https://www.ithome.com/c2":
         "宇树科技正式启动科创板网上、网下申购，发行价150.80元每股，发行后市值约609.93亿元，发行市盈率219倍。"
         "公司是极少数在IPO前实现规模化盈利的全球人形机器人企业之一，"
         "本次募集资金将投向新一代人形机器人本体研发与产线建设，加快在工业与商用场景的交付节奏。",
-        "IT之家", "https://www.ithome.com/c2"),
-    _mk("capital", "Stripe 75亿美元收购OpenRouter",
+    "https://techcrunch.com/d1":
         "Stripe 宣布以75亿美元收购 OpenRouter，为今年 AI 基础设施领域规模最大的并购交易。"
-        "OpenRouter 主营多模型统一调用网关，聚合了数十家厂商的模型接口，收购后其路由与计量能力将并入 Stripe 的支付与计费体系，"
-        "有望形成按调用量计费的一体化方案。",
-        "TechCrunch", "https://techcrunch.com/d1"),
-    _mk("capital", "Anthropic完成130亿美元新融资，估值达1830亿美元",
+        "OpenRouter 主营多模型统一调用网关，聚合了数十家厂商的模型接口，"
+        "收购后其路由与计量能力将并入 Stripe 的支付与计费体系，有望形成按调用量计费的一体化方案。",
+    "https://techcrunch.com/d2":
         "Anthropic 完成130亿美元新一轮融资，投后估值达1830亿美元，本轮由多家主权基金领投。"
         "资金将主要用于扩充算力与加强安全研究，公司同时披露企业客户数量与年度经常性收入均较上一年度显著增长，"
         "成为全球估值最高的AI模型公司之一。",
-        "TechCrunch", "https://techcrunch.com/d2"),
-    _mk("capital", "国内具身智能创企完成B轮，募集8亿元估值60亿元",
+    "https://www.qbitai.com/d3":
         "该创企完成B轮融资，募集8亿元，投后估值60亿元，资金将主要用于人形机器人量产产线建设与核心零部件自研。"
-        "公司称其新一代机型已进入小批量交付阶段，本轮融资将支撑产能爬坡，并加快在工业与商用服务场景的验证。",
-        "量子位", "https://www.qbitai.com/d3"),
-    _mk("tech", "数据中心液冷规模化落地，PUE降至1.08节电25%",
+        "公司称其新一代机型已进入小批量交付阶段，本轮融资将支撑产能爬坡，"
+        "并加快在工业与商用服务场景的验证。",
+    "https://www.theverge.com/e1":
         "该企业在12个数据中心完成液冷方案部署，PUE降至1.08，整体节电25%。"
         "方案采用冷板与浸没两条技术路线并行，适配高功率密度机柜，并配套余热回收系统。"
         "随着单机柜功率持续攀升，液冷正从试点走向规模化，成为新建智算中心的主流选择。",
-        "The Verge", "https://www.theverge.com/e1"),
-]
-LONG_ITEMS = [i for i in LONG_ITEMS if i["url"] in VALID]
+}
 
-ROUNDS = []          # 捕获每轮 prompt 与返回
+ROUNDS = []       # 全部调用记录
+MODE = {"v": "retry_helps"}   # retry_helps / always_short
+SELN = {"n": 0}   # 累计"阶段 A 选题调用"次数（跨场景计数，用于判断是否已是重试轮）
 
 
 class _Resp:
@@ -138,15 +152,47 @@ class _Resp:
         return False
 
 
+def _is_selection(prompt):
+    return "输出选题清单" in prompt
+
+
 def fake_urlopen(req, timeout=None):
     prompt = json.loads(req.data.decode("utf-8"))["messages"][0]["content"]
-    idx = len(ROUNDS)
-    ROUNDS.append({"prompt": prompt})
-    items = SHORT_ITEMS if idx == 0 else LONG_ITEMS
-    body = {"summary": "今日AI产业要闻：政策落地、芯片与模型进展、大额并购与具身智能融资。",
-            "items": items}
-    content = json.dumps(body, ensure_ascii=False)
-    return _Resp({"choices": [{"message": {"content": content}}]})
+    sel = _is_selection(prompt)
+    if sel:
+        SELN["n"] += 1
+    sel_round = SELN["n"]
+    ROUNDS.append({"kind": "A" if sel else "B", "prompt": prompt,
+                   "sel_round": sel_round})
+
+    if sel:
+        body_summary = "今日AI产业要闻：政策落地、芯片与模型进展、大额并购与具身智能融资。"
+        content = json.dumps({"summary": body_summary, "items": SEL_ITEMS},
+                             ensure_ascii=False)
+        return _Resp({"choices": [{"message": {"content": content}}]})
+
+    # 阶段 B：写正文。desc prompt 里不含 URL（避免模型把 URL 抄进正文），
+    # 因此按素材标题反查是哪一条。
+    url = ""
+    for m in MATERIAL:
+        if m["title"] in prompt:
+            url = m["url"]
+            break
+    # retry_helps：模型听劝 —— 带"太短"提示时写长
+    # always_short：模型不听劝 —— 只有走到第 2 轮选题（sel_round>=2）才写长
+    long_ok = (MODE["v"] == "retry_helps" and "太短" in prompt) or \
+              (MODE["v"] == "always_short" and sel_round >= 2)
+    desc = LONG_DESC.get(url, SHORT_DESC) if long_ok else SHORT_DESC
+    return _Resp({"choices": [{"message": {"content": desc}}]})
+
+
+def _stats(items):
+    tl = [len(i["title"]) for i in items]
+    dl = [len(i["desc"]) for i in items]
+    dist = {}
+    for i in items:
+        dist[i["cat"]] = dist.get(i["cat"], 0) + 1
+    return tl, dl, dist
 
 
 def main():
@@ -154,56 +200,88 @@ def main():
     np.call_glm.__globals__["urllib"] = np.urllib
 
     ok = True
+    global ROUNDS
 
-    # ===== 第 1 轮 =====
+    # ================= 主场景：阶段 B 单条重写能救回来 =================
+    print("=" * 74)
+    print("主场景：阶段 B 首轮写得短 → 按“太短”提示重写 → 达标")
+    print("=" * 74)
+    ROUNDS.clear()
+    MODE["v"] = "retry_helps"
     s1, items1 = np.generate_news(MATERIAL, "9月14日 星期一", attempt=0)
-    print(f"第1轮（短文案）→ 通过过滤 {len(items1)} 条")
-    assert len(items1) == 0, f"第1轮本应全被丢弃，实际留下 {len(items1)} 条"
-    print("  ✅ 短文案被字数硬校验全部拦下")
 
-    # ===== 第 2 轮（重试）=====
-    s2, items2 = np.generate_news(MATERIAL, "9月14日 星期一", attempt=1)
+    sel0 = [r for r in ROUNDS if r["kind"] == "A"][0]["prompt"]
+    desc_calls = [r for r in ROUNDS if r["kind"] == "B"]
+    n_desc_first = sum(1 for r in desc_calls if "太短" not in r["prompt"])
+    n_desc_retry = sum(1 for r in desc_calls if "太短" in r["prompt"])
 
-    # B. 重试 prompt 必须含新增修正提示
-    p1 = ROUNDS[1]["prompt"]
-    has_fix = "字数不达标" in p1 and "正文不足 80 字" in p1
-    print(f"  {'✅' if has_fix else '❌'} 重试 prompt 含“字数不达标”修正提示（本次修复的核心）")
-    ok &= has_fix
-    p0 = ROUNDS[0]["prompt"]
-    print(f"  {'✅' if '字数不达标' not in p0 else '❌'} 首轮 prompt 不含该提示（避免误导）")
-    ok &= ("字数不达标" not in p0)
+    print(f"\n调用构成：阶段 A 1 次 ｜ 阶段 B {len(desc_calls)} 次"
+          f"（首写 {n_desc_first} / 重写 {n_desc_retry}）")
+    # A. 阶段 A 只应放行 10 条（坏标题与编造 URL 被拦）
+    #    阶段 B 只对合格候选调用 → 首写次数应等于 10
+    a_ok = (n_desc_first == 10)
+    print(f"  {'✅' if a_ok else '❌'} 阶段 A 拦下坏候选，仅 10 条进入写正文"
+          f"（实得 {n_desc_first}）")
+    ok &= a_ok
 
-    # C. 最终质量
-    n = len(items2)
-    tl = [len(i["title"]) for i in items2]
-    dl = [len(i["desc"]) for i in items2]
-    dist = {}
-    for i in items2:
-        dist[i["cat"]] = dist.get(i["cat"], 0) + 1
-    print(f"\n第2轮（修正后）→ {n} 条 / 目标 8")
-    print(f"  标题字数 平均 {sum(tl)/len(tl):.1f}｜区间 {min(tl)}-{max(tl)}（8月基准 25.0）")
-    print(f"  正文字数 平均 {sum(dl)/len(dl):.1f}｜区间 {min(dl)}-{max(dl)}（8月基准 118.9）")
-    print(f"  四类分布 {dist}")
+    # B. 首写太短 → 每条都应触发一次重写，且重写 prompt 含修正提示
+    b_ok = (n_desc_retry == 10)
+    print(f"  {'✅' if b_ok else '❌'} 每条短正文都触发了重写，共 {n_desc_retry} 次")
+    ok &= b_ok
+    sample_retry = next((r["prompt"] for r in desc_calls if "太短" in r["prompt"]), "")
+    c_ok = "不足 120 字" in sample_retry and "不得自己编造" in sample_retry
+    print(f"  {'✅' if c_ok else '❌'} 重写 prompt 含“不足120字继续补细节 + 不得编造数字”")
+    ok &= c_ok
 
-    checks = [
-        ("产出 8 条", n == 8),
-        ("标题均 ≥15 字", min(tl) >= 15),
-        ("正文均 ≥80 字", min(dl) >= 80),
-        ("正文均 ≤400 字", max(dl) <= 400),
+    # 首轮选题 prompt 不应含重试提示（避免误导）
+    d_ok = "上一轮不合格" not in sel0
+    print(f"  {'✅' if d_ok else '❌'} 首轮选题 prompt 不含重试提示")
+    ok &= d_ok
+
+    tl, dl, dist = _stats(items1)
+    print(f"\n主场景结果 → {len(items1)} 条 / 目标 8")
+    if items1:
+        print(f"  标题字数 平均 {sum(tl)/len(tl):.1f}｜区间 {min(tl)}-{max(tl)}（8月基准 25.0）")
+        print(f"  正文字数 平均 {sum(dl)/len(dl):.1f}｜区间 {min(dl)}-{max(dl)}（8月基准 118.9）")
+        print(f"  四类分布 {dist}")
+    for name, good in [
+        ("产出 8 条", len(items1) == 8),
+        ("标题均 ≥15 字", bool(tl) and min(tl) >= 15),
+        ("正文均 ≥80 字（8月下沿）", bool(dl) and min(dl) >= 80),
+        ("正文均 ≤400 字", bool(dl) and max(dl) <= 400),
+        ("正文均值 ≥110 字", bool(dl) and sum(dl) / len(dl) >= 110),
         ("四类齐全", set(dist) == {"policy", "tech", "industry", "capital"}),
-        ("每类 ≥1 条", all(dist[c] >= 1 for c in ("policy", "tech", "industry", "capital"))),
-    ]
-    print()
-    for name, good in checks:
+        ("每类 ≥1 条", all(dist.get(c, 0) >= 1 for c in ("policy", "tech", "industry", "capital"))),
+        ("无编造 URL", all(i["url"] in VALID for i in items1)),
+    ]:
         print(f"  {'✅' if good else '❌'} {name}")
         ok &= good
 
-    # 无编造 URL
-    bad_url = [i for i in items2 if i["url"] not in VALID]
-    print(f"  {'✅' if not bad_url else '❌'} 无编造 URL")
-    ok &= not bad_url
+    # ================= 外环场景：阶段 B 完全不改 → 触发选题重试 =================
+    print("\n" + "=" * 74)
+    print("外环场景：阶段 B 两次都写短（模型完全不改）→ 0 条 → 选题重试")
+    print("=" * 74)
+    ROUNDS.clear()
+    MODE["v"] = "always_short"
+    SELN["n"] = 0
+    s2a, items2a = np.generate_news(MATERIAL, "9月14日 星期一", attempt=0)
+    print(f"  attempt=0 → {len(items2a)} 条")
+    e_ok = (len(items2a) == 0)
+    print(f"  {'✅' if e_ok else '❌'} 全短文案被判废，未写入残缺内容")
+    ok &= e_ok
 
-    print("\n" + ("🎉 mock 演练全部通过" if ok else "⚠ 存在失败项"))
+    ROUNDS.clear()
+    s2b, items2b = np.generate_news(MATERIAL, "9月14日 星期一", attempt=1)
+    sel1 = [r for r in ROUNDS if r["kind"] == "A"][0]["prompt"]
+    f_ok = "标题字数不达标" in sel1
+    print(f"  {'✅' if f_ok else '❌'} attempt=1 的选题 prompt 含“标题字数不达标”提示")
+    ok &= f_ok
+    print(f"  attempt=1 → {len(items2b)} 条")
+    g_ok = len(items2b) == 8
+    print(f"  {'✅' if g_ok else '❌'} 重试后恢复到 8 条")
+    ok &= g_ok
+
+    print("\n" + ("🎉 两阶段 mock 演练全部通过" if ok else "⚠ 存在失败项"))
     return 0 if ok else 1
 
 
