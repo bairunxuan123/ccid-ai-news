@@ -81,7 +81,7 @@ def build_day_prompt(material, day_str):
 素材：
 {lines}
 
-请从中挑选 4-8 条当日最有产业价值的 AI 新闻，整理成"人工智能产业动态"。**质量优先于数量：当日 AI 素材少就少写几条（4 条即可），绝不要为凑数收录无关新闻。**
+请从中挑选 4-8 条当日最有产业价值的 AI 新闻，整理成"人工智能产业动态"。**质量优先于数量：当日 AI 素材少就少写几条（4 条即可），绝不要为凑数收录无关新闻。** 若当日确实素材稀少（例如周末），可以少于 4 条，最少 2 条；但任何情况下都不得为了凑数收录与 AI 产业无关的内容。
 
 分类口径（必须严格按新闻实质判断，宁缺勿错）：
 - policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
@@ -97,12 +97,15 @@ def build_day_prompt(material, day_str):
 4. title 用中文，控制在 30 字内，须是新闻事实的准确概括，不要加评价性形容词；desc 用中文书面语客观陈述，不要口语和感叹号。
 5. **不要为了凑齐"每类 2 条"而错标分类**。若某一类当日确实没有对应新闻，该类可以为 0 条，四类数量允许不均衡（例如 3/3/2/0）。错标分类比数量不均衡严重得多。
 6. 输出前逐条自查：这条新闻的实质与所标分类是否一致？不一致就改正分类或换掉该条。
-7. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
-8. 选题限于产业与技术范畴：不收录人物言论、集会活动、非产业类社会话题等与 AI 产业价值无关的内容。
+7. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、操作系统更新（Windows/iOS/安卓的系统或功能更新）、产品与发布会预告、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
+8. 选题限于产业与技术范畴：判断标准是"这条新闻是否直接反映 AI 产业或技术本身的变化"。凡属个人公开表态、社会活动、与产业无关的公共事务，一律不选。
 9. 素材只有标题（没有正文），因此 title 与 desc 中**不得出现素材里没有的金额、估值、百分比、增长倍数**（如"50亿美元""2万亿美元""增长70%"）。需要表达程度时改用定性描述（如"大幅增长""估值处于高位"）。系统会校验并丢弃含无法核实数字的条目。
 10. **标题必须忠实于原文事实**：素材多为英文，须准确理解后再译为中文，不得截取英文原句、不得把原文没有的判断归纳进标题。例如原文讲"为 AI 供电是架构问题"，就不能写成"AI 在音频内容中的应用"。
 11. **desc 必须全部使用中文**（OpenAI、ChatGPT 等专有名词除外），不得残留英文句子或英文短语。系统会校验并丢弃英文残留过多的条目。
-12. 不要选用"早报/日报/盘点/汇总/速览"这类聚合内容，也不要选消费电子（iOS/iPhone/手机/相机/耳机）与汽车新品——素材里出现也不要选。"""
+12. 不要选用"早报/日报/盘点/汇总/速览"这类聚合内容，也不要选消费电子（iOS/iPhone/手机/相机/耳机）与汽车新品——素材里出现也不要选。
+13. **标题不得泛化**：必须保留原文的核心主体与事件（谁做了什么），禁止写成"OpenAI寻求技术突破""某公司面临挑战"这类丢掉具体信息的空泛标题。原文若讲的是具体的竞赛、事件、人物加入、计划，就如实写出。
+14. **summary 只能概括本次 items 里实际收录的条目**，不得提及未收录的新闻。系统会核对，出现未收录内容视为错误。
+15. 分类补充口径：企业发生安全事故、被攻击、被罚款等负面事件属于"产业动态"，不要标成"技术突破"；只有当新闻本身是技术能力/模型能力的进展时才用"技术突破"。"""
 
 
 def gen_day(material, day_str):
@@ -152,8 +155,11 @@ def gen_day(material, day_str):
                 "cat": cat, "catLabel": np.CAT_LABELS[cat],
                 "title": title, "desc": desc, "source": src, "url": url,
             })
-        if len(items) >= 3:
+        if len(items) >= 2:
             summary = np.clean_for_js(obj.get("summary", ""))[:120]
+            if not np.summary_consistent(summary, items):
+                np.log("  摘要提及了未收录内容，改用条目标题兜底摘要")
+                summary = np.clean_for_js(np.fallback_summary(items))
             return summary, items
         np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条，重试")
         time.sleep(2)
@@ -185,16 +191,34 @@ def js_block(day_str, weekday, summary, items):
 
 # 匹配每个日期块的起始（"  {" + 下一行的 date），数组第一个块同样能命中
 BLOCK_START_RE = re.compile(r'  \{\n    date: "(\d{4}-\d{2}-\d{2})"')
+# 日期块的结束标记（items 数组收尾 + 对象收尾）
+BLOCK_END = "\n    ]\n  },\n"
 # NEWS_DATA 数组的结束位置
 ARRAY_END_RE = re.compile(r"\n\];")
 
 
-def insert_blocks(html_path, blocks, days):
+def find_block(content, day, start=0):
+    """定位某日期块在 content 中的 [start, end) 偏移；找不到返回 None"""
+    m = BLOCK_START_RE.search(content, start)
+    while m:
+        if m.group(1) == day:
+            e = content.find(BLOCK_END, m.end())
+            if e == -1:
+                return None
+            return m.start(), e + len(BLOCK_END)
+        m = BLOCK_START_RE.search(content, m.end())
+    return None
+
+
+def insert_blocks(html_path, blocks, days, replace=False):
     """把若干天条目按日期倒序插入 NEWS_DATA 的正确位置。
 
     不能一律插到数组最前：当回溯日期中存在缺口（例如 9-11 无内容）时，
     盲目前插会破坏"新→旧"顺序。这里按日期找到第一个更早的块，插到它前面；
     若目标日期比现有全部更早，则追加到数组末尾（并补上必要的逗号）。
+
+    replace=True 时先删除这些日期的旧块再插入，用于质量不合格时的重生成，
+    这样无需把线上页面回滚到旧版本。
     """
     with open(html_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -203,6 +227,14 @@ def insert_blocks(html_path, blocks, days):
     if idx == -1:
         raise RuntimeError(f"{html_path} 未找到 NEWS_DATA 锚点")
     head = idx + len(anchor)
+
+    if replace:
+        # 从后往前删，避免先删导致后续偏移失效
+        spans = [sp for d in set(days) if (sp := find_block(content, d, head))]
+        for s, e in sorted(spans, reverse=True):
+            content = content[:s] + content[e:]
+        if spans:
+            np.log(f"  已移除 {len(spans)} 个旧块，准备重生成")
 
     written = 0
     for day, blk in zip(days, blocks):
@@ -226,18 +258,20 @@ def insert_blocks(html_path, blocks, days):
         else:
             content = content[:pos] + blk + content[pos:]
         written += 1
-    if written == 0:
+    if written == 0 and not replace:
         return False
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(content)
     np.log(f"  已写入 {html_path}（{written} 天）")
-    return True
+    return written > 0
 
 
 def main():
-    days = sys.argv[1:]
+    args = sys.argv[1:]
+    replace = "--replace" in args
+    days = [a for a in args if not a.startswith("--")]
     if not days:
-        print("用法: backfill_news.py 2026-09-09 2026-09-14 [...]")
+        print("用法: backfill_news.py [--replace] 2026-09-09 2026-09-14 [...]")
         return 2
     if not np.ZHIPU_API_KEY:
         np.log("缺少 ZHIPU_API_KEY")
@@ -250,11 +284,11 @@ def main():
     for day in days:
         material, raw_n = day_material(all_items, day)
         np.log(f"{day}: 当日原始 {raw_n} 条，可用素材 {len(material)} 条")
-        if len(material) < 3:
+        if len(material) < 2:
             np.log(f"  素材不足，跳过 {day}")
             continue
         summary, items = gen_day(material, day)
-        if len(items) < 3:
+        if len(items) < 2:
             np.log(f"  生成失败，跳过 {day}")
             continue
         weekday = np.WEEKDAYS[datetime.strptime(day, "%Y-%m-%d").weekday()]
@@ -271,7 +305,7 @@ def main():
     days_sorted = [r[0] for r in results]
     blocks = [r[1] for r in results]
     for p in (FULL_HTML, LITE_HTML):
-        insert_blocks(p, blocks, days_sorted)
+        insert_blocks(p, blocks, days_sorted, replace=replace)
 
     # JS 语法校验
     bad = False
