@@ -26,6 +26,7 @@ import os
 import re
 import sys
 import time
+import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from collections import Counter
@@ -605,6 +606,11 @@ def call_glm(prompt, temperature=0.4):
     要求输出 8-10 条（每条 title+desc+source+url 约 120-150 token）时
     极易被截断 —— json.loads 整体失败，一次生成完全白费。
     这里显式给足 4096，并把超时从 90s 放宽到 180s（输出变长后耗时增加）。
+
+    [2026-09-14 新增] 限流退避重试。改成两阶段后每天调用次数从 1-2 次升到
+    11-20 次（逐条写正文），实测诊断脚本连续调用时会撞上
+    `code 1302 您的账户已达到速率限制`。原先遇到即抛异常、整次生成白费，
+    现在按 3s/6s/9s 退避重试，最多 4 次；非限流类错误不重试，直接抛出。
     """
     body = json.dumps({
         "model": ZHIPU_MODEL,
@@ -612,20 +618,49 @@ def call_glm(prompt, temperature=0.4):
         "temperature": temperature,
         "max_tokens": 4096,
     }).encode("utf-8")
-    req = urllib.request.Request(
-        ZHIPU_URL,
-        data=body,
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {ZHIPU_API_KEY}",
-        },
-    )
-    with urllib.request.urlopen(req, timeout=180) as resp:
-        data = json.loads(resp.read().decode("utf-8"))
-    return data["choices"][0]["message"]["content"]
+    last = None
+    for i in range(4):
+        req = urllib.request.Request(
+            ZHIPU_URL,
+            data=body,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {ZHIPU_API_KEY}",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=180) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            return data["choices"][0]["message"]["content"]
+        except urllib.error.HTTPError as e:
+            detail = ""
+            try:
+                detail = e.read().decode("utf-8", "replace")[:300]
+            except Exception:
+                pass
+            last = f"HTTP {e.code} {detail}"
+            throttled = (e.code == 429 or "1302" in detail
+                         or "速率限制" in detail or "rate" in detail.lower())
+            if not throttled:
+                raise
+            wait = 3 * (i + 1)
+            log(f"  触发限流，{wait}s 后重试（第{i+1}/4 次）：{detail[:80]}")
+            time.sleep(wait)
+        except Exception as e:
+            last = str(e)
+            time.sleep(2 * (i + 1))
+    raise RuntimeError(f"GLM 调用失败（已重试 4 次）：{last}")
 
 
-def build_prompt(material, today_cn, attempt=0):
+def build_select_prompt(material, today_cn, attempt=0):
+    """阶段 A：只做选题与拟标题，不写正文。
+
+    [2026-09-14] 拆成两阶段的实测依据：glm-4-flash 在"一次输出 10 条完整
+    条目（title+desc+source+url）"的任务下，会主动压缩每条正文的输出配额，
+    正文平均只有 51 字；而 8 月定版标准是 118.9 字（236 条实测）。
+    把"写正文"拆成单条窄任务（见 build_desc_prompt）后模型才写得长。
+    阶段 A 输出很短，模型能把注意力放在选题判断与标题打磨上。
+    """
     def fmt(i, m):
         sm = (m.get("summary") or "").strip()[:SUMMARY_IN_PROMPT]
         head = f"{i+1}. {m['title']}\n   来源：{m['source']} ｜ URL：{m['url']}"
@@ -634,26 +669,21 @@ def build_prompt(material, today_cn, attempt=0):
     lines = "\n".join(
         fmt(i, m) for i, m in enumerate(material[:PROMPT_MATERIAL_CAP])
     )
-    # 重试时调高 temperature，并明确告知上一轮被丢弃的真实原因
-    # [2026-09-14] 此前只提"素材少/条目不足"，但新增了字数硬校验
-    # （标题≥15字、正文≥80字），条目被丢弃的主因已变成"写得太短"。
-    # 不点明真正原因，重试仍会产出同样的短文案，等于空转。
     if attempt == 0:
         temp_note = ""
     else:
         temp_note = (
-            "\n\n【上一轮输出不合格，本次务必修正】上一轮有部分条目被系统丢弃，"
-            "主要原因是字数不达标：标题须 20-30 字，正文 desc 须 100-160 字，"
-            "凡正文不足 80 字者一律作废。请在保持同等选题质量的前提下，"
-            "把每条正文写足信息量（谁做了什么 + 金额/数量/时间等具体细节 + 影响或后续计划），"
-            "并适当扩大选题范围（可放宽到 AI 邻域：芯片、算力、机器人、自动驾驶、数据中心）。"
+            "\n\n【上一轮不合格，本次务必修正】上一轮选题后可用条目不足 8 条，"
+            "主要原因是标题字数不达标（须 20-30 字，低于 15 字者一律作废），"
+            "或选题过窄。请扩大选题范围（可放宽到 AI 邻域：芯片、算力、机器人、"
+            "自动驾驶、数据中心），并把标题写足三要素（主体 + 动作 + 结果）。"
         )
     return f"""今天是{today_cn}。下面是从各大科技媒体抓取的 AI 相关新闻素材，每条含标题、正文摘要与来源 URL。{temp_note}
 
 素材：
 {lines}
 
-请从中挑选当日最有产业价值的 AI 新闻，整理成"人工智能产业动态"。
+请从中挑选当日最有产业价值的 AI 新闻，输出选题清单（**只出选题与标题，正文由后续步骤单独撰写**）。
 
 **请输出 10 条候选**（比最终需要的 8 条多 2 条，因为系统会做一轮硬性过滤，
 剔除消费电子/编造数字/英文残留的条目，需要留有冗余）。
@@ -665,18 +695,13 @@ def build_prompt(material, today_cn, attempt=0):
 - industry 产业动态 2-3 条：企业合作、产品上市、产能布局、行业趋势、企业业绩
 - capital 投融资 2-3 条：融资、并购、IPO、估值变化
 
-分类规则细节：
-- 10 条候选是本次要求；过滤后系统会截取前 8 条；
-- 若某一类当日确实没有对应新闻（极少），该类允许为 1 条，其它类补足；
-- 宁可少几条也绝不硬塞与 AI 产业无关的内容（消费电子/汽车新品/系统更新/政治人物等）——系统会硬过滤拦截，但需要你自觉避开。
-
 分类口径（必须严格按新闻实质判断，宁缺勿错）：
-- policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
-- tech 技术突破：模型/算法/芯片/算力/产品技术本身的进展
-- industry 产业动态：企业合作、产品上市、产能布局、行业趋势、企业业绩
-- capital 投融资：融资、并购、IPO、估值变化
+- 若某一类当日确实没有对应新闻（极少），该类允许为 1 条，其它类补足；
+- **不要为了凑齐"每类 2-3 条"而错标分类**，错标分类比数量不均衡严重得多；
+- 企业发生安全事故、被攻击、被罚款等负面事件属于"产业动态"，不要标成"技术突破"；
+  只有当新闻本身是技术能力/模型能力的进展时才用"技术突破"。
 
-============== 写作标准（本项目定版风格，务必逐条对齐）==============
+============== 标题写作标准（本项目定版风格，务必逐条对齐）==============
 
 【标题：20-30 字，三要素齐全】
 1. **主体 + 动作 + 结果**齐全。主体必须是具体机构名或公司名（如"国家发改委""交通运输部""Stripe""宇树科技"），禁止"某公司""相关部门""相关负责人"这类模糊主体。
@@ -697,34 +722,90 @@ def build_prompt(material, today_cn, attempt=0):
 - "Nvidia解释增长原因"（未说明向谁解释、解释哪项增长）
 - "某公司面临挑战"
 
-【正文 desc：100-160 字，不得少于 80 字】
-按"事实 → 细节 → 意义"三层写成一段完整陈述：
-- 第一层｜谁做了什么：写全具体机构名、文件名（加书名号）、产品名、模型名。
-- 第二层｜关键细节：从素材摘要中提取可核验的数字——金额、规模、数量、时间、占比、技术规格、覆盖范围、合作方数量。
-- 第三层｜影响、对比或后续计划：用事实表达（如"较此前2.8万台的预测近乎翻倍""下一步将联动……"），禁止"意义重大""里程碑式""引发广泛关注"这类空泛评价。
-
-✅ 正文范例（定版实际写法，请对齐字数与信息密度）：
-例1（156 字）：「市场监管总局与国家发改委联合印发《人工智能计量体系和能力建设指引（2026版）》，围绕基础支撑、通用技术、核心技术等六大板块系统布局，聚焦算法黑箱和决策可解释性等痛点部署关键技术攻关，推动AI性能可测量、可比较、可追溯，并支持构建国家级计量技术研发应用中心，打通实验室到行业应用的最后一公里。」
-例2（145 字）：「宇树科技正式启动科创板网上、网下申购，发行价150.80元每股，发行后市值约609.93亿元，发行市盈率219倍。券商测算中签率仅0.02%-0.03%，按年内科创板新股首日平均涨幅466%测算，中一签账面盈利有望突破20万元。宇树科技是极少数在IPO前实现规模化盈利的全球人形机器人企业之一。」
-❌ 禁用写法：仅十几个字的短语（实测出现过 11 字正文），系统会直接丢弃。
+【选题纪律】
+1. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、操作系统更新（Windows/iOS/安卓的系统或功能更新）、产品与发布会预告、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
+2. 选题限于产业与技术范畴：判断标准是"这条新闻是否直接反映 AI 产业或技术本身的变化"。凡属个人公开表态、社会活动、与产业无关的公共事务，一律不选。
+3. 不要选用"早报/日报/盘点/汇总/速览"这类聚合内容。
+4. **标题必须忠实于原文事实**：素材多为英文，须准确理解后再译为中文，不得截取英文原句、不得把原文没有的判断归纳进标题。
+5. **标题不得泛化**：必须保留原文的核心主体与事件（谁做了什么）。反面示例（实测出现过，一律禁止）："AI政策窗口开放"（没说是谁提的什么政策）、"Meta调整AI建议功能"（没说调整什么、为什么）、"Nvidia解释增长原因"（没说是谁问的、解释了哪项增长）、"AI供电架构问题"（主体和结论都丢失）、"发布脑机接口标准"（丢了主体"我国"）。
 
 硬性要求：
 1. 只输出一个 JSON 对象，不要任何其他文字、不要 markdown 代码块标记。
 2. 对象格式严格为：
-{{"summary":"一句话概括今日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题20-30字","desc":"正文100-160字","source":"媒体名","url":"https://原文链接"}},...]}}
-3. source 填媒体简称（如 IT之家、TechCrunch、The Verge），url 必须从上方素材中挑选真实 URL，禁止编造、拼接或改写。
-4. title 用中文，控制在 30 字内，须是新闻事实的准确概括，不要加评价性形容词；desc 用中文书面语客观陈述，不要口语和感叹号。
-5. **不要为了凑齐"每类 2-3 条"而错标分类**。若某一类当日实在没有对应新闻（极少），该类可以为 1 条，其它类补足候选总数；不要硬塞错标条目充数。错标分类比数量不均衡严重得多。
-6. 输出前逐条自查：这条新闻的实质与所标分类是否一致？不一致就改正分类或换掉该条。
-7. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、操作系统更新（Windows/iOS/安卓的系统或功能更新）、产品与发布会预告、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
-8. 选题限于产业与技术范畴：判断标准是"这条新闻是否直接反映 AI 产业或技术本身的变化"。凡属个人公开表态、社会活动、与产业无关的公共事务，一律不选。
-9. **数字必须来自素材**：素材标题与摘要中出现的金额、估值、百分比、增长倍数、技术规格可以放心使用，这正是正文该有的信息密度；**素材中没有的数字一律不得出现**。摘要缺失时改用定性描述（如"大幅增长""估值处于高位"）。系统会校验并丢弃含无法核实数字的条目。
-10. **标题必须忠实于原文事实**：素材多为英文，须准确理解后再译为中文，不得截取英文原句、不得把原文没有的判断归纳进标题。例如原文讲"为 AI 供电是架构问题"，就不能写成"AI 在音频内容中的应用"。
-11. **desc 以中文书面语为主**，不得残留整句英文；但公司名、产品名、模型名与技术术语（OpenAI、Apache Fluss、MiniMax Music 3.0、TPU、token）保留英文原名，不要生硬音译。系统会校验并丢弃英文残留过多的条目。
-12. 不要选用"早报/日报/盘点/汇总/速览"这类聚合内容，也不要选消费电子（iOS/iPhone/手机/相机/耳机）与汽车新品——素材里出现也不要选。
-13. **标题不得泛化**：必须保留原文的核心主体与事件（谁做了什么）。反面示例（实测出现过，一律禁止）："AI政策窗口开放"（没说是谁提的什么政策）、"Meta调整AI建议功能"（没说调整什么、为什么）、"Nvidia解释增长原因"（没说是谁问的、解释了哪项增长）、"AI供电架构问题"（主体和结论都丢失）、"发布脑机接口标准"（丢了主体"我国"）。
-14. **summary 只能概括本次 items 里实际收录的条目**，不得提及未收录的新闻。系统会核对，出现未收录内容视为错误。
-15. 分类补充口径：企业发生安全事故、被攻击、被罚款等负面事件属于"产业动态"，不要标成"技术突破"；只有当新闻本身是技术能力/模型能力的进展时才用"技术突破"。"""
+{{"summary":"一句话概括今日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题20-30字","source":"媒体名","url":"https://原文链接"}},...]}}
+   **注意：items 里不要写 desc 字段**，正文留待后续步骤生成。
+3. source 填媒体简称（如 IT之家、TechCrunch、The Verge），url 必须从上方素材中挑选真实 URL，禁止编造、拼接或改写。**同一条素材只能出现一次**。
+4. title 用中文，控制在 20-30 字，须是新闻事实的准确概括，不要加评价性形容词。
+5. **summary 只能概括本次 items 里实际收录的条目**，不得提及未收录的新闻。系统会核对，出现未收录内容视为错误。"""
+
+
+def clean_desc_output(text):
+    """把阶段 B 的裸文本输出清洗成可直接入库的一段正文。
+
+    模型偶尔会带出"正文："前缀、markdown 围栏、分点标记或 JSON 外壳；
+    这些若不剥掉，既污染页面，也会让字数统计虚高、掩盖正文过短的事实。
+    """
+    t = (text or "").strip()
+    t = re.sub(r"^```[a-zA-Z]*\s*", "", t)
+    t = re.sub(r"\s*```$", "", t).strip()
+    # 模型若仍返回 JSON 外壳，取其中的正文字段
+    if t.startswith("{"):
+        try:
+            o = json.loads(t[t.find("{"):t.rfind("}") + 1])
+            if isinstance(o, dict):
+                t = (o.get("desc") or o.get("text") or o.get("content")
+                     or o.get("正文") or t)
+        except Exception:
+            pass
+    # 去掉提示词回声（"正文："、"第一部分：约30字"等）
+    t = re.sub(r"^(正文|答复|答案|输出)\s*[:：]\s*", "", t)
+    t = re.sub(r"第一部分[（(][^）)]{0,20}[）)]\s*[:：]?", "", t)
+    t = re.sub(r"^(第[一二三四]部分)\s*[:：]?\s*", "", t)
+    # 分点标记（模型偶发）→ 去掉，正文必须是一段
+    t = re.sub(r"(?m)^\s*[-*•]\s*", "", t)
+    t = re.sub(r"\s*\n+\s*", "", t)
+    return t.strip()
+
+
+def build_desc_prompt(m, attempt=0):
+    """阶段 B：单条素材 → 100-160 字正文（三段结构化填空）。
+
+    [2026-09-14] 用"三段结构化填空 + 自数字数"而不是笼统说"写长一点"：
+    实测笼统要求（完整提示词 13983 字符）产出正文均 51 字，
+    而把任务窄化成"单条素材、三段配比、不足 110 字必须回填细节"后，
+    模型才会真正把摘要里的事实细节铺开。
+    """
+    title = (m.get("title") or "").strip()
+    sm = (m.get("summary") or "").strip()[:600]
+    src = m.get("source") or ""
+    retry_note = ""
+    if attempt:
+        retry_note = (
+            "\n\n【上一轮太短，本次必须写足】上一轮正文不足 80 字被判废。"
+            "请把第二部分（关键细节）充分展开：把原文摘要里所有可核验的事实"
+            "（金额、数量、时间、占比、技术规格、覆盖范围、合作方）逐条写进去，"
+            "写完先数一遍字数，**不足 120 字就继续补充事实细节**。"
+        )
+    return f"""请把下面这条新闻写成一段中文产业动态正文，用于行业简报。
+
+标题：{title}
+来源：{src}
+原文摘要：{sm if sm else "（无摘要，只能依据标题撰写，请谨慎保持保守表述）"}{retry_note}
+
+请严格按以下三部分依次写出，然后用逗号/句号自然连成**一段话**，总长 **110-150 字**：
+- 第一部分（约 30 字）：谁（具体机构/公司全名）做了什么（发布/融资/推出了什么）
+- 第二部分（约 70 字）：关键细节，必须写出摘要里的具体数字（金额、数量、时间、占比、技术规格、覆盖范围、合作方）
+- 第三部分（约 35 字）：影响、对比或后续计划，用事实表达（如"较此前2.8万台的预测近乎翻倍"），禁止"意义重大""里程碑式""引发广泛关注"这类空泛评价
+
+写作纪律：
+- 写完请自己数一遍字数：**不足 110 字必须继续补充第二部分的事实细节**。
+- **但也不要写超 160 字**。若已超过 160 字，请优先删掉第三部分里的铺垫与评价性语句，保留事实。定版正文字数实测平均 119 字，请向这个长度靠拢。
+- **只允许使用摘要中出现过的数字，不得自己编造**（系统会校验，编造数字整条作废）。
+- 以中文书面语为主，公司名/产品名/模型名/技术术语保留英文原名，不要残留整句英文。
+- 不要分点罗列、不要小标题、不要输出三部分的标题，直接输出这一段正文本身。
+- 不要加引号包裹，不要写"正文："之类的前缀。
+
+正文："""
 
 
 def parse_llm_json(content):
@@ -945,65 +1026,101 @@ def select_balanced(cands, target=MAX_ITEMS, prefer=2):
 
 
 def generate_news(material, today_cn, attempt=0):
-    prompt = build_prompt(material, today_cn, attempt=attempt)
+    """两阶段生成：先选题（阶段 A），再逐条撰写正文（阶段 B）。
+
+    [2026-09-14] 由"一次生成全部条目"改为两阶段。原因见 build_select_prompt /
+    build_desc_prompt 的注释：免费模型 glm-4-flash 在批量任务里会把每条正文
+    压缩到 50 字上下，达不到 8 月定版的 100-160 字标准；拆窄任务后才写得长。
+    """
+    prompt = build_select_prompt(material, today_cn, attempt=attempt)
     # 重试时把 temperature 从 0.4 提到 0.6，扩大选题多样性
     raw = call_glm(prompt, temperature=0.4 if attempt == 0 else 0.6)
     obj = parse_llm_json(raw)
     raw_items = obj.get("items", []) if isinstance(obj, dict) else []
 
-    valid_urls = {m["url"] for m in material}
+    by_url = {m["url"]: m for m in material}
     # [2026-09-14] 数字溯源必须把正文摘要一起纳入。
     # 否则会出现反向 bug：模型按 8 月标准写出"发行价150.80元每股"这类
     # 取自摘要的真实数字，却因标题里没有而被判为"编造数字"整条丢弃。
     material_text = " ".join(
         (m.get("title", "") + " " + (m.get("summary") or "")) for m in material
     )
-    out = []
+
+    # —— 阶段 A 过滤：分类 / URL 白名单 / 标题长度 / 聚合类 ——
+    cands, seen = [], set()
     for it in raw_items:
         cat = str(it.get("cat", "")).strip().lower()
         if cat not in CAT_LABELS:
             continue
         url = str(it.get("url", "")).strip()
-        if url not in valid_urls:      # URL 白名单强校验
+        if url not in by_url:          # URL 白名单强校验
             log(f"  丢弃编造 URL 的条目: {it.get('title', '')[:30]} url={url}")
             continue
-        title = clean_for_js(it.get("title", ""))[:60]
-        desc = clean_for_js(it.get("desc", ""))[:400]
-        src = clean_for_js(it.get("source", ""))[:30]
-        if not title or not desc or not url:
+        if url in seen:                # 同一条素材重复出现在两条候选里
+            log(f"  丢弃重复素材的条目: {it.get('title', '')[:30]}")
             continue
-        # 8 月定版标准：标题 20-30 字、正文 100-160 字。低于下限视为
-        # 丢信息的空泛写法（9 月实测出现过 8 字标题与 11 字正文），直接丢弃。
+        seen.add(url)
+        title = clean_for_js(it.get("title", ""))[:60]
+        if not title:
+            continue
+        # 8 月定版标准：标题 20-30 字（9 月实测出现过 8 字标题），低于下限直接丢弃
         if len(title) < MIN_TITLE_LEN:
             log(f"  丢弃标题过短的条目（{len(title)}字）: {title}")
-            continue
-        if len(desc) < MIN_DESC_LEN:
-            log(f"  丢弃正文过短的条目（{len(desc)}字）: {title[:26]}")
-            continue
-        # 数字溯源：金额/估值/百分比/倍数必须能在素材里找到，否则丢弃该条
-        if not numbers_grounded(title, material_text) or not numbers_grounded(desc, material_text):
-            log(f"  丢弃数字不可核实的条目: {title[:30]}")
             continue
         # 聚合类 / 消费电子类标题
         if title_blocked(title):
             log(f"  丢弃聚合或消费电子类条目: {title[:30]}")
             continue
+        cands.append({
+            "cat": cat,
+            "title": title,
+            "source": clean_for_js(it.get("source", ""))[:30] or by_url[url]["source"],
+            "url": url,
+        })
+
+    # —— 阶段 B：逐条素材单独撰写 100-160 字正文 ——
+    log(f"  选题完成：{len(cands)} 条候选，开始逐条撰写正文")
+    out = []
+    for ci, c in enumerate(cands):
+        if ci:
+            # 阶段 B 调用密集（每天 10-20 次），主动留出间隔，
+            # 比撞上限流再退避更省时间也更容易成功
+            time.sleep(1.0)
+        m = by_url[c["url"]]
+        desc = ""
+        # 单条最多两次：首次不合格则按"太短"提示重写一次
+        for b in range(2):
+            try:
+                got = call_glm(build_desc_prompt(m, attempt=b), temperature=0.5)
+            except Exception as e:
+                log(f"  正文生成调用失败（{c['title'][:20]}）: {e}")
+                continue
+            desc = clean_for_js(clean_desc_output(got))[:400]
+            if len(desc) >= MIN_DESC_LEN:
+                break
+            log(f"  正文过短（{len(desc)}字）重写: {c['title'][:22]}")
+        if len(desc) < MIN_DESC_LEN:
+            log(f"  丢弃正文始终过短的条目: {c['title'][:26]}")
+            continue
+        # 数字溯源：金额/估值/百分比/倍数必须能在素材里找到，否则丢弃该条
+        if not numbers_grounded(c["title"], material_text) or not numbers_grounded(desc, material_text):
+            log(f"  丢弃数字不可核实的条目: {c['title'][:30]}")
+            continue
         # desc 残留英文句子 → 翻译未完成
         if stray_english_count(desc) >= 3:
-            log(f"  丢弃英文残留的条目: {title[:30]}")
+            log(f"  丢弃英文残留的条目: {c['title'][:30]}")
             continue
         # 分类确定性纠偏（模型常为"四类均衡"而错标）
-        fixed = normalize_category(cat, title, desc)
-        if fixed != cat:
-            log(f"  分类纠偏: {cat}→{fixed}  {title[:24]}")
-            cat = fixed
+        fixed = normalize_category(c["cat"], c["title"], desc)
+        if fixed != c["cat"]:
+            log(f"  分类纠偏: {c['cat']}→{fixed}  {c['title'][:24]}")
         out.append({
-            "cat": cat,
-            "catLabel": CAT_LABELS[cat],
-            "title": title,
+            "cat": fixed,
+            "catLabel": CAT_LABELS[fixed],
+            "title": c["title"],
             "desc": desc,
-            "source": src,
-            "url": url,
+            "source": c["source"],
+            "url": c["url"],
         })
     # 候选 → 最终 8 条：四类均衡选取（必须在 summary 校验之前，
     # 否则摘要可能提及被裁掉的条目）
@@ -1013,8 +1130,6 @@ def generate_news(material, today_cn, attempt=0):
         log("  摘要提及了未收录内容，改用条目标题兜底摘要")
         summary = clean_for_js(fallback_summary(out))
     return summary, out
-
-
 # ---------------------------------------------------------------------------
 # HTML 写入
 # ---------------------------------------------------------------------------
