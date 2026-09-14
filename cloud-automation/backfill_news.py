@@ -173,13 +173,13 @@ def gen_day(material, day_str):
                 "cat": cat, "catLabel": np.CAT_LABELS[cat],
                 "title": title, "desc": desc, "source": src, "url": url,
             })
-        if len(items) >= 2:
+        if len(items) >= 6:
             summary = np.clean_for_js(obj.get("summary", ""))[:120]
             if not np.summary_consistent(summary, items):
                 np.log("  摘要提及了未收录内容，改用条目标题兜底摘要")
                 summary = np.clean_for_js(np.fallback_summary(items))
             return summary, items
-        np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条，重试")
+        np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条（<6 硬底线），重试")
         time.sleep(2)
     return "", []
 
