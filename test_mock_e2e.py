@@ -3,18 +3,20 @@
 """端到端 mock 演练（不打真实 API）：验证两阶段生成链与 8 月标准的过滤/重试路径。
 
 链路已改为两阶段（2026-09-14）：
-  阶段 A 选题：一次调用产出 10 条候选（只含 cat/title/source/url，不写正文）
-  阶段 B 写正文：逐条素材单独调用，产出 100-160 字 desc；单条不合格再重写一次
+  阶段 A 选题：一次调用产出候选（只含 cat/title/source/url，不写正文）
+  阶段 B 写正文：逐条素材单独调用，产出 110-150 字 desc；
+                 不合格不再直接丢弃，而是按体检结果【定向重写】至多 3 轮
 
-两个场景（都模拟真实会发生的失败）：
-  [主场景] 阶段 B 首次写得太短 → 按"太短"提示重写 → 达标 → 稳定产出 8 条
-  [外环]   阶段 B 两次都太短（模型完全不改）→ 0 条 → 触发选题重试（attempt=1）
+三个场景（都模拟真实会发生的失败）：
+  [主场景] 阶段 B 首次写得太短 → 按"字数不足"提示重写 → 达标 → 稳定产出 8 条
+  [救援场景] 阶段 B 首次写了摘要里没有的数字 → 按"数字对不上"提示重写 → 救回
+  [外环]   阶段 B 三次都太短（模型完全不改）→ 0 条 → 触发选题重试（attempt=1）
 
 断言重点：
-  A. 阶段 A 的短标题/编排类候选被拦下，长标题候选全部进入阶段 B
-  B. 阶段 B 单条重写时，prompt 必须含"太短"修正提示（否则重写是空转）
-  C. 阶段 B 写不出合格正文时该条被丢弃，且不影响其它条目
-  D. 外环重试 prompt 必须含"标题字数不达标"提示
+  A. 阶段 A 的短标题/聚合类/编造 URL/英文原句候选被拦下，合格候选才进阶段 B
+  B. 阶段 B 单条重写时，prompt 必须含针对性修正提示（否则重写是空转）
+  C. 数字对不上时回灌的是【具体数字名】的修复提示，而不是笼统"重写"
+  D. 外环重试 prompt 必须含"上一轮不合格，本次务必修正"提示
   E. 最终 8 条、四类均衡、标题与正文均落在 8 月标准区间
 """
 import json
@@ -53,10 +55,23 @@ MATERIAL = [
      "summary": "European regulators published implementation rules covering 55 high-risk AI systems, effective from next year."},
     {"title": "智驾方案商拿到新订单", "url": "https://www.ithome.com/e3", "source": "IT之家",
      "summary": "该方案商获得整车厂定点，订单涉及15款车型，生命周期内预计出货80万套。"},
+    {"title": "欧洲AI法案实施细则公布", "url": "https://www.theverge.com/e2", "source": "The Verge",
+     "summary": "European regulators published implementation rules covering 55 high-risk AI systems, effective from next year."},
+    {"title": "国产GPU厂商发布新一代训练卡", "url": "https://www.qbitai.com/f1", "source": "量子位",
+     "summary": "新一代训练卡单卡显存192GB，集群互联带宽提升4倍，已在多个智算中心完成适配验证。"},
+    {"title": "AI医疗影像企业获三类证", "url": "https://www.ithome.com/f2", "source": "IT之家",
+     "summary": "该企业AI影像辅助诊断软件获批三类医疗器械注册证，覆盖14种疾病，已进入300家医院。"},
+    {"title": "Rapidly scaling online storage for AI clusters",
+     "url": "https://techcrunch.com/g3", "source": "TechCrunch",
+     "summary": "A vendor announced rapid scaling of online storage for AI clusters, targeting petabyte-scale workloads."},
+    {"title": "算力政策有新动向", "url": "https://www.ithome.com/g1", "source": "IT之家",
+     "summary": "相关部门就智能算力布局发布新的指导意见，涉及算力枢纽节点的建设安排。"},
+    {"title": "今日AI行业新闻早报汇总", "url": "https://www.ithome.com/g2", "source": "IT之家",
+     "summary": "本期早报汇总了昨日AI行业的十余条动态，涵盖模型、芯片、政策与融资等方面。"},
 ]
 VALID = {m["url"] for m in MATERIAL}
 
-# ---------- 阶段 A 返回：10 条候选（含 2 条应被拦下的坏标题 + 1 条编造 URL）----------
+# ---------- 阶段 A 返回：候选（含应被拦下的坏标题 + 1 条编造 URL）----------
 SEL_ITEMS = [
     {"cat": "policy", "title": "两部门联合发布AI计量体系指引，破解测不准与数据荒",
      "source": "IT之家", "url": "https://www.ithome.com/a1"},
@@ -78,13 +93,23 @@ SEL_ITEMS = [
      "source": "量子位", "url": "https://www.qbitai.com/d3"},
     {"cat": "tech", "title": "数据中心液冷规模化落地，PUE降至1.08节电25%",
      "source": "The Verge", "url": "https://www.theverge.com/e1"},
-    # ↓ 以下 3 条应被阶段 A 拦下（不进入阶段 B，不消耗写正文的调用）
-    {"cat": "policy", "title": "AI政策窗口开放",                      # 太短(8字)
-     "source": "IT之家", "url": "https://www.ithome.com/e2"},
-    {"cat": "industry", "title": "早报：今日AI行业新闻汇总",           # 聚合类
+    {"cat": "policy", "title": "欧洲AI法案实施细则公布，55个高风险系统纳入监管",
+     "source": "The Verge", "url": "https://www.theverge.com/e2"},
+    {"cat": "industry", "title": "智驾方案商获整车厂定点，涉及15款车型出货80万套",
      "source": "IT之家", "url": "https://www.ithome.com/e3"},
+    {"cat": "tech", "title": "国产GPU厂商发布训练卡，单卡显存192GB带宽提升4倍",
+     "source": "量子位", "url": "https://www.qbitai.com/f1"},
+    {"cat": "industry", "title": "AI医疗影像软件获批三类证，覆盖14种疾病进300家医院",
+     "source": "IT之家", "url": "https://www.ithome.com/f2"},
+    # ↓ 以下 4 条应被阶段 A 拦下（不进入阶段 B，不消耗写正文的调用）
+    {"cat": "policy", "title": "AI政策窗口开放",                      # 太短(8字)
+     "source": "IT之家", "url": "https://www.ithome.com/g1"},
+    {"cat": "industry", "title": "早报：今日AI行业新闻汇总",           # 聚合类
+     "source": "IT之家", "url": "https://www.ithome.com/g2"},
     {"cat": "capital", "title": "消息称某AI公司完成新一轮大额融资",
      "source": "TechCrunch", "url": "https://techcrunch.com/fake"},    # 编造 URL
+    {"cat": "tech", "title": "Rapidly scaling online storage",        # 英文原句未翻译
+     "source": "TechCrunch", "url": "https://techcrunch.com/g3"},
 ]
 
 # ---------- 阶段 B 返回：短文案（模拟免费模型写成 20-30 字）----------
@@ -131,11 +156,43 @@ LONG_DESC = {
         "该企业在12个数据中心完成液冷方案部署，PUE降至1.08，整体节电25%。"
         "方案采用冷板与浸没两条技术路线并行，适配高功率密度机柜，并配套余热回收系统。"
         "随着单机柜功率持续攀升，液冷正从试点走向规模化，成为新建智算中心的主流选择。",
+    "https://www.theverge.com/e2":
+        "欧洲监管机构公布人工智能法案实施细则，将55个高风险人工智能系统纳入监管范围，"
+        "相关要求自明年起生效。细则明确了提供方的合规评估义务、技术文档留存要求，"
+        "以及在公共场景部署前需完成的第三方符合性评价流程，为成员国统一执法口径提供依据。",
+    "https://www.ithome.com/e3":
+        "该智能驾驶方案商获得整车厂定点，订单涉及15款车型，生命周期内预计出货80万套。"
+        "方案基于其自研的端到端感知与决策架构，可适配多种算力平台，"
+        "定点意味着其已通过整车厂的功能安全与量产验证，后续将进入量产交付阶段。",
+    "https://www.qbitai.com/f1":
+        "国产GPU厂商发布新一代训练卡，单卡显存192GB，集群互联带宽较上代提升4倍，"
+        "并已在多个智算中心完成适配验证。厂商同步升级了软件栈与算子库，"
+        "支持主流训练框架的平滑迁移，旨在缓解大模型训练环节的算力供给压力。",
+    "https://www.ithome.com/f2":
+        "该企业人工智能影像辅助诊断软件获批三类医疗器械注册证，覆盖14种疾病，"
+        "目前已进入300家医院投入使用。软件用于辅助医生识别影像中的可疑病灶并给出量化提示，"
+        "注册证的取得意味着其可以合规进入院内收费环节，加快基层医疗机构的铺开节奏。",
+}
+
+# ---------- 阶段 B 返回：写入了摘要里查不到的数字（模拟模型顺手"推算"）----------
+# "120亿元"在素材里完全不存在（素材里有 8亿元 / 60亿元 / 130亿美元），
+# 必须被 ungrounded_numbers 抓出来并要求改写，而不是整条丢弃。
+LONG_WITH_BAD_NUM = {
+    u: d + "项目预计带动产业链投资120亿元。" for u, d in LONG_DESC.items()
 }
 
 ROUNDS = []       # 全部调用记录
-MODE = {"v": "retry_helps"}   # retry_helps / always_short
+# 模型行为模式：
+#   retry_helps  首次短 → 收到"字数不足"提示后写长（正常模型）
+#   number_fix   首次写长但编了个数字 → 收到"数字对不上"提示后改掉（可救援）
+#   always_short 三轮都短，怎么说都不改 → 应当整批作废并触发选题重试
+MODE = {"v": "retry_helps"}
 SELN = {"n": 0}   # 累计"阶段 A 选题调用"次数（跨场景计数，用于判断是否已是重试轮）
+
+
+def _is_retry(prompt):
+    """"正文待修"轮次的 prompt 特征：带【上一轮不合格，本次必须逐条修正】段落。"""
+    return "上一轮不合格" in prompt or "上一轮太短" in prompt
 
 
 class _Resp:
@@ -178,11 +235,20 @@ def fake_urlopen(req, timeout=None):
         if m["title"] in prompt:
             url = m["url"]
             break
-    # retry_helps：模型听劝 —— 带"太短"提示时写长
-    # always_short：模型不听劝 —— 只有走到第 2 轮选题（sel_round>=2）才写长
-    long_ok = (MODE["v"] == "retry_helps" and "太短" in prompt) or \
-              (MODE["v"] == "always_short" and sel_round >= 2)
-    desc = LONG_DESC.get(url, SHORT_DESC) if long_ok else SHORT_DESC
+    mode = MODE["v"]
+    if mode == "retry_helps":
+        # 听劝：带"字数不足"提示就写长
+        desc = LONG_DESC.get(url, SHORT_DESC) if _is_retry(prompt) else SHORT_DESC
+    elif mode == "number_fix":
+        # 首次写长但带一个素材里没有的数字；被告知"数字对不上"后改掉
+        if "数字对不上" in prompt:
+            desc = LONG_DESC.get(url, SHORT_DESC)
+        elif _is_retry(prompt):
+            desc = SHORT_DESC
+        else:
+            desc = LONG_WITH_BAD_NUM.get(url, SHORT_DESC)
+    else:                                   # always_short：怎么说都写短
+        desc = LONG_DESC.get(url, SHORT_DESC) if sel_round >= 2 else SHORT_DESC
     return _Resp({"choices": [{"message": {"content": desc}}]})
 
 
@@ -204,7 +270,7 @@ def main():
 
     # ================= 主场景：阶段 B 单条重写能救回来 =================
     print("=" * 74)
-    print("主场景：阶段 B 首轮写得短 → 按“太短”提示重写 → 达标")
+    print("主场景：阶段 B 首轮写得短 → 按“字数不足”提示重写 → 达标")
     print("=" * 74)
     ROUNDS.clear()
     MODE["v"] = "retry_helps"
@@ -212,25 +278,25 @@ def main():
 
     sel0 = [r for r in ROUNDS if r["kind"] == "A"][0]["prompt"]
     desc_calls = [r for r in ROUNDS if r["kind"] == "B"]
-    n_desc_first = sum(1 for r in desc_calls if "太短" not in r["prompt"])
-    n_desc_retry = sum(1 for r in desc_calls if "太短" in r["prompt"])
+    n_desc_first = sum(1 for r in desc_calls if not _is_retry(r["prompt"]))
+    n_desc_retry = sum(1 for r in desc_calls if _is_retry(r["prompt"]))
 
     print(f"\n调用构成：阶段 A 1 次 ｜ 阶段 B {len(desc_calls)} 次"
           f"（首写 {n_desc_first} / 重写 {n_desc_retry}）")
-    # A. 阶段 A 只应放行 10 条（坏标题与编造 URL 被拦）
-    #    阶段 B 只对合格候选调用 → 首写次数应等于 10
-    a_ok = (n_desc_first == 10)
-    print(f"  {'✅' if a_ok else '❌'} 阶段 A 拦下坏候选，仅 10 条进入写正文"
-          f"（实得 {n_desc_first}）")
+    # A. 阶段 A 只应放行 14 条（短标题/聚合类/英文原句/编造 URL 被拦），
+    #    且阶段 B 写满 DESC_TARGET 就停手，不再为剩余候选白烧调用
+    a_ok = (n_desc_first == np.DESC_TARGET)
+    print(f"  {'✅' if a_ok else '❌'} 阶段 A 拦下 4 条坏候选，写正文到 {np.DESC_TARGET} 条即停"
+          f"（实得 {n_desc_first} 次首写）")
     ok &= a_ok
 
-    # B. 首写太短 → 每条都应触发一次重写，且重写 prompt 含修正提示
-    b_ok = (n_desc_retry == 10)
+    # B. 首写太短 → 每条都应触发一次重写
+    b_ok = (n_desc_retry == np.DESC_TARGET)
     print(f"  {'✅' if b_ok else '❌'} 每条短正文都触发了重写，共 {n_desc_retry} 次")
     ok &= b_ok
-    sample_retry = next((r["prompt"] for r in desc_calls if "太短" in r["prompt"]), "")
-    c_ok = "不足 120 字" in sample_retry and "不得自己编造" in sample_retry
-    print(f"  {'✅' if c_ok else '❌'} 重写 prompt 含“不足120字继续补细节 + 不得编造数字”")
+    sample_retry = next((r["prompt"] for r in desc_calls if _is_retry(r["prompt"])), "")
+    c_ok = "字数不足" in sample_retry and "不得自己编造" in sample_retry
+    print(f"  {'✅' if c_ok else '❌'} 重写 prompt 含“字数不足须补细节 + 不得编造数字”")
     ok &= c_ok
 
     # 首轮选题 prompt 不应含重试提示（避免误导）
@@ -257,9 +323,40 @@ def main():
         print(f"  {'✅' if good else '❌'} {name}")
         ok &= good
 
+    # ============ 救援场景：正文编了摘要里没有的数字 → 定向重写救回 ============
+    print("\n" + "=" * 74)
+    print("救援场景：首轮写出摘要里没有的数字 → 回灌“数字对不上”提示 → 救回整条")
+    print("=" * 74)
+    ROUNDS.clear()
+    SELN["n"] = 0
+    MODE["v"] = "number_fix"
+    s3, items3 = np.generate_news(MATERIAL, "9月14日 星期一", attempt=0)
+    d_calls = [r for r in ROUNDS if r["kind"] == "B"]
+    num_fix_calls = [r for r in d_calls if "数字对不上" in r["prompt"]]
+    h_ok = len(num_fix_calls) == np.DESC_TARGET
+    print(f"  {'✅' if h_ok else '❌'} 每条写了错数字的正文都被要求定向修正"
+          f"（实得 {len(num_fix_calls)} 次 / 应有 {np.DESC_TARGET} 次）")
+    ok &= h_ok
+    sample_fix = num_fix_calls[0]["prompt"] if num_fix_calls else ""
+    i_ok = ("120亿元" in sample_fix and "并没有" in sample_fix)
+    print(f"  {'✅' if i_ok else '❌'} 修正提示指名道姓列出了具体那个数字（120亿元）")
+    ok &= i_ok
+    # 同一金额的 amt:/mag: 双 token 不应重复罗列
+    i2_ok = sample_fix.count("120亿元") == 1
+    print(f"  {'✅' if i2_ok else '❌'} 金额不重复罗列（amt/mag 去重）")
+    ok &= i2_ok
+    j_ok = len(items3) == 8 and not any("120亿元" in it["desc"] for it in items3)
+    print(f"  {'✅' if j_ok else '❌'} 12 条全部救回、残留错误数字 0 条")
+    ok &= j_ok
+    _, dl3, dist3 = _stats(items3)
+    if dl3:
+        k_ok = sum(dl3) / len(dl3) >= 110
+        print(f"  {'✅' if k_ok else '❌'} 救回后正文均值 {sum(dl3)/len(dl3):.1f} 字仍达标")
+        ok &= k_ok
+
     # ================= 外环场景：阶段 B 完全不改 → 触发选题重试 =================
     print("\n" + "=" * 74)
-    print("外环场景：阶段 B 两次都写短（模型完全不改）→ 0 条 → 选题重试")
+    print("外环场景：阶段 B 三轮都写短（模型完全不改）→ 0 条 → 选题重试")
     print("=" * 74)
     ROUNDS.clear()
     MODE["v"] = "always_short"
@@ -273,8 +370,8 @@ def main():
     ROUNDS.clear()
     s2b, items2b = np.generate_news(MATERIAL, "9月14日 星期一", attempt=1)
     sel1 = [r for r in ROUNDS if r["kind"] == "A"][0]["prompt"]
-    f_ok = "标题字数不达标" in sel1
-    print(f"  {'✅' if f_ok else '❌'} attempt=1 的选题 prompt 含“标题字数不达标”提示")
+    f_ok = "上一轮不合格，本次务必修正" in sel1
+    print(f"  {'✅' if f_ok else '❌'} attempt=1 的选题 prompt 含“上一轮不合格，本次务必修正”")
     ok &= f_ok
     print(f"  attempt=1 → {len(items2b)} 条")
     g_ok = len(items2b) == 8
