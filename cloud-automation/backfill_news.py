@@ -59,51 +59,39 @@ def collect_all():
 
 
 def day_material(all_items, day):
-    """取某天及其前后 ±1 天内的 AI 相关素材；不足 8 条时持续放宽到"AI 邻域"。
+    """取某天及其前后 ±1 天内的所有素材，让 LLM 自己在更宽池子里挑 AI 相关。
 
     真实情况：很多 RSS 源的 published 日期不准（例如 IT之家常把今天发生的标昨天），
     严格按当天分会导致素材严重不足（9-14 当日 AI 强相关只有 4 条），LLM 无法凑够 8 条。
-    这里放宽到 ±1 天邻域（仍是单日主轴）+ AI 邻域补足，确保 8 条素材池。
+    这里放宽到 ±1 天邻域的全部素材，让 LLM 自己判断筛选；硬过滤交给 hard_blocked/title_blocked。
     """
-    from datetime import datetime, timedelta
+    from datetime import datetime
     target = datetime.strptime(day, "%Y-%m-%d")
     near = [it for it in all_items if it.get("day") and
             abs((datetime.strptime(it["day"], "%Y-%m-%d") - target).days) <= 1]
-
     same_day = [it for it in near if it["day"] == day]
-    strict_same = [it for it in same_day if np.is_ai_related(it["title"])]
-    # 优先用当日严格 → 当日邻域 → 邻日严格 → 邻日邻域
-    strict_near = [it for it in near if np.is_ai_related(it["title"])]
-    adjacent_near = [it for it in near if np.is_ai_adjacent(it["title"])]
-
-    # 合并去重：先严格当天，再严格邻日，最后邻域
-    merged = list(strict_same)
-    seen_urls = {it["url"] for it in strict_same}
-    for it in strict_near:
-        if it["url"] not in seen_urls:
-            merged.append(it)
-            seen_urls.add(it["url"])
-    for it in adjacent_near:
-        if it["url"] not in seen_urls:
-            merged.append(it)
-            seen_urls.add(it["url"])
-    np.log(f"  {day}: 当日 AI 强相关 {len(strict_same)} 条 → 邻域补足后 {len(merged)} 条")
-    return merged, len(same_day)
+    np.log(f"  {day}: 当日 {len(same_day)} 条 → ±1 邻域 {len(near)} 条（给 LLM 全池）")
+    return near, len(same_day)
 
 
 def build_day_prompt(material, day_str, attempt=0):
     weekday = np.WEEKDAYS[datetime.strptime(day_str, "%Y-%m-%d").weekday()]
     lines = "\n".join(
         f"{i+1}. {m['title']} ｜来源:{m['source']} ｜URL:{m['url']}"
-        for i, m in enumerate(material[:40])
+        for i, m in enumerate(material[:60])
     )
-    temp_note = "" if attempt == 0 else "（上一轮素材较少或输出条目不足，请尽可能扩大选题范围，放宽到 AI 邻域事件如芯片、算力、机器人、自动驾驶、数据中心、并购融资动态等）"
-    return f"""下面是{day_str}（{weekday}）当天及前后的 AI 相关新闻素材（编号+标题+URL）。{temp_note}
+    if attempt == 0:
+        temp_note = ""
+    elif attempt == 1:
+        temp_note = "\n\n【提示】请仔细检查素材池，从更广的范围挑选 8 条 AI 产业新闻，包括但不限于：芯片厂商（英伟达/AMD/华为海思/联发科）、云厂商（阿里云/腾讯云/华为云/AWS/Azure）、机器人厂商、模型厂商、算力/数据中心、AI 应用、AI 监管政策、AI 投融资事件。即使素材标题看起来边缘，只要实际反映 AI 产业变化都可选用。"
+    else:
+        temp_note = "\n\n【末次硬性要求】必须输出 8 条。素材池已包含 ±1 天共 " + str(len(material)) + " 条，请务必从 AI 相关（含 AI 邻域）中挑出 8 条覆盖 4 类各 2 条。若确实凑不齐，宁可扩大到 AI 邻域（芯片/算力/数据中心/机器人/智能驾驶/语音识别/视觉识别/数字人等）也不要少于 8 条，但绝对不得收录消费电子（手机/相机/耳机/显示器/家电）、汽车新品（新车/试驾/MPV/SUV）、操作系统更新（Windows/iOS/安卓/鸿蒙）、政治人物。系统会硬过滤。"
+    return f"""下面是{day_str}（{weekday}）当天及前后共 {len(material)} 条的宽口径新闻素材（编号+标题+URL）。
 
 素材：
 {lines}
 
-请从中挑选当日最有产业价值的 AI 新闻，整理成"人工智能产业动态"。
+请从中挑选 AI 产业相关的新闻，整理成"人工智能产业动态"。{temp_note}
 
 **目标数量：8 条，覆盖 4 类各 2 条**：
 - policy 政策发布 2 条：政府部门、监管机构、行业标准、法律法规相关
@@ -111,11 +99,11 @@ def build_day_prompt(material, day_str, attempt=0):
 - industry 产业动态 2 条：企业合作、产品上市、产能布局、行业趋势、企业业绩
 - capital 投融资 2 条：融资、并购、IPO、估值变化
 
-**重要：素材包含 ±1 天的好新闻**。优先用当天素材；当天素材不足时可选用邻日（昨天/今天）的重大新闻，但 desc 中要按事件实际日期表述（"昨日/今日..."）。
+**重要：素材含 ±1 天邻域和非 AI 内容**。优先用当天素材；当天不足时可选用邻日（昨天/今天）的重大新闻，但 desc 中要按事件实际日期表述（"昨日/今日..."）。
 
 分类规则细节：
-- 8 条总数是硬要求；不要为了凑数收录与 AI 产业无关的内容（消费电子/汽车新品/系统更新/政治人物等）——系统会硬过滤拦截，但需要你自觉避开。
-- 若某一类当日实在没有对应新闻（极少），该类允许为 1 条，其它类补足 8 条总数。
+- 8 条总数是硬要求；不要为了凑数收录与 AI 产业无关的内容（消费电子/汽车新品/系统更新/政治人物等）——系统会硬过滤拦截。
+- 若某一类当日实在没有对应新闻，该类允许为 1 条，其它类补足 8 条总数。
 - 若实在凑不齐 8 条高质量新闻，可放宽到 6-7 条，但不得少于 6 条。
 
 分类口径（必须严格按新闻实质判断，宁缺勿错）：
