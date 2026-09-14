@@ -106,9 +106,20 @@ MAX_ITEMS = 8
 # 同时把下面两类"可直接修复"的失败改为定向重写而非丢弃（见 desc_issues /
 # build_desc_prompt），修复后丢弃率降到可控水平，14 条足以稳定产出 8 条。
 CANDIDATE_ITEMS = 14
-# 阶段 B 写满多少条合格正文就停手（够 select_balanced 裁到 8 条且有余量，
-# 避免为没人要的候选白烧 API 调用）
-DESC_TARGET = 12
+# 阶段 A 每类至少要有多少条候选。低于此值就用更高 temperature 补选一轮并合并。
+# [2026-09-14] 真实 API 复验（run 34819377914）产出 8 条、标题均 25.5 字、
+# 正文均 134.2 字，长度全部达标，但四类分布是
+# {政策发布:3, 技术突破:2, 投融资:3}，"产业动态"一条都没有 —— 根因是
+# 阶段 A 给的 industry 候选本就少，再被阶段 B 的硬门槛筛掉几条，
+# select_balanced 最终无米下锅（它只能从候选里挑，变不出没有的类别）。
+# 用户要求的是"四类各 2 条"，所以候选阶段就必须按类卡下限。
+MIN_CANDS_PER_CAT = 3
+# 阶段 A 最多跑几轮（首轮 + 补选轮）
+MAX_SELECT_ROUNDS = 3
+# 阶段 B 写满多少条合格正文就停手（上限；提前收工条件是"四类各够 3 条"）
+DESC_TARGET = 16
+# 阶段 B 每类至少要有多少条合格正文，四类都够了才允许提前收工
+MIN_PER_CAT_DESC = 3
 
 # —— 8 月标准（用户要求"以后都按 8 月标准推送"）——
 # 8 月实测：236 条的平均字数 —— 标题 25.0 字、正文 118.9 字，正文最短 71 字、
@@ -718,8 +729,10 @@ def build_select_prompt(material, today_cn, attempt=0):
         temp_note = (
             "\n\n【上一轮不合格，本次务必修正】上一轮选题后可用条目不足 8 条。"
             "请按以下三点修正：①标题须 20-32 字（低于 15 字、高于 40 字一律作废），"
-            "务必写足三要素（主体 + 动作 + 结果）；②**四类都要有候选**，"
-            "尤其别把“政策发布”和“投融资”漏掉；③不要选英文原标题直接照抄的素材。"
+            "务必写足三要素（主体 + 动作 + 结果）；②**四类都要有候选**——"
+            "policy 政策发布、tech 技术突破、industry 产业动态、capital 投融资，"
+            "四类各出 3-4 条，尤其别把“产业动态”漏掉（实测最容易缺的就是这一类）；"
+            "③不要选英文原标题直接照抄的素材。"
         )
     return f"""今天是{today_cn}。下面是从各大科技媒体抓取的 AI 相关新闻素材，每条含标题、正文摘要与来源 URL。{temp_note}
 
@@ -732,12 +745,16 @@ def build_select_prompt(material, today_cn, attempt=0):
 硬性过滤——剔除消费电子/编造数字/英文残留的条目，需要留有足够冗余）。
 **候选必须按产业价值从高到低排序**，最终会优先取靠前的条目。
 
-{CANDIDATE_ITEMS} 条候选必须覆盖 4 类，**每类至少 3 条候选**（这样即使过滤掉几条，
-最终仍能凑齐"四类各 2 条"）：
+{CANDIDATE_ITEMS} 条候选必须覆盖 4 类，**每类至少 3 条候选、争取 4 条**：
 - policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
 - tech 技术突破：模型/算法/芯片/算力/产品技术本身的进展
 - industry 产业动态：企业合作、产品上市、产能布局、行业趋势、企业业绩
 - capital 投融资：融资、并购、IPO、估值变化
+
+**四类缺一不可**：最终要凑齐"四类各 2 条"，而系统只会从你给的候选里挑，
+你少给某一类，最终就一定会缺那一类。实测最容易漏的是 industry 产业动态
+（企业合作、新品上市、产能与订单、行业数据这类新闻），请专门找几条。若某类
+当日素材确实太少，也至少要给 2 条。
 
 分类口径（必须严格按新闻实质判断，宁缺勿错）：
 - 若某一类当日确实没有对应新闻（极少），该类允许为 1 条，其它类补足；
@@ -858,28 +875,31 @@ def build_desc_prompt(m, attempt=0, fix=None):
       · {"short": True}                    → 字数不够
       · {"numbers": {"amt:...", "pct:40"}} → 用了素材里没有的数字
       · {"english": True}                  → 残留整句英文
-    这样每一条被拦下的正文都有机会救回来，而不是像改造前那样直接丢弃整条新闻。
+      · {"leak": True}                     → 正文里混进了提示词指令
+      · {"vague": ("引起广泛关注",)}        → 写了空泛评价/凑字填充
+
+    [2026-09-14 复验后重写] 修改要求由"塞在摘要正下方"改为"提到最前面的
+    独立区块 + 显式反抄声明 + 首尾双重提示"。
+    原因见 run 34819377914 的真实产出，第 4 条正文长这样：
+        "OpenAI CEO Sam Altman表示，公司虽已秘密提交IPO申请，但不会在今年
+        上市。上一轮不合格，本次必须逐条修正，OpenAI将不会在2026年公开上市。"
+    —— 模型把指令原文当成正文吸收了，而且这条 83 字刚好压过 MIN_DESC_LEN
+    的线、数字也对得上，一路漏进最终结果。指令离"素材"越近、越像正文，
+    被抄的概率越高；所以现在把它放到最前面并明确标注"不是新闻内容"，
+    同时在 desc_issues 里加 leak 后验兜底（双保险）。
     """
     title = (m.get("title") or "").strip()
     sm = (m.get("summary") or "").strip()[:600]
     src = m.get("source") or ""
-    retry_note = ""
-    if attempt == 0 or not fix:
-        # 首轮，或调用方没给出具体问题 → 用通用的"写足"提示
-        if attempt:
-            retry_note = (
-                "\n\n【上一轮太短，本次必须写足】上一轮正文不足 80 字被判废。"
-                "请把第二部分（关键细节）充分展开：把原文摘要里所有可核验的事实"
-                "（金额、数量、时间、占比、技术规格、覆盖范围、合作方）逐条写进去，"
-                "写完先数一遍字数，**不足 120 字就继续补充事实细节**。"
-            )
-    else:
-        parts = []
+
+    # —— 构造【修改要求】区块（仅重写轮次有）——
+    rules = []
+    if attempt and fix:
         if fix.get("short"):
-            parts.append(
-                "- **字数不足**：上一轮不足 110 字。请把第二部分（关键细节）"
-                "充分展开，把摘要里所有可核验的事实（金额、数量、时间、占比、"
-                "技术规格、覆盖范围、合作方）逐条写进去。"
+            rules.append(
+                "字数不足：上一版不足 110 字。请把第二部分（关键细节）充分展开，"
+                "把摘要里所有可核验的事实（金额、数量、时间、占比、技术规格、"
+                "覆盖范围、合作方）逐条写进去。"
             )
         bad = fix.get("numbers") or set()
         if bad:
@@ -888,41 +908,96 @@ def build_desc_prompt(m, attempt=0, fix=None):
             shown = {t for t in bad
                      if not (t.startswith("mag:") and t.split(":", 1)[1] in ams)}
             names = "、".join(sorted(_fmt_token(t) for t in shown))
-            parts.append(
-                f"- **数字对不上**：上一轮写入了这些数字：{names}。"
-                "但原文摘要里**并没有**这些数字。请二选一：①改用摘要中真实出现的"
-                "数字；②删掉这个数字，改写成不含该数字的事实表述。"
-                "**绝不能保留摘要里查不到的数字**（系统会校验，保留则整条作废）。"
+            rules.append(
+                f"数字对不上：上一版写入了{names}，但新闻素材里并没有这些数字。"
+                "请改用素材中真实出现的数字，或删掉这个数字、改写成不含该数字的事实表述。"
             )
         if fix.get("english"):
-            parts.append(
-                "- **英文残留**：上一轮正文里夹了整句英文。请把整句英文全部译成中文，"
+            rules.append(
+                "英文残留：上一版夹了整句英文。请把整句英文译成中文，"
                 "只保留公司名/产品名/模型名/技术术语的英文原名。"
             )
-        if parts:
-            retry_note = (
-                "\n\n【上一轮不合格，本次必须逐条修正】\n" + "\n".join(parts)
+        if fix.get("leak"):
+            rules.append(
+                "混入了指令：上一版把写作要求本身（类似“上一轮不合格”这样的字样）"
+                "当成新闻写进了正文。正文里只允许有这条新闻的内容，"
+                "一个字的说明性文字都不许出现。"
             )
-    return f"""请把下面这条新闻写成一段中文产业动态正文，用于行业简报。
+        vague = tuple(fix.get("vague") or ())
+        if vague:
+            rules.append(
+                "空泛表述：上一版出现了" + "、".join(f"“{v}”" for v in vague)
+                + "这类没有信息量的评价或凑字填充。请删掉它们，"
+                "换成可核验的事实（数字、时间、机构名、技术规格）。"
+            )
+    if rules:
+        fix_block = (
+            "\n【修改要求】以下是针对你**上一版**输出的修改指令，属于工作说明，"
+            "**不是新闻内容**。正文只能是这条新闻本身，"
+            "这些指令的字眼一个都不许出现在正文里（系统会检查，出现则整条作废）。\n"
+            + "\n".join(f"{i + 1}. {r}" for i, r in enumerate(rules))
+            + "\n【修改要求结束】\n"
+        )
+    else:
+        fix_block = ""
 
+    return f"""请把下面这条新闻写成一段中文产业动态正文，用于行业简报。{fix_block}
+【新闻素材】
 标题：{title}
 来源：{src}
-原文摘要：{sm if sm else "（无摘要，只能依据标题撰写，请谨慎保持保守表述）"}{retry_note}
+原文摘要：{sm if sm else "（无摘要，只能依据标题撰写，请谨慎保持保守表述）"}
 
-请严格按以下三部分依次写出，然后用逗号/句号自然连成**一段话**，总长 **110-150 字**：
+【正文写法】请严格按以下三部分依次写出，然后用逗号/句号自然连成**一段话**，总长 **110-150 字**：
 - 第一部分（约 30 字）：谁（具体机构/公司全名）做了什么（发布/融资/推出了什么）
 - 第二部分（约 70 字）：关键细节，必须写出摘要里的具体数字（金额、数量、时间、占比、技术规格、覆盖范围、合作方）
-- 第三部分（约 35 字）：影响、对比或后续计划，用事实表达（如"较此前2.8万台的预测近乎翻倍"），禁止"意义重大""里程碑式""引发广泛关注"这类空泛评价
+- 第三部分（约 35 字）：影响、对比或后续计划，用事实表达（如“较此前2.8万台的预测近乎翻倍”）
 
-写作纪律：
+【写作纪律】
 - 写完请自己数一遍字数：**不足 110 字必须继续补充第二部分的事实细节**。
 - **但也不要写超 160 字**。若已超过 160 字，请优先删掉第三部分里的铺垫与评价性语句，保留事实。定版正文字数实测平均 119 字，请向这个长度靠拢。
 - **只允许使用摘要中出现过的数字，不得自己编造**（系统会校验，编造数字整条作废）。
+- 禁止“意义重大”“里程碑式”“引发广泛关注”“覆盖范围广泛”“合作方众多”这类没有信息量的空泛评价与凑字填充，第三部分也必须用事实说话。
 - 以中文书面语为主，公司名/产品名/模型名/技术术语保留英文原名，不要残留整句英文。
 - 不要分点罗列、不要小标题、不要输出三部分的标题，直接输出这一段正文本身。
-- 不要加引号包裹，不要写"正文："之类的前缀。
+- 不要加引号包裹，不要写“正文：”之类的前缀。
+- 不要复述或引用本提示里的任何要求、说明文字，正文只能是这条新闻的内容本身。
 
 正文："""
+
+
+# 提示词指令残留在正文里的特征短语。
+# [2026-09-14] 真实 API 复验（run 34819377914）里模型把"上一轮不合格，
+# 本次必须逐条修正"当正文抄了，且该条刚好压线过 MIN_DESC_LEN，一路漏进成品。
+# 提示词侧已改成"指令前置 + 明确声明不是新闻内容"，这里再做一道后验兜底：
+# 正常新闻正文不可能出现这些说明性字眼，命中即可判定为污染。
+_PROMPT_LEAK_MARKS = (
+    "上一轮", "上一版", "不合格", "逐条修正", "必须修正", "字数不足",
+    "数字对不上", "英文残留", "本次必须", "写作纪律", "修改要求",
+    "原文摘要", "系统会校验", "整条作废", "请二选一", "混入指令",
+    "空泛表述", "正文写法", "新闻素材", "以下三部分", "请严格按",
+)
+
+# 空泛评价与凑字填充。8 月定版正文里不出现这类说法。
+# [2026-09-14] 复验产出里第 6 条结尾"此法案出台，引起广泛关注"、
+# 第 7 条"覆盖范围广泛，合作方众多"，都是把提示词的禁用词换个说法、
+# 或为凑字数堆的废话。注意"值得关注"这类过于常用的表达不收，
+# 否则会误杀正常行文（如"值得关注的是，该方案将于明年落地"）。
+_VAGUE_MARKS = (
+    "引发广泛关注", "引起广泛关注", "备受关注", "引发关注", "引发热议",
+    "意义重大", "重要意义", "里程碑", "覆盖范围广泛", "合作方众多",
+    "前景广阔", "值得期待", "开启新篇章", "注入新动能", "迈上新台阶",
+    "广泛好评", "广受关注",
+)
+
+
+def prompt_leak(desc):
+    """正文里是否混进了提示词的指令文字（返回命中的短语，空元组=干净）。"""
+    return tuple(w for w in _PROMPT_LEAK_MARKS if w in (desc or ""))
+
+
+def vague_phrases(desc):
+    """正文里的空泛评价/凑字填充（返回命中的短语，空元组=干净）。"""
+    return tuple(w for w in _VAGUE_MARKS if w in (desc or ""))
 
 
 def desc_issues(desc, material_text):
@@ -930,6 +1005,9 @@ def desc_issues(desc, material_text):
 
     把原来"任一不合格就丢弃整条"的三道硬门槛，收敛成一份可修复清单，
     交给 build_desc_prompt 做定向重写。只有重写若干轮仍不合格才真正丢弃。
+
+    [2026-09-14] 由 3 项检查扩到 5 项：新增 leak（提示词指令污染）与
+    vague（空泛评价/凑字填充）。这两项都是真实 API 复验暴露出来的漏网类型。
     """
     issues = {}
     if len(desc) < MIN_DESC_LEN:
@@ -939,7 +1017,33 @@ def desc_issues(desc, material_text):
         issues["numbers"] = bad
     if stray_english_count(desc) >= 3:
         issues["english"] = True
+    leak = prompt_leak(desc)
+    if leak:
+        issues["leak"] = leak
+    vague = vague_phrases(desc)
+    if vague:
+        issues["vague"] = vague
     return issues
+
+
+def issues_brief(issues):
+    """把体检结果压成一行可读的原因串，供日志使用。
+
+    [2026-09-14] 抽成公共函数：news_pipeline 与 backfill_news 都要打这行日志，
+    两边各写一份的话，以后每加一项检查必然漏改其中一处。
+    """
+    why = []
+    if issues.get("short"):
+        why.append("字数不足")
+    if issues.get("numbers"):
+        why.append("数字对不上:" + ",".join(sorted(issues["numbers"])))
+    if issues.get("english"):
+        why.append("英文残留")
+    if issues.get("leak"):
+        why.append("混入指令:" + "、".join(issues["leak"][:2]))
+    if issues.get("vague"):
+        why.append("空泛表述:" + "、".join(issues["vague"][:2]))
+    return "｜".join(why)
 
 
 def parse_llm_json(content):
@@ -1150,6 +1254,58 @@ def interleave_by_category(cands, prefer=3):
     return [cands[i] for i in order]
 
 
+_EN_ENTITY = re.compile(r"[A-Za-z][A-Za-z\.\-]{3,}")
+_CN_ENTITY = re.compile(
+    r"[\u4e00-\u9fff]{2,4}(?:科技|集团|公司|研究院|实验室|大学|银行|证券|"
+    r"大学|智能|网络|电子|软件|半导体|机器人|生物|医药|能源|电力|航空|航天)"
+)
+
+
+def _title_shape(t):
+    """把标题拆成 (主体词集合, 2-gram 集合)，用于判两条是否在讲同一件事。"""
+    s = re.sub(r"[\s，。：、！？·\-—–“”‘’（）()\[\]【】/]", "", t or "")
+    grams = {s[i:i + 2] for i in range(len(s) - 1)}
+    ents = {w.lower().strip(".") for w in _EN_ENTITY.findall(t or "")}
+    ents |= set(_CN_ENTITY.findall(t or ""))
+    return ents, grams
+
+
+def dedupe_similar(items, min_shared_grams=5):
+    """去掉"同一主体 + 同一类别 + 措辞高度重合"的重复条目，保留价值序靠前的。
+
+    [2026-09-14 新增] 真实 API 复验产出里第 3、4 条都是 OpenAI 上市/控速：
+      · OpenAI CEO支持控制AI发展速度，强调非停止技术进步（投融资）
+      · OpenAI年内不上市，CEO称2026年上市不妥（投融资）
+    两条占了 8 条里的 2 个名额，等于当天少报一条别的新闻。
+
+    判据是双条件，单看任一条都会误伤：
+      · 只看英文主体词 → "OpenAI" 当天出现十次都算重复（太狠）
+      · 只看 2-gram 相似度 → 这两条措辞差异太大，Jaccard 仅 0.17（抓不住）
+    所以要求同时满足：共享至少一个主体词、同属一类、共同 2-gram ≥ 5 个。
+    """
+    out = []
+    for it in items:
+        e, g = _title_shape(it.get("title", ""))
+        dup = None
+        for k in out:
+            if k["cat"] != it["cat"]:
+                continue                 # 不同类别的同主体新闻（如芯片 vs 财报）不算重复
+            ke, kg = _title_shape(k.get("title", ""))
+            shared_ent = e & ke
+            if not shared_ent:
+                continue
+            common = len(g & kg)
+            if common >= min_shared_grams:
+                dup = (k["title"], len(shared_ent), common)
+                break
+        if dup:
+            log(f"  丢弃话题重复的条目（与「{dup[0][:16]}」共享主体 {dup[1]} 个、"
+                f"共同词片 {dup[2]} 个）: {it['title'][:20]}")
+            continue
+        out.append(it)
+    return out
+
+
 def select_balanced(cands, target=MAX_ITEMS, prefer=2):
     """从候选里挑 target 条，尽量做到四类均衡；返回结果保持原价值序。
 
@@ -1185,29 +1341,19 @@ def select_balanced(cands, target=MAX_ITEMS, prefer=2):
     return out
 
 
-def generate_news(material, today_cn, attempt=0):
-    """两阶段生成：先选题（阶段 A），再逐条撰写正文（阶段 B）。
+def _filter_candidates(raw_items, by_url, seen=None):
+    """对阶段 A 的原始输出做全套硬过滤，返回候选列表（不含 _rank）。
 
-    [2026-09-14] 由"一次生成全部条目"改为两阶段。原因见 build_select_prompt /
-    build_desc_prompt 的注释：免费模型 glm-4-flash 在批量任务里会把每条正文
-    压缩到 50 字上下，达不到 8 月定版的 100-160 字标准；拆窄任务后才写得长。
+    [2026-09-14 抽出] 这段原先内联在 generate_news 里。抽出来是为了让
+    collect_candidates() 能在"某类候选不足"时再跑一轮选题并合并结果，
+    两轮共用同一套过滤规则——否则补选进来的条目会绕过校验。
+
+    过滤项：分类合法性 / URL 白名单 / 重复素材 / 标题长度上下界 /
+    标题未翻译 / 标题含提示词文字 / 聚合与消费电子类。
     """
-    prompt = build_select_prompt(material, today_cn, attempt=attempt)
-    # 重试时把 temperature 从 0.4 提到 0.6，扩大选题多样性
-    raw = call_glm(prompt, temperature=0.4 if attempt == 0 else 0.6)
-    obj = parse_llm_json(raw)
-    raw_items = obj.get("items", []) if isinstance(obj, dict) else []
-
-    by_url = {m["url"]: m for m in material}
-    # [2026-09-14] 数字溯源必须把正文摘要一起纳入。
-    # 否则会出现反向 bug：模型按 8 月标准写出"发行价150.80元每股"这类
-    # 取自摘要的真实数字，却因标题里没有而被判为"编造数字"整条丢弃。
-    material_text = " ".join(
-        (m.get("title", "") + " " + (m.get("summary") or "")) for m in material
-    )
-
-    # —— 阶段 A 过滤：分类 / URL 白名单 / 标题长度 / 聚合类 ——
-    cands, seen = [], set()
+    cands = []
+    if seen is None:
+        seen = set()
     for it in raw_items:
         cat = str(it.get("cat", "")).strip().lower()
         if cat not in CAT_LABELS:
@@ -1235,6 +1381,10 @@ def generate_news(material, today_cn, attempt=0):
         if title_english_residue(title):
             log(f"  丢弃标题未翻译的条目: {title[:30]}")
             continue
+        # 标题里混进了提示词文字（模型偶尔把写作要求当标题输出）
+        if prompt_leak(title):
+            log(f"  丢弃标题混入提示词的条目: {title[:30]}")
+            continue
         # 聚合类 / 消费电子类标题
         if title_blocked(title):
             log(f"  丢弃聚合或消费电子类条目: {title[:30]}")
@@ -1244,9 +1394,77 @@ def generate_news(material, today_cn, attempt=0):
             "title": title,
             "source": clean_for_js(it.get("source", ""))[:30] or by_url[url]["source"],
             "url": url,
-            # 记住候选的价值序（阶段 A 的排序），阶段 B 轮转处理后要还原回来
-            "_rank": len(cands),
         })
+    return cands
+
+
+def _cat_ready(items, per_cat):
+    """四类是否都写够了 per_cat 条（阶段 B 提前收工的判据）。"""
+    dist = Counter(x["cat"] for x in items)
+    return all(dist.get(k, 0) >= per_cat for k in CAT_LABELS)
+
+
+def collect_candidates(material, by_url, today_cn, attempt=0):
+    """阶段 A：选题 + 硬过滤；某类候选不足则补选并合并，返回 (摘要对象, 候选列表)。
+
+    [2026-09-14 新增补选] 真实 API 复验（run 34819377914）产出 8 条、标题均
+    25.5 字、正文均 134.2 字，长度全部达标，四类却是
+    {政策发布:3, 技术突破:2, 投融资:3}，"产业动态"一条都没有。根因是
+    select_balanced 只能从候选里挑，变不出候选里没有的类别 —— 所以必须
+    在候选阶段就把每一类的下限卡住，而不是等最后才发现缺项。
+    补选时 temperature 提到 0.7，逼模型换个角度去素材里找该类新闻。
+    """
+    obj, cands = {}, []
+    for rnd in range(MAX_SELECT_ROUNDS):
+        try:
+            # 首轮 0.4 保稳；补选轮 0.7 求变，否则模型每次挑的都差不多
+            raw = call_glm(
+                build_select_prompt(material, today_cn, attempt=attempt + rnd),
+                temperature=0.4 if rnd == 0 else 0.7,
+            )
+        except Exception as e:
+            log(f"  阶段 A 第{rnd+1}轮调用失败: {e}")
+            continue
+        got = parse_llm_json(raw)
+        if not isinstance(got, dict):
+            continue
+        if not obj:
+            obj = got                  # 首轮成功的 summary 作为最终摘要
+        fresh = _filter_candidates(got.get("items", []) or [],
+                                   by_url, {c["url"] for c in cands})
+        if fresh:
+            base = len(cands)          # 先到的轮次价值序更靠前
+            for k, c in enumerate(fresh):
+                c["_rank"] = base + k
+            cands.extend(fresh)
+        dist = Counter(c["cat"] for c in cands)
+        lack = [CAT_LABELS[k] for k in CAT_LABELS
+                if dist.get(k, 0) < MIN_CANDS_PER_CAT]
+        log(f"  阶段 A 第{rnd+1}轮：候选 {len(cands)} 条 "
+            + " ".join(f"{CAT_LABELS[k]}{dist.get(k, 0)}" for k in CAT_LABELS)
+            + (f"｜仍缺 {'/'.join(lack)}" if lack else "｜四类齐备"))
+        if not lack:
+            break
+    return obj, cands
+
+
+def generate_news(material, today_cn, attempt=0):
+    """两阶段生成：先选题（阶段 A），再逐条撰写正文（阶段 B）。
+
+    [2026-09-14] 由"一次生成全部条目"改为两阶段。原因见 build_select_prompt /
+    build_desc_prompt 的注释：免费模型 glm-4-flash 在批量任务里会把每条正文
+    压缩到 50 字上下，达不到 8 月定版的 100-160 字标准；拆窄任务后才写得长。
+    """
+    by_url = {m["url"]: m for m in material}
+    # [2026-09-14] 数字溯源必须把正文摘要一起纳入。
+    # 否则会出现反向 bug：模型按 8 月标准写出"发行价150.80元每股"这类
+    # 取自摘要的真实数字，却因标题里没有而被判为"编造数字"整条丢弃。
+    material_text = " ".join(
+        (m.get("title", "") + " " + (m.get("summary") or "")) for m in material
+    )
+
+    # —— 阶段 A：选题 + 硬过滤（含四类候选不足时的补选）——
+    obj, cands = collect_candidates(material, by_url, today_cn, attempt=attempt)
 
     # —— 阶段 B：逐条素材单独撰写 110-150 字正文 ——
     # [2026-09-14] 由"一次不成即丢弃"改为"定向重写至多 3 轮"。
@@ -1254,13 +1472,20 @@ def generate_news(material, today_cn, attempt=0):
     # "数字不可核实"、2 条死于"英文残留"——这些都是重写一次就能修好的问题，
     # 直接丢弃等于每天白扔 5-6 条可用新闻。现在把体检结果（desc_issues）
     # 原样回灌进提示词，指名要求改掉那个数字/那句英文。
-    log(f"  选题完成：{len(cands)} 条候选，开始逐条撰写正文（写满 {DESC_TARGET} 条即停）")
+    log(f"  选题完成：{len(cands)} 条候选，开始逐条撰写正文"
+        f"（四类各满 {MIN_PER_CAT_DESC} 条才收工，上限 {DESC_TARGET} 条）")
     # 按类轮转排序，保证无论写到哪里停手，四类都是齐的
-    cands = interleave_by_category(cands)
+    cands = interleave_by_category(cands, prefer=MIN_PER_CAT_DESC)
     out = []
     for ci, c in enumerate(cands):
         if len(out) >= DESC_TARGET:
-            log(f"  已写满 {DESC_TARGET} 条合格正文，其余候选不再调用")
+            log(f"  已达上限 {DESC_TARGET} 条，其余候选不再调用")
+            break
+        # 收工条件不只是"凑够 8 条"，还要四类都各有 3 条供均衡选取。
+        # [2026-09-14] 复验时只按条数收工，结果 8 条里缺了"产业动态"——
+        # 因为写到 12 条就停手，而 industry 候选恰好都排在后面还没轮到。
+        if len(out) >= MAX_ITEMS and _cat_ready(out, MIN_PER_CAT_DESC):
+            log(f"  已写满 {len(out)} 条且四类齐备，其余候选不再调用")
             break
         if ci:
             # 阶段 B 调用密集（每天 10-30 次），主动留出间隔，
@@ -1286,14 +1511,7 @@ def generate_news(material, today_cn, attempt=0):
             issues = desc_issues(desc, material_text)
             if not issues:
                 break
-            why = []
-            if issues.get("short"):
-                why.append(f"过短{len(desc)}字")
-            if issues.get("numbers"):
-                why.append("数字对不上:" + ",".join(sorted(issues["numbers"])))
-            if issues.get("english"):
-                why.append("英文残留")
-            log(f"  正文待修（第{b+1}轮）{'｜'.join(why)}: {c['title'][:22]}")
+            log(f"  正文待修（第{b+1}轮）{issues_brief(issues)}: {c['title'][:22]}")
         if not got_any:
             log(f"  丢弃调用全失败的条目: {c['title'][:26]}")
             continue
@@ -1318,12 +1536,22 @@ def generate_news(material, today_cn, attempt=0):
             "url": c["url"],
             "_rank": c.get("_rank", 999),
         })
+    # 各类实际写出多少条合格正文。这一行是排查"四类缺项"的关键分界：
+    # 若某类候选有 3 条却没写出来 → 是正文体检门槛把它筛掉了（改门槛）；
+    # 若某类候选本来就不足 3 条 → 是阶段 A/补选的问题（改提示词）。
+    # [2026-09-14] 复验缺"产业动态"时，只看最终 8 条根本分不清是哪种，
+    # 只能翻后台日志逐条数，故把这一步固化成常规输出。
+    _dist_out = Counter(x["cat"] for x in out)
+    log("  阶段 B 合格正文：" + " ".join(
+        f"{CAT_LABELS[k]}{_dist_out.get(k, 0)}" for k in CAT_LABELS))
     # 候选 → 最终 8 条：四类均衡选取（必须在 summary 校验之前，
     # 否则摘要可能提及被裁掉的条目）
     # 先按阶段 A 的价值序还原（阶段 B 为了四类覆盖做了轮转排序）
     out.sort(key=lambda x: x.get("_rank", 999))
     for x in out:
         x.pop("_rank", None)
+    # 去掉话题重复的（同一主体 + 同类 + 措辞重合），再做均衡选取
+    out = dedupe_similar(out)
     out = select_balanced(out)
     summary = clean_for_js(obj.get("summary", ""))[:120] if isinstance(obj, dict) else ""
     if out and not summary_consistent(summary, out):
