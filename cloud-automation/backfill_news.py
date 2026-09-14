@@ -70,15 +70,28 @@ def day_material(all_items, day):
     near = [it for it in all_items if it.get("day") and
             abs((datetime.strptime(it["day"], "%Y-%m-%d") - target).days) <= 1]
     same_day = [it for it in near if it["day"] == day]
-    np.log(f"  {day}: 当日 {len(same_day)} 条 → ±1 邻域 {len(near)} 条（给 LLM 全池）")
-    return near, len(same_day)
+    # AI 相关性预过滤 + 消费电子剔除：与日常流水线口径一致
+    near = [it for it in near
+            if np.is_ai_related(it["title"]) and not np.title_blocked(it["title"])]
+    # 按源轮转交错：build_day_prompt 只截取前 N 条，不重排则列表前部会被 IT之家 占满
+    buckets = {}
+    for m in near:
+        buckets.setdefault(m["source"], []).append(m)
+    inter, i = [], 0
+    while any(len(v) > i for v in buckets.values()):
+        for v in buckets.values():
+            if len(v) > i:
+                inter.append(v[i])
+        i += 1
+    np.log(f"  {day}: 当日 {len(same_day)} 条 → ±1 邻域 AI 相关 {len(inter)} 条（已按源轮转）")
+    return inter, len(same_day)
 
 
 def build_day_prompt(material, day_str, attempt=0):
     weekday = np.WEEKDAYS[datetime.strptime(day_str, "%Y-%m-%d").weekday()]
     lines = "\n".join(
         f"{i+1}. {m['title']} ｜来源:{m['source']} ｜URL:{m['url']}"
-        for i, m in enumerate(material[:60])
+        for i, m in enumerate(material[:np.PROMPT_MATERIAL_CAP])
     )
     if attempt == 0:
         temp_note = ""
