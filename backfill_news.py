@@ -1,0 +1,237 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+补齐缺失日期的 AI 产业动态（一次性回溯脚本）
+
+与 news_pipeline.py 同源逻辑：
+  - 复用 RSS 抓取 + AI 相关性过滤
+  - 按 RSS 发布日把素材分组，对每个缺失日期单独调 GLM 生成 8 条
+  - URL 强制白名单（只接受素材里真实存在的链接）
+  - 按日期倒序插入两个 HTML 的 NEWS_DATA 头部，并做 node JS 语法校验
+
+用法：
+  ZHIPU_API_KEY=xxx python3 backfill_news.py 2026-09-09 2026-09-14
+"""
+import json
+import os
+import re
+import sys
+import time
+import email.utils
+from datetime import datetime
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import news_pipeline as np
+
+WORKSPACE = os.path.dirname(os.path.abspath(__file__))
+FULL_HTML = os.path.join(WORKSPACE, "ai-chain-map.html")
+LITE_HTML = os.path.join(WORKSPACE, "ai-chain-map-lite.html")
+
+
+def parse_day(published):
+    """从 RSS 日期字符串取出 YYYY-MM-DD，失败返回 None"""
+    if not published:
+        return None
+    try:
+        return email.utils.parsedate_to_datetime(published).strftime("%Y-%m-%d")
+    except Exception:
+        pass
+    try:
+        return datetime.fromisoformat(published.replace("Z", "+00:00")).strftime("%Y-%m-%d")
+    except Exception:
+        return None
+
+
+def collect_all():
+    """抓全部源，返回 [{title,url,source,published,day}]（不去重之外的过滤）"""
+    seen, out = set(), []
+    for src in np.RSS_SOURCES:
+        items = np.fetch_rss_items(src)
+        np.log(f"  {src} → {len(items)} 条")
+        for it in items:
+            if it["url"] in seen:
+                continue
+            seen.add(it["url"])
+            it["day"] = parse_day(it["published"])
+            out.append(it)
+    np.log(f"总去重素材：{len(out)} 条")
+    return out
+
+
+def day_material(all_items, day):
+    """取某天的 AI 相关素材；不足 6 条时放宽（保留非消费电子噪声）"""
+    same_day = [it for it in all_items if it["day"] == day]
+    strict = [it for it in same_day if np.is_ai_related(it["title"])]
+    if len(strict) >= 6:
+        return strict, len(same_day)
+    relaxed = strict + [
+        it for it in same_day
+        if it not in strict and not any(b in it["title"].lower() for b in np.BLOCK_CN)
+    ]
+    return relaxed, len(same_day)
+
+
+def build_day_prompt(material, day_str):
+    weekday = np.WEEKDAYS[datetime.strptime(day_str, "%Y-%m-%d").weekday()]
+    lines = "\n".join(
+        f"{i+1}. {m['title']} ｜来源:{m['source']} ｜URL:{m['url']}"
+        for i, m in enumerate(material[:30])
+    )
+    return f"""下面是{day_str}（{weekday}）当天各大科技媒体发布的 AI 相关新闻素材（编号+标题+URL）。
+
+素材：
+{lines}
+
+请从中挑选 8 条最有产业价值的新闻，整理成"人工智能产业动态"，四类各 2 条：
+- policy 政策发布：政府/监管/标准相关
+- tech 技术突破：模型/算法/芯片/算力技术进展
+- industry 产业动态：企业合作/产品发布/行业趋势
+- capital 投融资：融资/并购/IPO
+
+硬性要求：
+1. 只输出一个 JSON 对象，不要任何其他文字、不要 markdown 代码块标记。
+2. 对象格式严格为：
+{{"summary":"一句话概括当日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题不超过30字","desc":"简述80-120字，客观专业","source":"媒体名","url":"https://原文链接"}},...]}}
+3. source 填媒体简称（如 IT之家、TechCrunch、OpenAI），url 必须从上方素材中挑选真实 URL，禁止编造。
+4. title 用中文，控制在 30 字内；desc 用中文书面语，不要口语和感叹号。
+5. 四类（policy/tech/industry/capital）各 2 条左右，总数尽量接近 8。
+6. 若某类素材确实不足可少于此数，不要硬凑编造；宁少勿假。
+7. 描述不得出现未在素材中体现的具体数字，避免张冠李戴。"""
+
+
+def gen_day(material, day_str):
+    """某天生成，最多重试 2 次"""
+    valid_urls = {m["url"] for m in material}
+    for attempt in range(3):
+        try:
+            raw = np.call_glm(build_day_prompt(material, day_str))
+            obj = np.parse_llm_json(raw)
+        except Exception as e:
+            np.log(f"  {day_str} 第{attempt+1}次生成失败: {e}")
+            time.sleep(3)
+            continue
+        items, ok = [], True
+        for it in (obj.get("items") or []):
+            cat = str(it.get("cat", "")).strip().lower()
+            url = str(it.get("url", "")).strip()
+            if cat not in np.CAT_LABELS:
+                continue
+            if url not in valid_urls:
+                np.log(f"  丢弃编造 URL: {str(it.get('title',''))[:26]}")
+                continue
+            title = np.clean_for_js(it.get("title", ""))[:60]
+            desc = np.clean_for_js(it.get("desc", ""))[:400]
+            src = np.clean_for_js(it.get("source", ""))[:30]
+            if not (title and desc and src):
+                continue
+            items.append({
+                "cat": cat, "catLabel": np.CAT_LABELS[cat],
+                "title": title, "desc": desc, "source": src, "url": url,
+            })
+        if len(items) >= 4:
+            summary = np.clean_for_js(obj.get("summary", ""))[:120]
+            return summary, items
+        np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条，重试")
+        time.sleep(2)
+    return "", []
+
+
+def js_block(day_str, weekday, summary, items):
+    """按现有 HTML 的缩进风格构造条目块"""
+    per = [",\n".join(
+        "      {\n"
+        f'        cat: "{i["cat"]}",\n'
+        f'        catLabel: "{i["catLabel"]}",\n'
+        f'        title: "{i["title"]}",\n'
+        f'        desc: "{i["desc"]}",\n'
+        f'        source: "{i["source"]}",\n'
+        f'        url: "{i["url"]}"\n'
+        "      }" for i in items)]
+    return (
+        "  {\n"
+        f'    date: "{day_str}",\n'
+        f'    weekday: "{weekday}",\n'
+        f'    summary: "{summary}",\n'
+        "    items: [\n"
+        + ",\n".join(per) + "\n"
+        "    ]\n"
+        "  },\n"
+    )
+
+
+def insert_blocks(html_path, blocks, days):
+    with open(html_path, "r", encoding="utf-8") as f:
+        content = f.read()
+    anchor = "var NEWS_DATA = [\n"
+    idx = content.find(anchor)
+    if idx == -1:
+        raise RuntimeError(f"{html_path} 未找到 NEWS_DATA 锚点")
+    new_blocks = []
+    for day, blk in zip(days, blocks):
+        if f'date: "{day}"' in content:
+            np.log(f"  {day} 已存在，跳过")
+            continue
+        new_blocks.append(blk)
+    if not new_blocks:
+        return False
+    insert_at = idx + len(anchor)
+    content = content[:insert_at] + "".join(new_blocks) + content[insert_at:]
+    with open(html_path, "w", encoding="utf-8") as f:
+        f.write(content)
+    np.log(f"  已写入 {html_path}（{len(new_blocks)} 天）")
+    return True
+
+
+def main():
+    days = sys.argv[1:]
+    if not days:
+        print("用法: backfill_news.py 2026-09-09 2026-09-14 [...]")
+        return 2
+    if not np.ZHIPU_API_KEY:
+        np.log("缺少 ZHIPU_API_KEY")
+        return 2
+
+    np.log("抓取全部素材 ...")
+    all_items = collect_all()
+
+    results = []
+    for day in days:
+        material, raw_n = day_material(all_items, day)
+        np.log(f"{day}: 当日原始 {raw_n} 条，可用素材 {len(material)} 条")
+        if len(material) < 4:
+            np.log(f"  素材不足，跳过 {day}")
+            continue
+        summary, items = gen_day(material, day)
+        if len(items) < 4:
+            np.log(f"  生成失败，跳过 {day}")
+            continue
+        weekday = np.WEEKDAYS[datetime.strptime(day, "%Y-%m-%d").weekday()]
+        results.append((day, js_block(day, weekday, summary, items), len(items)))
+        np.log(f"  ✓ {day} 生成 {len(items)} 条 | {summary[:40]}")
+        time.sleep(1)
+
+    if not results:
+        np.log("无任何可用结果")
+        return 1
+
+    # 按日期倒序排列（最新在前）
+    results.sort(key=lambda x: x[0], reverse=True)
+    days_sorted = [r[0] for r in results]
+    blocks = [r[1] for r in results]
+    for p in (FULL_HTML, LITE_HTML):
+        insert_blocks(p, blocks, days_sorted)
+
+    # JS 语法校验
+    bad = False
+    for p in (FULL_HTML, LITE_HTML):
+        if np.check_js_syntax(p) is False:
+            bad = True
+            np.log(f"JS 校验失败: {p}")
+    if bad:
+        return 1
+    np.log(f"全部完成：写入 {len(results)} 天，日期 {days_sorted}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

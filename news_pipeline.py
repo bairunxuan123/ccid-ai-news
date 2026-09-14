@@ -314,7 +314,10 @@ def write_into_html(html_path, block, date_str):
 
 
 def check_js_syntax(html_path):
-    """用 node 校验 NEWS_DATA 语法"""
+    """用 node 校验 NEWS_DATA 语法。
+
+    返回 True=通过 / False=不通过 / None=node 不可用（跳过校验）。
+    """
     js_check = (
         "const s=require('fs').readFileSync(process.argv[1],'utf8');"
         "const m=s.match(/var NEWS_DATA = (\\[[\\s\\S]*?\\]);/);"
@@ -328,8 +331,44 @@ def check_js_syntax(html_path):
         "{encoding:'utf8'});process.stdout.write(r.stdout);process.stderr.write(r.stderr);"
         "process.exit(r.status||0)"
     )
-    proc = subprocess_run(code, html_path)
+    try:
+        proc = subprocess_run(code, html_path)
+    except FileNotFoundError:
+        print("  node 不可用，改用 Python 兜底校验")
+        return check_news_data_python(html_path)
     return proc == 0
+
+
+def check_news_data_python(html_path):
+    """不依赖 node 的兜底校验：把 NEWS_DATA 的 JS 字面量还原为 JSON 再解析。
+
+    做法：先把字符串字面量抽成占位符（避免误改字符串内部内容），
+    再给裸键补引号，最后还原字面量并用 json 解析。
+    """
+    with open(html_path, "r", encoding="utf-8") as f:
+        content = f.read()
+    m = re.search(r"var NEWS_DATA = (\[[\s\S]*?\]);", content)
+    if not m:
+        print(f"  [兜底校验] 未找到 NEWS_DATA: {html_path}")
+        return False
+    src = m.group(1)
+
+    holder = []
+
+    def _stash(mm):
+        holder.append(mm.group(0))
+        return f"\x00{len(holder) - 1}\x00"
+
+    safe = re.sub(r'"(?:[^"\\]|\\.)*"', _stash, src)
+    safe = re.sub(r"([{,])(\s*)([A-Za-z_]\w*)(\s*):", r'\1\2"\3"\4:', safe)
+    safe = re.sub(r"\x00(\d+)\x00", lambda mm: holder[int(mm.group(1))], safe)
+    try:
+        json.loads(safe)
+    except Exception as e:
+        print(f"  [兜底校验] NEWS_DATA 解析失败: {e}")
+        return False
+    print("  [兜底校验] OK")
+    return True
 
 
 def subprocess_run(code, arg):
@@ -391,12 +430,15 @@ def main():
         log("两个文件当天均已写入过，无需更新")
         return 0
 
-    # 4. JS 语法校验
+    # 4. JS 语法校验（True=通过 / False=不通过 / None=node 不可用则跳过）
     ok = True
     for p in (FULL_HTML, LITE_HTML):
-        if check_js_syntax(p) != 0:
+        res = check_js_syntax(p)
+        if res is False:
             ok = False
             log(f"JS 语法校验失败: {p}")
+        elif res is None:
+            log(f"  node 不可用，跳过 {p} 的语法校验")
     if not ok:
         log("语法校验未通过，请人工检查（git 未提交，线上不受影响）")
         return 1

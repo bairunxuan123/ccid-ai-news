@@ -22,15 +22,24 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Set up Node（用于 NEWS_DATA 的 JS 语法校验）
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: Run news pipeline（抓取→LLM生成→写入完整版+阉割版）
+        id: pipeline
+        continue-on-error: true
         env:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
         run: python news_pipeline.py
 
       - name: Sync index.html（完整版默认入口，海报短链）
+        if: steps.pipeline.outcome == 'success'
         run: cp -f ai-chain-map.html index.html
 
       - name: Commit & push
+        if: steps.pipeline.outcome == 'success'
         run: |
           git config user.name "daily-news-bot"
           git config user.email "daily-news-bot@users.noreply.github.com"
@@ -46,13 +55,26 @@ jobs:
         if: always()
         env:
           SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+          PIPELINE_OUTCOME: ${{ steps.pipeline.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           LATEST_DATE=$(grep -m1 -oE 'date: "2026-[0-9]{2}-[0-9]{2}"' ai-chain-map.html | sed 's/date: "//;s/"//' || echo "未知")
-          TITLE="赛迪AI产业动态 ${LATEST_DATE} 已上线"
-          DESP=$(printf '今日产业动态已更新至 **%s**。\n\n[打开完整版](https://bairunxuan123.github.io/ccid-ai-news/)\n\n[打开阉割版](https://bairunxuan123.github.io/ccid-ai-news/ai-chain-map-lite.html)' "$LATEST_DATE")
+          if [ "$PIPELINE_OUTCOME" = "success" ]; then
+            TITLE="赛迪AI产业动态 ${LATEST_DATE} 已上线"
+            DESP=$(printf '今日产业动态已更新至 **%s**。\n\n[打开完整版](https://bairunxuan123.github.io/ccid-ai-news/)\n\n[打开阉割版](https://bairunxuan123.github.io/ccid-ai-news/ai-chain-map-lite.html)' "$LATEST_DATE")
+          else
+            TITLE="赛迪AI动态 更新失败待排查"
+            DESP=$(printf '今日流水线执行失败（状态：%s），线上内容仍为 **%s**。\n\n[查看运行日志](%s)' "$PIPELINE_OUTCOME" "$LATEST_DATE" "$RUN_URL")
+          fi
           if [ -n "${SERVERCHAN_SENDKEY}" ]; then
             RESP=$(curl -s -X POST "https://sctapi.ftqq.com/${SERVERCHAN_SENDKEY}.send" --data-urlencode "title=${TITLE}" --data-urlencode "desp=${DESP}")
             echo "Server酱 响应: ${RESP}"
           else
             echo "SERVERCHAN_SENDKEY 未配置，跳过微信通知"
           fi
+
+      - name: Fail if pipeline failed（让 Actions 标红，便于追踪）
+        if: steps.pipeline.outcome != 'success'
+        run: |
+          echo "流水线未成功（outcome=${{ steps.pipeline.outcome }}），job 标记为失败"
+          exit 1
