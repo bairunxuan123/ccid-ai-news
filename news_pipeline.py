@@ -20,6 +20,7 @@ AI 产业动态每日自动流水线（云端版，由 GitHub Actions 每天 14:
 环境变量：
   ZHIPU_API_KEY  智谱开放平台 API Key（bigmodel.cn 免费注册，glm-4-flash 免费）
 """
+import html as _html
 import json
 import os
 import re
@@ -60,15 +61,52 @@ RSS_SOURCES = [
     "https://openai.com/news/rss.xml",
 ]
 
+# 源域名 → 媒体简称。8 月定版里 source 字段填的是"IT之家""The Verge"这类简称，
+# 直接告知模型可免去它从 URL 反推媒体名（反推偶尔会写成域名或写错）。
+SOURCE_NAMES = {
+    "ithome.com": "IT之家",
+    "qbitai.com": "量子位",
+    "techcrunch.com": "TechCrunch",
+    "theverge.com": "The Verge",
+    "venturebeat.com": "VentureBeat",
+    "artificialintelligence-news.com": "AI News",
+    "technologyreview.com": "MIT Tech Review",
+    "spectrum.ieee.org": "IEEE Spectrum",
+    "arstechnica.com": "Ars Technica",
+    "openai.com": "OpenAI",
+}
+
+
+def source_name(url):
+    """把 RSS 源地址转成媒体简称，未知源退化为域名。"""
+    host = url.split("/")[2] if "//" in url else url
+    for dom, name in SOURCE_NAMES.items():
+        if dom in host:
+            return name
+    return host
+
+
 # 单源取样上限：避免综合源（IT之家单源 60 条）独占素材池，
 # 保证 AI 垂直源（TechCrunch/The Verge/MIT/OpenAI）都能进入 prompt
 PER_SOURCE_CAP = 30
-# 送进 prompt 的素材条数上限（过少会漏掉好素材，过多会稀释模型注意力）
-PROMPT_MATERIAL_CAP = 120
+# 送进 prompt 的素材条数上限。
+# [2026-09-14] 120 → 60：素材现在带正文摘要（每条最多 250 字），
+# 60 条 × 约 340 字符 ≈ 2 万字符，在模型上下文内可从容容纳；
+# 继续用 120 条会把摘要挤掉，等于白抓。
+PROMPT_MATERIAL_CAP = 60
+# 每条素材的摘要送进 prompt 的字数上限
+SUMMARY_IN_PROMPT = 250
 # 最终写入的条目数（用户硬要求：每天 8 条，四类各 2 条）
 MAX_ITEMS = 8
 # 要求模型输出的候选条数：比 MAX_ITEMS 多 2 条，给硬过滤留冗余
 CANDIDATE_ITEMS = 10
+
+# —— 8 月标准（用户要求"以后都按 8 月标准推送"）——
+# 8 月实测：236 条的平均字数 —— 标题 25.0 字、正文 118.9 字，正文最短 71 字、
+# 无一低于 60 字。9 月退化到标题 16.3 字、正文 75.3 字且 43% 不足 60 字。
+# 下面两个下限按 8 月实测下沿留少量余量设定，低于此值视为不合格直接丢弃。
+MIN_TITLE_LEN = 15
+MIN_DESC_LEN = 80
 
 # AI 相关性过滤（强命中 / 弱命中+排除词，英文按词边界，避免 email/said 误伤）
 STRONG_EN = [
@@ -222,12 +260,17 @@ _MAG = {"k": 1e3, "thousand": 1e3, "m": 1e6, "million": 1e6,
         "b": 1e9, "bn": 1e9, "billion": 1e9}
 
 
-def risky_tokens(text):
+def risky_tokens(text, bare_numbers=False):
     """把金额/百分比/倍数统一换算成可跨中英文比对的规范 token。
 
     素材多为英文（"$500M"），生成结果是中文（"5亿美元"），
     直接做子串匹配会误杀，因此统一折算为绝对数值再比对。
     同时对金额额外发放 "mag:" 别名，使 "$2B" 能匹配中文的"20亿"（未带币种）。
+
+    bare_numbers=True 时额外收录裸数字（≥4 位含千分位，如 "50,000"），
+    仅用于素材侧：中文表述"出货5万台"折算为 50000，需要与英文摘要里的
+    "50,000 units" 对上。文本侧不可开启——否则"2026年"这类年份也会变成
+    必须溯源的硬约束，素材中稍缺提及就整条误杀。
     """
     if not text:
         return set()
@@ -235,20 +278,35 @@ def risky_tokens(text):
     s = re.sub(r"\s+", "", text)
     toks = set()
 
+    if bare_numbers:
+        for m in re.finditer(r"\d[\d,]{3,}", s):
+            try:
+                toks.add("mag:%d" % round(float(m.group(0).replace(",", ""))))
+            except ValueError:
+                pass
+
     def money(n):
         toks.add("amt:%d" % round(n))
         toks.add("mag:%d" % round(n))
 
     # 中文口径金额：5亿 / 5亿美元 / 500万美元 / 2000万元
-    for m in re.finditer(r"(\d+(?:\.\d+)?)(亿|万|千)?(美元|美金|元|人民币|港币)", s):
+    # 支持双量级（"5千万美元" = 5 × 千 × 万 = 5000万美元），
+    # 与英文 "$50 million" 折算后同为 5e7，可正确比对。
+    for m in re.finditer(r"(\d+(?:\.\d+)?)([亿万千]?)([亿万千]?)(美元|美金|元|人民币|港币)", s):
         num = float(m.group(1))
-        mult = {"亿": 1e8, "万": 1e4, "千": 1e3}.get(m.group(2), 1.0)
+        mult = 1.0
+        for g in (m.group(2), m.group(3)):
+            if g:
+                mult *= {"亿": 1e8, "万": 1e4, "千": 1e3}[g]
         money(num * mult)
-    # 中文裸量级（无币种）：20亿 / 500万
-    for m in re.finditer(r"(\d+(?:\.\d+)?)(亿|万|千)(?![美元人民币港])", s):
-        num = float(m.group(1))
+    # 中文裸量级（无币种）：20亿 / 500万 / 5千万
+    # 负向断言同时排除后接量级字的情形，否则"5千万美元"会被切出
+    # 一个虚假的"5千"token，导致比对失败。
+    for m in re.finditer(r"(\d+(?:\.\d+)?)([亿万千])([亿万千])?(?![美元人民币港亿万千])", s):
         mult = {"亿": 1e8, "万": 1e4, "千": 1e3}[m.group(2)]
-        toks.add("mag:%d" % round(num * mult))
+        if m.group(3):
+            mult *= {"亿": 1e8, "万": 1e4, "千": 1e3}[m.group(3)]
+        toks.add("mag:%d" % round(float(m.group(1)) * mult))
     # 英文口径金额：$500M / 2 billion / 500M
     # 必须在原文本（保留空格）上匹配：去空格会把 "M valuation" 粘成 "Mvaluation"，
     # 词边界失效导致英文金额整体漏检。
@@ -258,8 +316,12 @@ def risky_tokens(text):
     # 百分比
     for m in re.finditer(r"(\d+(?:\.\d+)?)%", s):
         toks.add("pct:%g" % float(m.group(1)))
-    # 倍数
+    # 倍数（中文"3倍" / 英文"3x"、"3 times" 统一折算）
+    # [2026-09-14] 补英文口径：此前只认中文"倍"，英文源素材里的 "3x"
+    # 被判为素材中不存在，导致"吞吐提升3倍"这类忠实于摘要的表述整条被丢弃。
     for m in re.finditer(r"(\d+(?:\.\d+)?)倍", s):
+        toks.add("x:%g" % float(m.group(1)))
+    for m in re.finditer(r"(\d+(?:\.\d+)?)\s*(?:x|times)(?![a-zA-Z])", raw, re.I):
         toks.add("x:%g" % float(m.group(1)))
     return toks
 
@@ -274,7 +336,7 @@ def numbers_grounded(text, material_text):
     toks = risky_tokens(text)
     if not toks:
         return True
-    return toks <= risky_tokens(material_text)
+    return toks <= risky_tokens(material_text, bare_numbers=True)
 
 
 # 允许在中文文本中直接出现的英文专有名词 / 技术缩写
@@ -371,8 +433,37 @@ def http_get(url, timeout=20):
         return resp.read().decode("utf-8", errors="ignore")
 
 
+def _strip_html(s, limit=600):
+    """把 RSS 摘要里的 HTML 片段洗成纯文本（去标签、解实体、压空白、截断）。
+
+    [2026-09-14] 与"恢复 8 月标准"配套新增。RSS 的 description / content 字段
+    常是带标签的 HTML（也可能整体被 entity 编码过一次），需要解两遍实体。
+    """
+    if not s:
+        return ""
+    try:
+        s = _html.unescape(s)                       # 先解一层（&lt;p&gt; 形态）
+        s = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", s, flags=re.S | re.I)
+        s = re.sub(r"<[^>]+>", " ", s)              # 去标签
+        s = _html.unescape(s)                       # 再解一层（残留实体）
+        s = re.sub(r"\s+", " ", s).strip()
+    except Exception:
+        return ""
+    return s[:limit]
+
+
+# RSS/Atom 中承载正文摘要的字段名（各源叫法不同，取最长的那个）
+_SUM_TAGS = ("description", "summary", "content", "encoded", "subtitle")
+
+
 def fetch_rss_items(source):
-    """抓取单个 RSS/Atom 源，返回 [{title, url, source, published}]"""
+    """抓取单个 RSS/Atom 源，返回 [{title, url, source, published, summary}]
+
+    [2026-09-14] 新增 summary（正文摘要）字段。此前只取标题，导致模型手里
+    没有任何事实细节，只能写出"某公司面临挑战"这类空泛标题和十几字的正文；
+    而 8 月那批高质量条目（含发行价、市盈率、融资额等具体数字）正是
+    依赖 RSS 自带的正文摘要写出来的。所有源均提供该字段，不应丢弃。
+    """
     try:
         raw = http_get(source)
         # 剔除 XML 非法控制字符（部分源含 \x00-\x1f 导致解析失败）
@@ -401,6 +492,16 @@ def fetch_rss_items(source):
                     return c.text.strip()
         return ""
 
+    def first_summary(el):
+        """取该条目所有候选字段中最长的正文摘要（content 通常比 summary 全）"""
+        best = ""
+        for c in el.iter():
+            if local(c.tag) in _SUM_TAGS and c.text and c.text.strip():
+                t = _strip_html(c.text)
+                if len(t) > len(best):
+                    best = t
+        return best
+
     items = []
     for node in root.iter():
         if local(node.tag) not in ("item", "entry"):
@@ -410,7 +511,13 @@ def fetch_rss_items(source):
         pub = first_text(node, "pubDate") or first_text(node, "published") or first_text(node, "updated")
         if not title or not link:
             continue
-        items.append({"title": title, "url": link, "source": source, "published": pub})
+        items.append({
+            "title": title,
+            "url": link,
+            "source": source_name(source),
+            "published": pub,
+            "summary": first_summary(node),
+        })
     return items
 
 
@@ -519,13 +626,17 @@ def call_glm(prompt, temperature=0.4):
 
 
 def build_prompt(material, today_cn, attempt=0):
+    def fmt(i, m):
+        sm = (m.get("summary") or "").strip()[:SUMMARY_IN_PROMPT]
+        head = f"{i+1}. {m['title']}\n   来源：{m['source']} ｜ URL：{m['url']}"
+        return f"{head}\n   摘要：{sm}" if sm else f"{head}\n   摘要：（无，仅可依据标题撰写）"
+
     lines = "\n".join(
-        f"{i+1}. {m['title']} ｜来源:{m['source']} ｜URL:{m['url']}"
-        for i, m in enumerate(material[:PROMPT_MATERIAL_CAP])
+        fmt(i, m) for i, m in enumerate(material[:PROMPT_MATERIAL_CAP])
     )
     # 第二次重试时调高 temperature，增加多样性
     temp_note = "" if attempt == 0 else "（上一轮素材较少或输出条目不足，请尽可能扩大选题范围，放宽到 AI 邻域事件如芯片、算力、机器人、自动驾驶、数据中心等）"
-    return f"""今天是{today_cn}。下面是从各大科技媒体抓取的 AI 相关新闻素材（编号+标题+URL）。{temp_note}
+    return f"""今天是{today_cn}。下面是从各大科技媒体抓取的 AI 相关新闻素材，每条含标题、正文摘要与来源 URL。{temp_note}
 
 素材：
 {lines}
@@ -553,23 +664,53 @@ def build_prompt(material, today_cn, attempt=0):
 - industry 产业动态：企业合作、产品上市、产能布局、行业趋势、企业业绩
 - capital 投融资：融资、并购、IPO、估值变化
 
+============== 写作标准（本项目定版风格，务必逐条对齐）==============
+
+【标题：20-30 字，三要素齐全】
+1. **主体 + 动作 + 结果**齐全。主体必须是具体机构名或公司名（如"国家发改委""交通运输部""Stripe""宇树科技"），禁止"某公司""相关部门""相关负责人"这类模糊主体。
+2. **尽量带数字**：金额、数量、规模、时间、比例。参考基准：定版风格中 56% 的标题含数字。
+3. **约三分之一的标题使用双分句**（逗号连接）：前半句陈述事实，后半句点出结果或意义。
+4. 可用冒号引出细节（如"国家发改委：加快人工智能法立法进程"）。
+5. 严禁丢掉主体或事件信息的空泛写法。
+
+✅ 标题范例（照此风格撰写）：
+- 两部门联合发布AI计量体系指引，破解测不准与数据荒
+- 北京亦庄建成首个词元工厂，日产1.4万亿词元
+- Stripe 75亿美元收购OpenRouter
+- 宇树科技科创板挂牌，人形机器人第一股诞生
+- 摩根士丹利再上调中国人形机器人出货预期至5万台
+- 交通部发布AI+交通场景方案41个
+❌ 禁用写法（实测出现过，一律禁止）：
+- "AI政策窗口开放"（未说明是谁提出的什么政策）
+- "Nvidia解释增长原因"（未说明向谁解释、解释哪项增长）
+- "某公司面临挑战"
+
+【正文 desc：100-160 字，不得少于 80 字】
+按"事实 → 细节 → 意义"三层写成一段完整陈述：
+- 第一层｜谁做了什么：写全具体机构名、文件名（加书名号）、产品名、模型名。
+- 第二层｜关键细节：从素材摘要中提取可核验的数字——金额、规模、数量、时间、占比、技术规格、覆盖范围、合作方数量。
+- 第三层｜影响、对比或后续计划：用事实表达（如"较此前2.8万台的预测近乎翻倍""下一步将联动……"），禁止"意义重大""里程碑式""引发广泛关注"这类空泛评价。
+
+✅ 正文范例（定版实际写法，请对齐字数与信息密度）：
+例1（156 字）：「市场监管总局与国家发改委联合印发《人工智能计量体系和能力建设指引（2026版）》，围绕基础支撑、通用技术、核心技术等六大板块系统布局，聚焦算法黑箱和决策可解释性等痛点部署关键技术攻关，推动AI性能可测量、可比较、可追溯，并支持构建国家级计量技术研发应用中心，打通实验室到行业应用的最后一公里。」
+例2（145 字）：「宇树科技正式启动科创板网上、网下申购，发行价150.80元每股，发行后市值约609.93亿元，发行市盈率219倍。券商测算中签率仅0.02%-0.03%，按年内科创板新股首日平均涨幅466%测算，中一签账面盈利有望突破20万元。宇树科技是极少数在IPO前实现规模化盈利的全球人形机器人企业之一。」
+❌ 禁用写法：仅十几个字的短语（实测出现过 11 字正文），系统会直接丢弃。
+
 硬性要求：
 1. 只输出一个 JSON 对象，不要任何其他文字、不要 markdown 代码块标记。
 2. 对象格式严格为：
-{{"summary":"一句话概括今日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题不超过30字","desc":"简述80-120字，客观专业","source":"媒体名","url":"https://原文链接"}},...]}}
+{{"summary":"一句话概括今日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题20-30字","desc":"正文100-160字","source":"媒体名","url":"https://原文链接"}},...]}}
 3. source 填媒体简称（如 IT之家、TechCrunch、The Verge），url 必须从上方素材中挑选真实 URL，禁止编造、拼接或改写。
 4. title 用中文，控制在 30 字内，须是新闻事实的准确概括，不要加评价性形容词；desc 用中文书面语客观陈述，不要口语和感叹号。
 5. **不要为了凑齐"每类 2-3 条"而错标分类**。若某一类当日实在没有对应新闻（极少），该类可以为 1 条，其它类补足候选总数；不要硬塞错标条目充数。错标分类比数量不均衡严重得多。
 6. 输出前逐条自查：这条新闻的实质与所标分类是否一致？不一致就改正分类或换掉该条。
 7. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、操作系统更新（Windows/iOS/安卓的系统或功能更新）、产品与发布会预告、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
 8. 选题限于产业与技术范畴：判断标准是"这条新闻是否直接反映 AI 产业或技术本身的变化"。凡属个人公开表态、社会活动、与产业无关的公共事务，一律不选。
-9. 素材只有标题（没有正文），因此 title 与 desc 中**不得出现素材里没有的金额、估值、百分比、增长倍数**（如"50亿美元""2万亿美元""增长70%"）。需要表达程度时改用定性描述（如"大幅增长""估值处于高位"）。系统会校验并丢弃含无法核实数字的条目。
+9. **数字必须来自素材**：素材标题与摘要中出现的金额、估值、百分比、增长倍数、技术规格可以放心使用，这正是正文该有的信息密度；**素材中没有的数字一律不得出现**。摘要缺失时改用定性描述（如"大幅增长""估值处于高位"）。系统会校验并丢弃含无法核实数字的条目。
 10. **标题必须忠实于原文事实**：素材多为英文，须准确理解后再译为中文，不得截取英文原句、不得把原文没有的判断归纳进标题。例如原文讲"为 AI 供电是架构问题"，就不能写成"AI 在音频内容中的应用"。
-11. **desc 必须全部使用中文**（OpenAI、ChatGPT 等专有名词除外），不得残留英文句子或英文短语。系统会校验并丢弃英文残留过多的条目。
+11. **desc 以中文书面语为主**，不得残留整句英文；但公司名、产品名、模型名与技术术语（OpenAI、Apache Fluss、MiniMax Music 3.0、TPU、token）保留英文原名，不要生硬音译。系统会校验并丢弃英文残留过多的条目。
 12. 不要选用"早报/日报/盘点/汇总/速览"这类聚合内容，也不要选消费电子（iOS/iPhone/手机/相机/耳机）与汽车新品——素材里出现也不要选。
-13. **标题不得泛化**：必须保留原文的核心主体与事件（谁做了什么），禁止写成"OpenAI寻求技术突破""某公司面临挑战"这类丢掉具体信息的空泛标题。原文若讲的是具体的竞赛、事件、人物加入、计划，就如实写出。
-    **反面示例（实测出现过的错误写法，一律禁止）**："AI政策窗口开放"（没说是谁提的什么政策）、"Meta调整AI建议功能"（没说调整什么、为什么）、"Nvidia解释增长原因"（没说是谁问的、解释了哪项增长）、"AI供电架构问题"（主体和结论都丢失）、"发布脑机接口标准"（丢了主体"我国"）。正确写法应像"美国新提案拟对违规AI开发者最高监禁20年"这样，主体、动作、关键信息齐全。
-13b. **desc 必须是 80-120 字的完整陈述**，至少包含"主体 + 做了什么 + 关键细节/影响"三要素；禁止只写一句短短语（如"AI供电面临架构问题"这种 9 个字的写法）。素材只有标题时，可围绕标题给出客观的背景性说明，但不得编造素材中没有的数字。
+13. **标题不得泛化**：必须保留原文的核心主体与事件（谁做了什么）。反面示例（实测出现过，一律禁止）："AI政策窗口开放"（没说是谁提的什么政策）、"Meta调整AI建议功能"（没说调整什么、为什么）、"Nvidia解释增长原因"（没说是谁问的、解释了哪项增长）、"AI供电架构问题"（主体和结论都丢失）、"发布脑机接口标准"（丢了主体"我国"）。
 14. **summary 只能概括本次 items 里实际收录的条目**，不得提及未收录的新闻。系统会核对，出现未收录内容视为错误。
 15. 分类补充口径：企业发生安全事故、被攻击、被罚款等负面事件属于"产业动态"，不要标成"技术突破"；只有当新闻本身是技术能力/模型能力的进展时才用"技术突破"。"""
 
@@ -799,7 +940,12 @@ def generate_news(material, today_cn, attempt=0):
     raw_items = obj.get("items", []) if isinstance(obj, dict) else []
 
     valid_urls = {m["url"] for m in material}
-    material_text = " ".join(m.get("title", "") for m in material)
+    # [2026-09-14] 数字溯源必须把正文摘要一起纳入。
+    # 否则会出现反向 bug：模型按 8 月标准写出"发行价150.80元每股"这类
+    # 取自摘要的真实数字，却因标题里没有而被判为"编造数字"整条丢弃。
+    material_text = " ".join(
+        (m.get("title", "") + " " + (m.get("summary") or "")) for m in material
+    )
     out = []
     for it in raw_items:
         cat = str(it.get("cat", "")).strip().lower()
@@ -813,6 +959,14 @@ def generate_news(material, today_cn, attempt=0):
         desc = clean_for_js(it.get("desc", ""))[:400]
         src = clean_for_js(it.get("source", ""))[:30]
         if not title or not desc or not url:
+            continue
+        # 8 月定版标准：标题 20-30 字、正文 100-160 字。低于下限视为
+        # 丢信息的空泛写法（9 月实测出现过 8 字标题与 11 字正文），直接丢弃。
+        if len(title) < MIN_TITLE_LEN:
+            log(f"  丢弃标题过短的条目（{len(title)}字）: {title}")
+            continue
+        if len(desc) < MIN_DESC_LEN:
+            log(f"  丢弃正文过短的条目（{len(desc)}字）: {title[:26]}")
             continue
         # 数字溯源：金额/估值/百分比/倍数必须能在素材里找到，否则丢弃该条
         if not numbers_grounded(title, material_text) or not numbers_grounded(desc, material_text):
