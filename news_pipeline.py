@@ -27,6 +27,7 @@ import sys
 import time
 import urllib.request
 import xml.etree.ElementTree as ET
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 
 # ---------------------------------------------------------------------------
@@ -64,6 +65,10 @@ RSS_SOURCES = [
 PER_SOURCE_CAP = 30
 # 送进 prompt 的素材条数上限（过少会漏掉好素材，过多会稀释模型注意力）
 PROMPT_MATERIAL_CAP = 120
+# 最终写入的条目数（用户硬要求：每天 8 条，四类各 2 条）
+MAX_ITEMS = 8
+# 要求模型输出的候选条数：比 MAX_ITEMS 多 2 条，给硬过滤留冗余
+CANDIDATE_ITEMS = 10
 
 # AI 相关性过滤（强命中 / 弱命中+排除词，英文按词边界，避免 email/said 误伤）
 STRONG_EN = [
@@ -288,14 +293,32 @@ _EN_ALLOW = {
 
 
 def stray_english_count(text):
-    """统计文本中"不应残留"的英文单词数（长度≥4 且非专有名词白名单）"""
+    """统计文本中"不该残留的英文"。
+
+    [2026-09-14 修复] 原实现把所有非白名单英文词（长度≥4）都计数，阈值 3。
+    但真实新闻标题里本来就会嵌公司名/人名（Nscale、Fidji Simo、Mecka…），
+    于是 "Nscale添加前OpenAI高管Fidji Simo" 被判为"英文未翻译"整条丢弃
+    —— 实测每天因此损失 1 条，直接拖累 8 条目标。
+    改为只认【真正的英文残留】：
+      · 连续 ≥3 个非白名单英文词（说明是一句英文短语/句子），或
+      · 非白名单英文词总数 ≥6（长段英文）
+    零散嵌在中文里的专有名词不再计分。
+    """
     if not text:
         return 0
-    n = 0
-    for w in re.findall(r"[A-Za-z]{4,}", text):
-        if w.lower() not in _EN_ALLOW:
-            n += 1
-    return n
+    words = re.findall(r"[A-Za-z][A-Za-z\.\-]*", text)
+    bad = [w for w in words if w.lower().strip(".") not in _EN_ALLOW]
+    if len(bad) >= 6:
+        return len(bad)
+    run = 0
+    for w in words:
+        if w.lower().strip(".") not in _EN_ALLOW and len(w) >= 4:
+            run += 1
+            if run >= 3:            # 连续 3 个英文词 = 残留的英文短语
+                return len(bad)
+        else:
+            run = 0
+    return 0
 
 
 # 豁免词：命中则认为不是消费电子硬件（"手机助手"是 AI 应用形态，非终端硬件）
@@ -469,10 +492,18 @@ def collect_material(hours=72):
 # LLM 生成
 # ---------------------------------------------------------------------------
 def call_glm(prompt, temperature=0.4):
+    """调用智谱 GLM 生成。
+
+    [2026-09-14 修复] 原先未指定 max_tokens，沿用 API 默认值（偏小），
+    要求输出 8-10 条（每条 title+desc+source+url 约 120-150 token）时
+    极易被截断 —— json.loads 整体失败，一次生成完全白费。
+    这里显式给足 4096，并把超时从 90s 放宽到 180s（输出变长后耗时增加）。
+    """
     body = json.dumps({
         "model": ZHIPU_MODEL,
         "messages": [{"role": "user", "content": prompt}],
         "temperature": temperature,
+        "max_tokens": 4096,
     }).encode("utf-8")
     req = urllib.request.Request(
         ZHIPU_URL,
@@ -482,7 +513,7 @@ def call_glm(prompt, temperature=0.4):
             "Authorization": f"Bearer {ZHIPU_API_KEY}",
         },
     )
-    with urllib.request.urlopen(req, timeout=90) as resp:
+    with urllib.request.urlopen(req, timeout=180) as resp:
         data = json.loads(resp.read().decode("utf-8"))
     return data["choices"][0]["message"]["content"]
 
@@ -501,15 +532,19 @@ def build_prompt(material, today_cn, attempt=0):
 
 请从中挑选当日最有产业价值的 AI 新闻，整理成"人工智能产业动态"。
 
-**目标数量：8 条，覆盖 4 类各 2 条**：
-- policy 政策发布 2 条：政府部门、监管机构、行业标准、法律法规相关
-- tech 技术突破 2 条：模型/算法/芯片/算力/产品技术本身的进展
-- industry 产业动态 2 条：企业合作、产品上市、产能布局、行业趋势、企业业绩
-- capital 投融资 2 条：融资、并购、IPO、估值变化
+**请输出 10 条候选**（比最终需要的 8 条多 2 条，因为系统会做一轮硬性过滤，
+剔除消费电子/编造数字/英文残留的条目，需要留有冗余）。
+**候选必须按产业价值从高到低排序**，最终会取靠前的条目。
+
+10 条候选尽量覆盖 4 类，参考配比：
+- policy 政策发布 2-3 条：政府部门、监管机构、行业标准、法律法规相关
+- tech 技术突破 2-3 条：模型/算法/芯片/算力/产品技术本身的进展
+- industry 产业动态 2-3 条：企业合作、产品上市、产能布局、行业趋势、企业业绩
+- capital 投融资 2-3 条：融资、并购、IPO、估值变化
 
 分类规则细节：
-- 8 条总数是硬要求；但若某一类当日确实没有对应新闻（极少），该类允许为 1 条，其它类补足 8 条总数；
-- 若实在凑不齐 8 条高质量新闻，可放宽到 6-7 条，但不得少于 6 条；
+- 10 条候选是本次要求；过滤后系统会截取前 8 条；
+- 若某一类当日确实没有对应新闻（极少），该类允许为 1 条，其它类补足；
 - 宁可少几条也绝不硬塞与 AI 产业无关的内容（消费电子/汽车新品/系统更新/政治人物等）——系统会硬过滤拦截，但需要你自觉避开。
 
 分类口径（必须严格按新闻实质判断，宁缺勿错）：
@@ -524,7 +559,7 @@ def build_prompt(material, today_cn, attempt=0):
 {{"summary":"一句话概括今日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题不超过30字","desc":"简述80-120字，客观专业","source":"媒体名","url":"https://原文链接"}},...]}}
 3. source 填媒体简称（如 IT之家、TechCrunch、The Verge），url 必须从上方素材中挑选真实 URL，禁止编造、拼接或改写。
 4. title 用中文，控制在 30 字内，须是新闻事实的准确概括，不要加评价性形容词；desc 用中文书面语客观陈述，不要口语和感叹号。
-5. **不要为了凑齐"每类 2 条"而错标分类**。若某一类当日实在没有对应新闻（极少），该类可以为 1 条，但其它类补足 8 条总数；不要硬塞错标条目充数。错标分类比数量不均衡严重得多。
+5. **不要为了凑齐"每类 2-3 条"而错标分类**。若某一类当日实在没有对应新闻（极少），该类可以为 1 条，其它类补足候选总数；不要硬塞错标条目充数。错标分类比数量不均衡严重得多。
 6. 输出前逐条自查：这条新闻的实质与所标分类是否一致？不一致就改正分类或换掉该条。
 7. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、操作系统更新（Windows/iOS/安卓的系统或功能更新）、产品与发布会预告、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
 8. 选题限于产业与技术范畴：判断标准是"这条新闻是否直接反映 AI 产业或技术本身的变化"。凡属个人公开表态、社会活动、与产业无关的公共事务，一律不选。
@@ -533,20 +568,70 @@ def build_prompt(material, today_cn, attempt=0):
 11. **desc 必须全部使用中文**（OpenAI、ChatGPT 等专有名词除外），不得残留英文句子或英文短语。系统会校验并丢弃英文残留过多的条目。
 12. 不要选用"早报/日报/盘点/汇总/速览"这类聚合内容，也不要选消费电子（iOS/iPhone/手机/相机/耳机）与汽车新品——素材里出现也不要选。
 13. **标题不得泛化**：必须保留原文的核心主体与事件（谁做了什么），禁止写成"OpenAI寻求技术突破""某公司面临挑战"这类丢掉具体信息的空泛标题。原文若讲的是具体的竞赛、事件、人物加入、计划，就如实写出。
+    **反面示例（实测出现过的错误写法，一律禁止）**："AI政策窗口开放"（没说是谁提的什么政策）、"Meta调整AI建议功能"（没说调整什么、为什么）、"Nvidia解释增长原因"（没说是谁问的、解释了哪项增长）、"AI供电架构问题"（主体和结论都丢失）、"发布脑机接口标准"（丢了主体"我国"）。正确写法应像"美国新提案拟对违规AI开发者最高监禁20年"这样，主体、动作、关键信息齐全。
+13b. **desc 必须是 80-120 字的完整陈述**，至少包含"主体 + 做了什么 + 关键细节/影响"三要素；禁止只写一句短短语（如"AI供电面临架构问题"这种 9 个字的写法）。素材只有标题时，可围绕标题给出客观的背景性说明，但不得编造素材中没有的数字。
 14. **summary 只能概括本次 items 里实际收录的条目**，不得提及未收录的新闻。系统会核对，出现未收录内容视为错误。
 15. 分类补充口径：企业发生安全事故、被攻击、被罚款等负面事件属于"产业动态"，不要标成"技术突破"；只有当新闻本身是技术能力/模型能力的进展时才用"技术突破"。"""
 
 
 def parse_llm_json(content):
-    """从 LLM 输出中稳健提取 JSON 对象（含 summary 与 items）"""
-    text = content.strip()
+    """从 LLM 输出中稳健提取 JSON 对象（含 summary 与 items）。
+
+    [2026-09-14] 增加截断容错。原实现直接 json.loads(text[start:end+1])，
+    一旦模型输出被 max_tokens 截断（最后一个 item 只写了一半），
+    整体解析失败 → 这一次生成完全白费，重试又要重新消耗一次调用。
+    现在解析失败后退化为"逐条抢救已完整输出的 item 对象"，
+    能救出多少算多少（配合上层重试，把"整批丢失"降级为"少一两条"）。
+    """
+    text = (content or "").strip()
     if text.startswith("```"):
         text = re.sub(r"^```[a-zA-Z]*\s*", "", text)
         text = re.sub(r"\s*```$", "", text)
-    start, end = text.find("{"), text.rfind("}")
-    if start == -1 or end == -1:
+    start = text.find("{")
+    if start == -1:
         raise ValueError(f"LLM 输出未找到 JSON 对象: {text[:200]}")
-    return json.loads(text[start:end + 1])
+    end = text.rfind("}")
+    if end > start:
+        try:
+            return json.loads(text[start:end + 1])
+        except Exception:
+            pass
+
+    # —— 截断容错：按花括号配对扫描，抢救出每个完整的 item 对象 ——
+    salvaged, items = {}, []
+    seen_titles = set()
+    for m in re.finditer(r"\{", text):
+        depth, close = 0, -1
+        for j in range(m.start(), len(text)):
+            ch = text[j]
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    close = j
+                    break
+        if close == -1:          # 这一层没闭合（截断点），跳过
+            continue
+        frag = text[m.start():close + 1]
+        if '"title"' not in frag or '"cat"' not in frag:
+            continue
+        try:
+            obj = json.loads(frag)
+        except Exception:
+            continue
+        t = str(obj.get("title", "")).strip()
+        if t and t not in seen_titles:
+            seen_titles.add(t)
+            items.append(obj)
+    if not items:
+        raise ValueError(f"LLM 输出 JSON 解析失败且无法抢救: {text[:200]}")
+    sm = re.search(r'"summary"\s*:\s*"(.*?)"\s*,', text, re.S)
+    if sm:
+        salvaged["summary"] = sm.group(1)
+    salvaged["items"] = items
+    log(f"  ⚠ LLM 输出疑似被截断，已抢救出 {len(items)} 条完整条目")
+    return salvaged
 
 
 def clean_for_js(value):
@@ -559,27 +644,85 @@ def clean_for_js(value):
 # 分类纠偏关键词
 POLICY_HINTS = ["政策", "监管", "法规", "法案", "立法", "政府", "部委", "标准",
                 "合规", "备案", "条例", "管理办法", "管理局", "指导意见", "规划",
-                "扶持", "补贴", "政府采购", "市级", "省级"]
+                "扶持", "补贴", "政府采购", "市级", "省级",
+                # [2026-09-14] 补：立法流程类词，此前"美国新提案遏制前沿AI发展"
+                # 因缺"提案"被降级成产业动态
+                "提案", "草案", "印发", "禁令", "商务部", "发改委", "工信部",
+                "网信办", "监管机构", "监管部门", "监管框架", "新规"]
 CAPITAL_HINTS = ["融资", "并购", "收购", "ipo", "上市", "估值", "投资", "注资",
                  "增资", "参股", "领投", "跟投", "募资", "轮"]
 NEGATIVE_HINTS = ["黑客", "攻击", "入侵", "罚款", "起诉", "诉讼", "争议", "泄露",
-                  "宕机", "故障", "被罚", "违规", "反垄断", "泄密"]
+                  "宕机", "故障", "被罚", "违规", "反垄断", "泄密",
+                  # [2026-09-14] 补：负面事件通用表述，避免"某公司面临网络安全
+                  # 问题"被标成技术突破
+                  "安全问题", "网络安全问题", "陷入困境"]
+
+# 明确的资本类信号：用于把【被错标成其它类】的投融资新闻改判回来。
+# 刻意不含裸"上市"/"投资"——它们会和"产品上市""战略投资"混淆，另由
+# _capital_signal() 结合产品发布词做区分。
+CAPITAL_STRONG = [
+    "融资", "并购", "收购", "ipo", "估值", "募资", "领投", "跟投",
+    "注资", "增资", "参股", "首次公开募股", "天使轮", "种子轮",
+    "轮融资", "融资轮", "上市计划", "推迟上市", "暂缓上市", "股票",
+]
+# 明确的政策类信号：用于把被错标成产业/技术的政策新闻改判回来
+POLICY_STRONG = [
+    "法案", "立法", "条例", "管理办法", "指导意见", "发改委", "工信部",
+    "网信办", "商务部", "监管部门", "监管机构", "国家标准", "行业标准",
+    "新提案", "提案", "印发", "禁令", "监管框架", "合规要求", "实施细则",
+]
+# 产品发布语境：命中则裸"上市"不算资本信号（"新GPU产品上市"≠IPO）
+_PRODUCT_LAUNCH = [
+    "产品上市", "新品上市", "新机上市", "开售", "首销", "预售", "发售",
+    "正式上市销售", "开卖",
+]
+
+
+def _capital_signal(text):
+    """资本类信号强度（含裸"上市"的语境消歧）"""
+    n = sum(1 for k in CAPITAL_STRONG if k in text)
+    if "上市" in text and not any(p in text for p in _PRODUCT_LAUNCH):
+        n += 1
+    return n
+
+
+def _policy_signal(text):
+    return sum(1 for k in POLICY_STRONG if k in text)
 
 
 def normalize_category(cat, title, desc):
-    """分类确定性纠偏。
+    """分类确定性纠偏（双向）。
 
-    模型常为了让各分类数量好看而错标（例如把"某公司陷入安全争议"标成政策发布）。
-    这里按关键词兜底校正：政策发布必须有政策类词汇，投融资必须有资本类词汇，
-    技术突破不得用于负面事件。
+    [2026-09-14 修复] 原实现只会【降级】：模型标的类目缺支撑词就统统丢进
+    industry，从不改判到正确的类目。实测后果是投融资常年 0 条、政策发布也
+    被吃掉 —— 例如
+      "Mecka AI在Sequoia领投的融资中估值近5亿美元"（模型标 industry）
+      "OpenAI CEO称2026年上市不合适"（模型标 policy→被降级 industry）
+      "美国新提案遏制前沿AI发展，最高监禁20年"（模型标 policy→被降级 industry）
+    本该是投融资/政策发布的新闻全被压进产业动态，导致四类失衡、凑不满 8 条。
+    现在改为：先用强信号把条目【改判】到资本/政策，再对无支撑的类目降级。
     """
     text = (str(title or "") + str(desc or "")).lower()
+    n_cap = _capital_signal(text)
+    n_pol = _policy_signal(text)
+    n_neg = sum(1 for k in NEGATIVE_HINTS if k in text)
+
+    # 1) 模型标 capital / policy，但文本没有对应支撑 → 按更强信号改判，否则降级
+    if cat == "capital" and n_cap == 0:
+        return "policy" if n_pol else "industry"
     if cat == "policy" and not any(k in text for k in POLICY_HINTS):
+        if n_cap:
+            return "capital"
         return "industry"
-    if cat == "capital" and not any(k in text for k in CAPITAL_HINTS):
+    # 2) 技术突破不得用于负面事件
+    if cat == "tech" and n_neg:
         return "industry"
-    if cat == "tech" and any(k in text for k in NEGATIVE_HINTS):
-        return "industry"
+    # 3) 模型标 industry / tech，但文本是明确的资本或政策事件 → 改判
+    if cat in ("industry", "tech"):
+        if n_cap and not n_pol:
+            return "capital"
+        if n_pol and not n_cap:
+            return "policy"
     return cat
 
 
@@ -611,6 +754,41 @@ def summary_consistent(summary, items):
 def fallback_summary(items):
     """由已收录条目拼装的兜底摘要，保证与条目一致"""
     return "、".join(str(it.get("title", "")) for it in items[:3])[:110]
+
+
+def select_balanced(cands, target=MAX_ITEMS, prefer=2):
+    """从候选里挑 target 条，尽量做到四类均衡；返回结果保持原价值序。
+
+    [2026-09-14 新增] 之前直接把候选全量写入，模型倾向多写"产业动态"、
+    少写"投融资"，四类就不均衡。这里改成"轮转取用"：
+      第一轮：每类先各取 1 条（保证四类都出现）
+      第二轮：每类再各取 1 条（尽量凑到各 2 条）
+      剩余名额：按候选原本的价值降序补齐
+    这样即使模型输出的四类配比跑偏，最终写入的 8 条也能归位；
+    若某类当日确实没有候选，则名额自动让给其它类，不会硬塞错标条目。
+    """
+    if len(cands) <= target:
+        return cands
+    by_cat = {}
+    for idx, c in enumerate(cands):
+        by_cat.setdefault(c["cat"], []).append(idx)
+    picked = set()
+    for want in range(1, prefer + 1):
+        for cat in CAT_LABELS:
+            pool = by_cat.get(cat, [])
+            if len(picked) >= target:
+                break
+            if len(pool) >= want:
+                picked.add(pool[want - 1])
+    for idx in range(len(cands)):          # 剩余名额按价值序补齐
+        if len(picked) >= target:
+            break
+        picked.add(idx)
+    out = [cands[i] for i in sorted(picked)]
+    dist = Counter(c["cat"] for c in out)
+    log(f"  均衡选取：候选 {len(cands)} 条 → 写入 {len(out)} 条 "
+        + " ".join(f"{CAT_LABELS[k]}{dist.get(k, 0)}" for k in CAT_LABELS))
+    return out
 
 
 def generate_news(material, today_cn, attempt=0):
@@ -661,6 +839,9 @@ def generate_news(material, today_cn, attempt=0):
             "source": src,
             "url": url,
         })
+    # 候选 → 最终 8 条：四类均衡选取（必须在 summary 校验之前，
+    # 否则摘要可能提及被裁掉的条目）
+    out = select_balanced(out)
     summary = clean_for_js(obj.get("summary", ""))[:120] if isinstance(obj, dict) else ""
     if out and not summary_consistent(summary, out):
         log("  摘要提及了未收录内容，改用条目标题兜底摘要")
