@@ -101,9 +101,25 @@ def build_day_prompt(material, day_str, attempt=0):
     if attempt == 0:
         temp_note = ""
     elif attempt == 1:
-        temp_note = "\n\n【提示】请仔细检查素材池，从更广的范围挑选 10 条候选 AI 产业新闻，包括但不限于：芯片厂商（英伟达/AMD/华为海思/联发科）、云厂商（阿里云/腾讯云/华为云/AWS/Azure）、机器人厂商、模型厂商、算力/数据中心、AI 应用、AI 监管政策、AI 投融资事件。即使素材标题看起来边缘，只要实际反映 AI 产业变化都可选用。\n\n【上一轮被丢弃的主因是标题不达标或素材摘要太空】标题须 20-30 字（低于 15 字一律作废）。请优先挑选摘要中含具体数字与事实的新闻——正文由后续步骤逐条撰写，需要可核验的细节支撑。"
+        temp_note = ("\n\n【提示】请仔细检查素材池，从更广的范围挑选候选 AI 产业新闻，包括但不限于："
+                     "芯片厂商（英伟达/AMD/华为海思/联发科）、云厂商（阿里云/腾讯云/华为云/AWS/Azure）、"
+                     "机器人厂商、模型厂商、算力/数据中心、AI 应用、AI 监管政策、AI 投融资事件。"
+                     "即使素材标题看起来边缘，只要实际反映 AI 产业变化都可选用。\n\n"
+                     "【上一轮被丢弃的主因是标题不达标或素材摘要太空】标题须 20-32 字"
+                     "（低于 15 字、高于 40 字一律作废）。请优先挑选摘要中含具体数字与事实的新闻"
+                     "——正文由后续步骤逐条撰写，需要可核验的细节支撑。")
     else:
-        temp_note = "\n\n【末次硬性要求】必须输出 10 条候选。素材池已包含 ±1 天共 " + str(len(material)) + " 条，请务必从 AI 相关（含 AI 邻域）中挑出 10 条候选，覆盖 4 类各 2-3 条。\n**同时务必保证标题质量：20-30 字、三要素齐全（主体+动作+结果）**，宁可少出几条候选，也不要出丢主体的空泛标题。若确实凑不齐 10 条，可优先扩大到 AI 邻域（芯片/算力/数据中心/机器人/智能驾驶/语音识别/视觉识别/数字人等）补足；**即使候选数不足，也绝不允许用空泛标题充数——质量优先于条数**，但绝对不得收录消费电子（手机/相机/耳机/显示器/家电）、汽车新品（新车/试驾/MPV/SUV）、操作系统更新（Windows/iOS/安卓/鸿蒙）、政治人物。系统会硬过滤。"
+        temp_note = ("\n\n【末次硬性要求】必须输出 " + str(np.CANDIDATE_ITEMS) + " 条候选。"
+                     "素材池已包含 ±1 天共 " + str(len(material)) + " 条，请务必从 AI 相关"
+                     "（含 AI 邻域）中挑出 " + str(np.CANDIDATE_ITEMS) + " 条候选，四类每类至少 3 条，"
+                     "尤其别把“政策发布”和“投融资”漏掉。\n"
+                     "**同时务必保证标题质量：20-32 字、三要素齐全（主体+动作+结果）、必须译成中文"
+                     "（禁止把英文原标题直接当标题）**，宁可少出几条候选，也不要出丢主体的空泛标题。"
+                     "若确实凑不齐，可优先扩大到 AI 邻域（芯片/算力/数据中心/机器人/智能驾驶/"
+                     "语音识别/视觉识别/数字人等）补足；**即使候选数不足，也绝不允许用空泛标题充数"
+                     "——质量优先于条数**，但绝对不得收录消费电子（手机/相机/耳机/显示器/家电）、"
+                     "汽车新品（新车/试驾/MPV/SUV）、操作系统更新（Windows/iOS/安卓/鸿蒙）、政治人物。"
+                     "系统会硬过滤。")
     return f"""下面是{day_str}（{weekday}）当天及前后共 {len(material)} 条的宽口径新闻素材（编号+标题+URL）。
 
 素材：
@@ -111,15 +127,16 @@ def build_day_prompt(material, day_str, attempt=0):
 
 请从中挑选 AI 产业相关的新闻，整理成"人工智能产业动态"。{temp_note}
 
-**请输出 10 条候选**（比最终需要的 8 条多 2 条，因为系统会做一轮硬性过滤，
-剔除消费电子/编造数字/英文残留的条目，需要留有冗余），
+**请输出 {np.CANDIDATE_ITEMS} 条候选**（比最终需要的 8 条多出不少，因为系统会做一轮硬性过滤，
+剔除消费电子/编造数字/英文残留的条目，需要留有足够冗余），
 **并按产业价值从高到低排序**，系统会按四类均衡选取前 8 条：
 
-10 条候选尽量覆盖 4 类，参考配比：
-- policy 政策发布 2-3 条：政府部门、监管机构、行业标准、法律法规相关
-- tech 技术突破 2-3 条：模型/算法/芯片/算力/产品技术本身的进展
-- industry 产业动态 2-3 条：企业合作、产品上市、产能布局、行业趋势、企业业绩
-- capital 投融资 2-3 条：融资、并购、IPO、估值变化
+{np.CANDIDATE_ITEMS} 条候选必须覆盖 4 类，**每类至少 3 条候选**（这样即使过滤掉几条，
+最终仍能凑齐"四类各 2 条"）：
+- policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
+- tech 技术突破：模型/算法/芯片/算力/产品技术本身的进展
+- industry 产业动态：企业合作、产品上市、产能布局、行业趋势、企业业绩
+- capital 投融资：融资、并购、IPO、估值变化
 
 **重要：素材含 ±1 天邻域和非 AI 内容**。优先用当天素材；当天不足时可选用邻日（昨天/今天）的重大新闻，但 desc 中要按事件实际日期表述（"昨日/今日..."）。
 
@@ -135,7 +152,7 @@ def build_day_prompt(material, day_str, attempt=0):
 
 ============== 写作标准（本项目定版风格，务必逐条对齐）==============
 
-【标题：20-30 字，三要素齐全】
+【标题：20-32 字，三要素齐全】
 1. **主体 + 动作 + 结果**齐全。主体必须是具体机构名或公司名（如"国家发改委""交通运输部""Stripe""宇树科技"），禁止"某公司""相关部门"这类模糊主体。
 2. **尽量带数字**：金额、数量、规模、时间、比例。参考基准：定版风格中 56% 的标题含数字。
 3. **约三分之一的标题使用双分句**（逗号连接）：前半句陈述事实，后半句点出结果或意义。
@@ -159,7 +176,7 @@ def build_day_prompt(material, day_str, attempt=0):
 硬性要求：
 1. 只输出一个 JSON 对象，不要任何其他文字、不要 markdown 代码块标记。
 2. 对象格式严格为：
-{{"summary":"一句话概括当日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题20-30字","source":"媒体名","url":"https://原文链接"}},...]}}
+{{"summary":"一句话概括当日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题20-32字","source":"媒体名","url":"https://原文链接"}},...]}}
    **注意：items 里不要写 desc 字段**，正文留待后续步骤生成。
 3. source 填媒体简称（如 IT之家、TechCrunch、The Verge），url 必须从上方素材中挑选真实 URL，禁止编造、拼接或改写。**同一条素材只能出现一次**。
 4. title 用中文，控制在 20-30 字，须是新闻事实的准确概括，不要加评价性形容词。
@@ -218,9 +235,15 @@ def gen_day(material, day_str):
             title = np.clean_for_js(it.get("title", ""))[:60]
             if not title:
                 continue
-            # 8 月定版标准：标题 20-30 字（9 月实测出现过 8 字标题），低于下限直接丢弃
+            # 8 月定版标准：标题 20-32 字（9 月实测出现过 8 字标题），低于下限直接丢弃
             if len(title) < np.MIN_TITLE_LEN:
                 np.log(f"  丢弃标题过短（{len(title)}字）: {title}")
+                continue
+            if len(title) > np.MAX_TITLE_LEN:
+                np.log(f"  丢弃标题过长（{len(title)}字）: {title[:26]}")
+                continue
+            if np.title_english_residue(title):
+                np.log(f"  丢弃标题未翻译: {title[:26]}")
                 continue
             # 硬拦截：消费电子/汽车新品/系统更新/政治人物（与 daily pipeline 保持一致）
             if np.hard_blocked(title):
@@ -233,38 +256,56 @@ def gen_day(material, day_str):
                 "cat": cat, "title": title,
                 "source": np.clean_for_js(it.get("source", ""))[:30],
                 "url": url,
+                "_rank": len(cands),
             })
 
         # —— 阶段 B：逐条素材单独撰写 110-150 字正文 ——
         # [2026-09-14] 与 news_pipeline 同步：免费模型 glm-4-flash 在批量任务里
         # 会把每条正文压到 50 字上下（实测批量 3 条 → 均 63 字），
         # 拆成单条窄任务后可稳定产出 170-210 字，才能达到 8 月定版的 118.9 字。
-        np.log(f"  {day_str} 阶段A {len(cands)} 条候选，开始逐条写正文")
+        # 同时把"一次不成即丢弃"改为"定向重写至多 3 轮"（见 np.desc_issues）。
+        np.log(f"  {day_str} 阶段A {len(cands)} 条候选，开始逐条写正文"
+               f"（写满 {np.DESC_TARGET} 条即停）")
         by_url = {m["url"]: m for m in material}
+        cands = np.interleave_by_category(cands)   # 按类轮转，保证四类都覆盖到
         items = []
         for ci, c in enumerate(cands):
+            if len(items) >= np.DESC_TARGET:
+                np.log(f"  已写满 {np.DESC_TARGET} 条合格正文，其余候选不再调用")
+                break
             if ci:
                 time.sleep(1.0)
             m = by_url[c["url"]]
-            desc = ""
-            for b in range(2):
+            desc, issues, got_any = "", {}, False
+            for b in range(3):
                 try:
-                    got = np.call_glm(np.build_desc_prompt(m, attempt=b), temperature=0.5)
+                    got = np.call_glm(
+                        np.build_desc_prompt(m, attempt=b, fix=issues if b else None),
+                        temperature=0.5 if b == 0 else 0.35)
                 except Exception as e:
                     np.log(f"  正文生成失败（{c['title'][:18]}）: {e}")
                     continue
-                desc = np.clean_for_js(np.clean_desc_output(got))[:400]
-                if len(desc) >= np.MIN_DESC_LEN:
+                got_any = True
+                cand_desc = np.clean_for_js(np.clean_desc_output(got))[:400]
+                if not cand_desc:
+                    continue
+                desc = cand_desc
+                issues = np.desc_issues(desc, material_text)
+                if not issues:
                     break
-                np.log(f"  正文过短（{len(desc)}字）重写: {c['title'][:22]}")
-            if len(desc) < np.MIN_DESC_LEN:
-                np.log(f"  丢弃正文始终过短的条目: {c['title'][:26]}")
+                why = []
+                if issues.get("short"):
+                    why.append(f"过短{len(desc)}字")
+                if issues.get("numbers"):
+                    why.append("数字对不上:" + ",".join(sorted(issues["numbers"])))
+                if issues.get("english"):
+                    why.append("英文残留")
+                np.log(f"  正文待修（第{b+1}轮）{'｜'.join(why)}: {c['title'][:20]}")
+            if not got_any or issues:
+                np.log(f"  丢弃重写仍不合格的条目: {c['title'][:26]}")
                 continue
-            if not np.numbers_grounded(c["title"], material_text) or not np.numbers_grounded(desc, material_text):
-                np.log(f"  丢弃数字不可核实的条目: {c['title'][:26]}")
-                continue
-            if np.stray_english_count(desc) >= 3:
-                np.log(f"  丢弃英文残留的条目: {c['title'][:26]}")
+            if np.ungrounded_numbers(c["title"], material_text):
+                np.log(f"  丢弃标题数字不可核实的条目: {c['title'][:26]}")
                 continue
             # 分类确定性纠偏
             fixed = np.normalize_category(c["cat"], c["title"], desc)
@@ -274,9 +315,13 @@ def gen_day(material, day_str):
                 "cat": fixed, "catLabel": np.CAT_LABELS[fixed],
                 "title": c["title"], "desc": desc,
                 "source": c["source"] or m["source"], "url": c["url"],
+                "_rank": c.get("_rank", 999),
             })
         if len(items) >= 6:
-            # 候选 → 最终 8 条：四类均衡选取（须在摘要校验前）
+            # 先还原阶段 A 的价值序，再四类均衡选取（须在摘要校验前）
+            items.sort(key=lambda x: x.get("_rank", 999))
+            for x in items:
+                x.pop("_rank", None)
             items = np.select_balanced(items)
             summary = np.clean_for_js(obj.get("summary", ""))[:120]
             if not np.summary_consistent(summary, items):
