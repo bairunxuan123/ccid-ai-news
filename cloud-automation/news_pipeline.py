@@ -27,7 +27,7 @@ import sys
 import time
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 # ---------------------------------------------------------------------------
 # 配置
@@ -41,14 +41,29 @@ ZHIPU_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
 ZHIPU_MODEL = "glm-4-flash"   # 免费模型
 
 # 新闻源（GitHub Actions 在美国节点运行，尽量用可达性好的源；单源失败不影响整体）
+# [2026-09-14] 扩充：原 6 源里中文源只有 IT之家（综合 IT 站，消费电子噪声大），
+#   高质量 AI 垂直源仅 4 个且多在 48h 窗口无更新，导致凑不出 8 条四类均衡。
+#   实测补充以下源（可用性已验证）：
+#     量子位（中文 AI 垂直，更新到当天）｜AI News（AI 垂直）｜
+#     Ars Technica｜IEEE Spectrum AI
 RSS_SOURCES = [
     "https://www.ithome.com/rss/",                                  # 中文 IT 综合
+    "https://www.qbitai.com/feed",                                  # 量子位（中文 AI 垂直）★ 新增
     "https://techcrunch.com/category/artificial-intelligence/feed/",
     "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",  # Atom
     "https://venturebeat.com/category/ai/feed/",
+    "https://www.artificialintelligence-news.com/feed/",            # AI News ★ 新增
     "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+    "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss",  # IEEE Spectrum AI ★ 新增
+    "https://feeds.arstechnica.com/arstechnica/technology-lab",     # Ars Technica ★ 新增
     "https://openai.com/news/rss.xml",
 ]
+
+# 单源取样上限：避免综合源（IT之家单源 60 条）独占素材池，
+# 保证 AI 垂直源（TechCrunch/The Verge/MIT/OpenAI）都能进入 prompt
+PER_SOURCE_CAP = 30
+# 送进 prompt 的素材条数上限（过少会漏掉好素材，过多会稀释模型注意力）
+PROMPT_MATERIAL_CAP = 120
 
 # AI 相关性过滤（强命中 / 弱命中+排除词，英文按词边界，避免 email/said 误伤）
 STRONG_EN = [
@@ -57,12 +72,21 @@ STRONG_EN = [
     "neural", "transformer", "generative ai", "robotaxi", "agentic",
     "grok", "xai", "qwen", "midjourney", "stable diffusion", "hugging face",
     "artificial intelligence", "foundation model", "gpu", "datacenter",
+    # 2026-09-14 补：OpenAI/主流模型系专有名词，此前缺失导致
+    # "Perplexity trusts GPT-6 Astra" 这类高价值素材被 is_ai_related 误拦
+    "perplexity", "gpt", "codex", "sora", "dall-e", "o1", "o3",
+    "hyperclova", "phi-", "granite", "command r",
 ]
 STRONG_CN = [
     "人工智能", "大模型", "大语言模型", "智能体", "多模态", "自动驾驶", "智驾",
     "算力", "数据中心", "英伟达", "深度学习", "机器学习", "神经网络", "生成式",
     "大模型公司", "ai大模型", "具身智能", "智算", "aigc", "ai服务器", "ai芯片",
     "ai应用", "ai安全", "ai治理", "ai眼镜", "ai手机", "ai pc",
+    # 2026-09-14 补：国内 AI 厂商/模型名（中文源的 AI 新闻多以公司名+模型名出现）
+    "豆包", "通义", "文心", "混元", "kimi", "月之暗面", "智谱", "百川",
+    "阶跃", "minimax", "零一万物", "商汤", "科大讯飞", "讯飞星火", "昆仑万维",
+    "盘古", "昇腾", "寒武纪", "摩尔线程", "地平线", "小马智行", "文远知行",
+    "宇树", "优必选", "智元机器人",
 ]
 WEAK_CN = ["芯片", "机器人", "gpu", "智能"]
 # 兜底放宽时使用的"AI 邻域"词：只有命中这些才允许把弱相关新闻纳入
@@ -96,11 +120,40 @@ BLOCK_CN = [
 ]
 
 # TITLE_BLOCK 用于"二次过滤"：标题含聚合类/某些消费品但话题可能涉及 AI 的
+# [2026-09-14] 扩充：素材池实测发现以下漏网消费电子会进 prompt 并被模型选中
+#   —— 努比亚/摩托罗拉/realme 新机、小米平板、米家窗帘、奇瑞捷豹路虎新车、
+#      Win11 Copilot、ANKER AI 会议耳机等。这些即使带"AI"字样也不属于 AI 产业动态。
+#   设计：消费电子终端与系统更新【无条件拦】；产品发布向动词【仅当标题不含
+#   AI 硬件信号时拦】——这样"英伟达上架 RTX PRO 专业显卡"能保留，
+#   而"realme 手机预热"被拦。汽车不用品牌名拦（小鹏/特斯拉同时是智驾/机器人重要厂商），
+#   改用"万元起"这类零售价格特征精准识别新车新闻。
 TITLE_BLOCK = [
+    # 聚合汇总类
     "早报", "日报", "晚报", "周报", "月报", "盘点", "汇总", "速览", "一周要闻",
-    "时事", "寻求胜利", "官图", "试驾", "新车", "座舱", "续航", "渲染图",
-    "ios", "iphone", "ipad", "macbook", "airpods", "apple watch", "鸿蒙",
+    # 消费电子终端（含"AI 手机/AI 耳机"这类营销话术）
+    "手机", "平板", "笔记本", "耳机", "手表", "手环", "充电宝", "移动电源",
+    # 智能家居 / 家电
+    "窗帘", "米家", "空气炸锅", "电饭煲", "空调", "冰箱", "洗衣机",
     "扫拖", "扫地机器人", "门锁", "浴霸", "晾衣机", "加湿器",
+    # 操作系统与终端更新（放宽为直接匹配，此前精确匹配导致 Win11 Copilot 漏网）
+    "win11", "win10", "windows 11", "windows 10", "ipados", "macos",
+    "ios", "iphone", "ipad", "macbook", "airpods", "apple watch", "鸿蒙",
+    # 汽车新品（非 AI 产业事件）
+    "官图", "试驾", "新车", "座舱", "续航", "渲染图",
+    # 操作系统内核（Linux 内核发布等，借 "AMDGPU"/"GPU" 关键词混入）
+    "内核",
+]
+
+# 产品发布向动词：仅当标题【不含】AI 硬件信号时才拦截（避免误杀算力硬件新闻）
+TITLE_BLOCK_SOFT = [
+    "新机", "预热", "开售", "预售", "上架", "首销", "万元起",
+    "时事", "寻求胜利",
+]
+# AI 硬件/算力信号：命中则豁免 TITLE_BLOCK_SOFT
+_AI_HW_SIGNAL = [
+    "算力", "数据中心", "gpu", "显卡", "显存", "服务器", "推理", "训练",
+    "英伟达", "nvidia", "amd", "intel", "海思", "昇腾", "寒武纪", "摩尔线程",
+    "大模型", "人工智能", "智算",
 ]
 
 # 匹配前先去掉空格/连字符等分隔符：使 "iOS 27" 能命中 "ios2"、"Win 11" 命中 "win11"
@@ -245,19 +298,30 @@ def stray_english_count(text):
     return n
 
 
-# 聚合类 / 消费电子类标题拦截（即使含 AI 字样也不属于"AI 产业动态"）
-TITLE_BLOCK = [
-    "早报", "日报", "晚报", "周报", "月报", "盘点", "汇总", "速览", "一周要闻",
-    "时事", "寻求胜利", "官图", "试驾", "新车", "座舱", "续航", "渲染图",
-    "ios", "iphone", "ipad", "macbook", "airpods", "apple watch", "鸿蒙",
-    "扫拖", "扫地机器人", "门锁", "浴霸", "晾衣机", "加湿器",
+# 豁免词：命中则认为不是消费电子硬件（"手机助手"是 AI 应用形态，非终端硬件）
+_TITLE_EXEMPT = [
+    "手机助手", "手机智能体", "手机端ai", "端侧ai", "移动端ai助手",
 ]
 
 
 def title_blocked(title):
-    """标题是否为应当排除的类型（聚合汇总 / 消费电子 / 汽车新品）"""
-    t = (title or "").lower()
-    return any(b in t for b in TITLE_BLOCK)
+    """标题是否为应当排除的类型（聚合汇总 / 消费电子 / 汽车新品 / 系统更新）。
+
+    [2026-09-14] 由"单一 has-any 匹配"升级为两级判定：
+      · TITLE_BLOCK      —— 消费电子终端、系统更新、汽车新品、聚合类：无条件排除
+      · TITLE_BLOCK_SOFT —— 产品发布向动词（新机/预售/上架/万元起…）：
+                            仅当标题【不含】AI 硬件信号时才排除，
+                            避免误杀"英伟达上架 RTX PRO 专业显卡"这类算力硬件新闻
+    匹配前统一去掉空格/连字符，覆盖 "Win 11"、"iOS 27" 等带空格写法。
+    """
+    t = re.sub(r"[\s\-_·]+", "", (title or "").lower())
+    if any(e in t for e in _TITLE_EXEMPT):
+        return False
+    if any(b in t for b in TITLE_BLOCK):
+        return True
+    if any(b in t for b in TITLE_BLOCK_SOFT) and not any(s in t for s in _AI_HW_SIGNAL):
+        return True
+    return False
 
 CAT_LABELS = {
     "policy": "政策发布",
@@ -327,25 +391,78 @@ def fetch_rss_items(source):
     return items
 
 
-def collect_material(hours=48):
-    """汇总所有源最近 N 小时且 AI 相关的条目，去重。
+def _parse_pubdate(s):
+    """解析 RSS 发布时间（RFC822 / ISO8601），失败返回 None（不因此丢弃素材）。"""
+    if not s:
+        return None
+    s = s.strip()
+    try:                                    # "Mon, 14 Sep 2026 00:00:00 GMT"
+        from email.utils import parsedate_to_datetime
+        dt = parsedate_to_datetime(s)
+        if dt is not None:
+            if dt.tzinfo is not None:
+                dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+            return dt
+    except Exception:
+        pass
+    try:                                    # "2026-09-14T00:00:00Z"
+        dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        if dt.tzinfo is not None:
+            dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+        return dt
+    except Exception:
+        return None
 
-    默认 48h 窗口（原 36h），单源上限 60 条（原 40），保证 8 条生成有足够素材池。
+
+def collect_material(hours=72):
+    """汇总所有源最近 N 小时且 AI 相关的条目，去重；**按源均衡取样**。
+
+    [2026-09-14 关键修复] 原实现为
+        for src in RSS_SOURCES:
+            for it in fetch_rss_items(src): ...
+            if len(material) >= 60: break
+    而 IT之家（第一个源）单源就返回 60 条，循环在第一个源之后直接 break，
+    TechCrunch / The Verge / MIT Tech Review / OpenAI 四个高质量 AI 垂直源的
+    素材全部丢失 —— LLM 只能看到 IT之家的消费电子，于是产出"智能门锁+浴霸+扫拖"。
+    同时 cutoff 变量算了却从未参与过滤（OpenAI RSS 含 1192 条历史文章，必须靠它滤掉）。
+
+    现改为：遍历全部源、每源最多 PER_SOURCE_CAP 条、cutoff 真正生效。
     """
     seen, material = set(), []
     cutoff = datetime.utcnow() - timedelta(hours=hours)
+    dist = []
     for src in RSS_SOURCES:
+        got, total = 0, 0
         for it in fetch_rss_items(src):
             if it["url"] in seen:
                 continue
             seen.add(it["url"])
+            total += 1
+            pub = _parse_pubdate(it.get("published"))
+            if pub is not None and pub < cutoff:
+                continue                    # 超出时间窗口的历史文章
             if not is_ai_related(it["title"]):
                 continue
+            if title_blocked(it["title"]):
+                continue                    # 消费电子/系统更新/汽车新品不进素材池
             material.append(it)
-        if len(material) >= 60:
-            break
-    log(f"素材汇总：{len(material)} 条 AI 相关（近 {hours}h）")
-    return material
+            got += 1
+            if got >= PER_SOURCE_CAP:
+                break
+        dist.append(f"{src.split('/')[2]}={got}/{total}")
+    # 按源轮转交错重排：prompt 只截取前 N 条，若不重排则列表前部会被单一综合源占满
+    buckets = {}
+    for m in material:
+        buckets.setdefault(m["source"], []).append(m)
+    interleaved, i = [], 0
+    while any(len(v) > i for v in buckets.values()):
+        for v in buckets.values():
+            if len(v) > i:
+                interleaved.append(v[i])
+        i += 1
+    log(f"素材汇总：{len(interleaved)} 条 AI 相关（近 {hours}h）")
+    log("  来源分布（采用/原始）：" + "  ".join(dist))
+    return interleaved
 
 
 # ---------------------------------------------------------------------------
@@ -373,7 +490,7 @@ def call_glm(prompt, temperature=0.4):
 def build_prompt(material, today_cn, attempt=0):
     lines = "\n".join(
         f"{i+1}. {m['title']} ｜来源:{m['source']} ｜URL:{m['url']}"
-        for i, m in enumerate(material[:40])
+        for i, m in enumerate(material[:PROMPT_MATERIAL_CAP])
     )
     # 第二次重试时调高 temperature，增加多样性
     temp_note = "" if attempt == 0 else "（上一轮素材较少或输出条目不足，请尽可能扩大选题范围，放宽到 AI 邻域事件如芯片、算力、机器人、自动驾驶、数据中心等）"
@@ -686,7 +803,7 @@ def main():
             return 2
 
     # 1. 抓素材
-    material = collect_material(hours=48)
+    material = collect_material(hours=72)
     if len(material) < 8:
         log("素材不足（<8 条），本次跳过，避免生成低质/编造内容")
         return 0
