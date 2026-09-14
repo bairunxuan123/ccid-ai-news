@@ -59,14 +59,35 @@ def collect_all():
 
 
 def day_material(all_items, day):
-    """取某天的 AI 相关素材；不足 6 条时放宽到"AI 邻域"（仍有明确口径，不放行消费电子噪声）"""
-    same_day = [it for it in all_items if it["day"] == day]
-    strict = [it for it in same_day if np.is_ai_related(it["title"])]
-    if len(strict) >= 6:
-        return strict, len(same_day)
-    adjacent = [it for it in same_day if np.is_ai_adjacent(it["title"])]
-    # 邻域集合至少不劣于 strict
-    merged = strict + [it for it in adjacent if it not in strict]
+    """取某天及其前后 ±1 天内的 AI 相关素材；不足 8 条时持续放宽到"AI 邻域"。
+
+    真实情况：很多 RSS 源的 published 日期不准（例如 IT之家常把今天发生的标昨天），
+    严格按当天分会导致素材严重不足（9-14 当日 AI 强相关只有 4 条），LLM 无法凑够 8 条。
+    这里放宽到 ±1 天邻域（仍是单日主轴）+ AI 邻域补足，确保 8 条素材池。
+    """
+    from datetime import datetime, timedelta
+    target = datetime.strptime(day, "%Y-%m-%d")
+    near = [it for it in all_items if it.get("day") and
+            abs((datetime.strptime(it["day"], "%Y-%m-%d") - target).days) <= 1]
+
+    same_day = [it for it in near if it["day"] == day]
+    strict_same = [it for it in same_day if np.is_ai_related(it["title"])]
+    # 优先用当日严格 → 当日邻域 → 邻日严格 → 邻日邻域
+    strict_near = [it for it in near if np.is_ai_related(it["title"])]
+    adjacent_near = [it for it in near if np.is_ai_adjacent(it["title"])]
+
+    # 合并去重：先严格当天，再严格邻日，最后邻域
+    merged = list(strict_same)
+    seen_urls = {it["url"] for it in strict_same}
+    for it in strict_near:
+        if it["url"] not in seen_urls:
+            merged.append(it)
+            seen_urls.add(it["url"])
+    for it in adjacent_near:
+        if it["url"] not in seen_urls:
+            merged.append(it)
+            seen_urls.add(it["url"])
+    np.log(f"  {day}: 当日 AI 强相关 {len(strict_same)} 条 → 邻域补足后 {len(merged)} 条")
     return merged, len(same_day)
 
 
@@ -76,8 +97,8 @@ def build_day_prompt(material, day_str, attempt=0):
         f"{i+1}. {m['title']} ｜来源:{m['source']} ｜URL:{m['url']}"
         for i, m in enumerate(material[:40])
     )
-    temp_note = "" if attempt == 0 else "（上一轮素材较少或输出条目不足，请尽可能扩大选题范围，放宽到 AI 邻域事件如芯片、算力、机器人、自动驾驶、数据中心等）"
-    return f"""下面是{day_str}（{weekday}）当天各大科技媒体发布的 AI 相关新闻素材（编号+标题+URL）。{temp_note}
+    temp_note = "" if attempt == 0 else "（上一轮素材较少或输出条目不足，请尽可能扩大选题范围，放宽到 AI 邻域事件如芯片、算力、机器人、自动驾驶、数据中心、并购融资动态等）"
+    return f"""下面是{day_str}（{weekday}）当天及前后的 AI 相关新闻素材（编号+标题+URL）。{temp_note}
 
 素材：
 {lines}
@@ -90,10 +111,12 @@ def build_day_prompt(material, day_str, attempt=0):
 - industry 产业动态 2 条：企业合作、产品上市、产能布局、行业趋势、企业业绩
 - capital 投融资 2 条：融资、并购、IPO、估值变化
 
+**重要：素材包含 ±1 天的好新闻**。优先用当天素材；当天素材不足时可选用邻日（昨天/今天）的重大新闻，但 desc 中要按事件实际日期表述（"昨日/今日..."）。
+
 分类规则细节：
-- 8 条总数是硬要求；但若某一类当日确实没有对应新闻（极少），该类允许为 1 条，其它类补足 8 条总数；
-- 若实在凑不齐 8 条高质量新闻，可放宽到 6-7 条，但不得少于 6 条；
-- 宁可少几条也绝不硬塞与 AI 产业无关的内容（消费电子/汽车新品/系统更新/政治人物等）——系统会硬过滤拦截，但需要你自觉避开。
+- 8 条总数是硬要求；不要为了凑数收录与 AI 产业无关的内容（消费电子/汽车新品/系统更新/政治人物等）——系统会硬过滤拦截，但需要你自觉避开。
+- 若某一类当日实在没有对应新闻（极少），该类允许为 1 条，其它类补足 8 条总数。
+- 若实在凑不齐 8 条高质量新闻，可放宽到 6-7 条，但不得少于 6 条。
 
 分类口径（必须严格按新闻实质判断，宁缺勿错）：
 - policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
@@ -154,6 +177,10 @@ def gen_day(material, day_str):
             desc = np.clean_for_js(it.get("desc", ""))[:400]
             src = np.clean_for_js(it.get("source", ""))[:30]
             if not (title and desc and src):
+                continue
+            # 硬拦截：消费电子/汽车新品/系统更新/政治人物（与 daily pipeline 保持一致）
+            if np.hard_blocked(title):
+                np.log(f"  硬拦截: {title[:26]}")
                 continue
             if not np.numbers_grounded(title, material_text) or not np.numbers_grounded(desc, material_text):
                 np.log(f"  丢弃数字不可核实的条目: {title[:26]}")
@@ -302,13 +329,15 @@ def main():
     for day in days:
         material, raw_n = day_material(all_items, day)
         np.log(f"{day}: 当日原始 {raw_n} 条，可用素材 {len(material)} 条")
-        if len(material) < 2:
-            np.log(f"  素材不足，跳过 {day}")
+        if len(material) < 6:
+            np.log(f"  素材不足 6 条（含邻域），放弃 {day}")
             continue
         summary, items = gen_day(material, day)
-        if len(items) < 2:
-            np.log(f"  生成失败，跳过 {day}")
+        if len(items) < 6:
+            np.log(f"  生成失败（<6 条），跳过 {day}")
             continue
+        if len(items) < 8:
+            np.log(f"  ⚠ 仅 {len(items)} 条（<8 目标），仍写入")
         weekday = np.WEEKDAYS[datetime.strptime(day, "%Y-%m-%d").weekday()]
         results.append((day, js_block(day, weekday, summary, items), len(items)))
         np.log(f"  ✓ {day} 生成 {len(items)} 条 | {summary[:40]}")
