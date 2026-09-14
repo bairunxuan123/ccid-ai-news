@@ -99,14 +99,23 @@ PROMPT_MATERIAL_CAP = 60
 SUMMARY_IN_PROMPT = 250
 # 最终写入的条目数（用户硬要求：每天 8 条，四类各 2 条）
 MAX_ITEMS = 8
-# 要求模型输出的候选条数：比 MAX_ITEMS 多 2 条，给硬过滤留冗余
-CANDIDATE_ITEMS = 10
+# 要求模型输出的候选条数。
+# [2026-09-14] 由 10 提到 14。10 条候选的实测结果：真实 API 跑一遍只剩 3 条
+# （见 run 34818610548 日志：4 条判"数字不可核实"、2 条判"英文残留"、
+# 还有分类/标题原因），冗余完全不够，四类也凑不齐。
+# 同时把下面两类"可直接修复"的失败改为定向重写而非丢弃（见 desc_issues /
+# build_desc_prompt），修复后丢弃率降到可控水平，14 条足以稳定产出 8 条。
+CANDIDATE_ITEMS = 14
+# 阶段 B 写满多少条合格正文就停手（够 select_balanced 裁到 8 条且有余量，
+# 避免为没人要的候选白烧 API 调用）
+DESC_TARGET = 12
 
 # —— 8 月标准（用户要求"以后都按 8 月标准推送"）——
 # 8 月实测：236 条的平均字数 —— 标题 25.0 字、正文 118.9 字，正文最短 71 字、
 # 无一低于 60 字。9 月退化到标题 16.3 字、正文 75.3 字且 43% 不足 60 字。
-# 下面两个下限按 8 月实测下沿留少量余量设定，低于此值视为不合格直接丢弃。
+# 标题上限：8 月实测中位数 24 字，故 40 字以上视为失控（实测出现过 52 字）。
 MIN_TITLE_LEN = 15
+MAX_TITLE_LEN = 40
 MIN_DESC_LEN = 80
 
 # AI 相关性过滤（强命中 / 弱命中+排除词，英文按词边界，避免 email/said 误伤）
@@ -327,6 +336,22 @@ def risky_tokens(text, bare_numbers=False):
     return toks
 
 
+def ungrounded_numbers(text, material_text):
+    """返回文本中【无法在素材里核实】的金额/百分比/倍数 token（空集=全部可核实）。
+
+    [2026-09-14] 与 numbers_grounded 的区别：这里把"差集"暴露出来，
+    好让上层知道具体是哪个数字对不上（amt:300000000 / pct:40 / x:3 …），
+    从而在重写提示里指名道姓地要求改掉，而不是整条丢掉。
+    实测依据（run 34818610548）：10 条候选里有 4 条因数字问题被直接丢弃，
+    而这些数字多数是模型顺手四舍五入或补了一句"提升40%"造成的——
+    重写一次即可修正，丢弃等于白扔一条可用新闻。
+    """
+    toks = risky_tokens(text)
+    if not toks:
+        return set()
+    return toks - risky_tokens(material_text, bare_numbers=True)
+
+
 def numbers_grounded(text, material_text):
     """文本里的金额/百分比/倍数必须在素材中真实出现过，否则视为不可核实。
 
@@ -334,10 +359,28 @@ def numbers_grounded(text, material_text):
     "估值约2万亿美元"），因此这类数字必须能被素材标题支持。
     比对时统一折算口径，避免 "$500M" 与 "5亿美元" 被误判为不匹配。
     """
-    toks = risky_tokens(text)
-    if not toks:
-        return True
-    return toks <= risky_tokens(material_text, bare_numbers=True)
+    return not ungrounded_numbers(text, material_text)
+
+
+def _en_word_count(text):
+    """文本里非白名单英文词的数量（粗口径，用于判断标题是否整句英文）。"""
+    words = re.findall(r"[A-Za-z][A-Za-z\.\-]*", text or "")
+    return sum(1 for w in words if w.lower().strip(".") not in _EN_ALLOW)
+
+
+def title_english_residue(title):
+    """标题是否为未翻译的英文原句。
+
+    [2026-09-14] 新增。实测（run 34818610548）出现
+    "Rapidly scaling online storage" 这种标题——模型把英文原标题直接交了，
+    没有翻译。这类候选应当在阶段 A 就筛掉，别浪费阶段 B 的调用。
+    判据：非白名单英文词 ≥3 个，且中文字符占比不足三成。
+    """
+    t = title or ""
+    cn = sum(1 for ch in t if "\u4e00" <= ch <= "\u9fff")
+    if cn >= 6:
+        return False
+    return _en_word_count(t) >= 3
 
 
 # 允许在中文文本中直接出现的英文专有名词 / 技术缩写
@@ -673,10 +716,10 @@ def build_select_prompt(material, today_cn, attempt=0):
         temp_note = ""
     else:
         temp_note = (
-            "\n\n【上一轮不合格，本次务必修正】上一轮选题后可用条目不足 8 条，"
-            "主要原因是标题字数不达标（须 20-30 字，低于 15 字者一律作废），"
-            "或选题过窄。请扩大选题范围（可放宽到 AI 邻域：芯片、算力、机器人、"
-            "自动驾驶、数据中心），并把标题写足三要素（主体 + 动作 + 结果）。"
+            "\n\n【上一轮不合格，本次务必修正】上一轮选题后可用条目不足 8 条。"
+            "请按以下三点修正：①标题须 20-32 字（低于 15 字、高于 40 字一律作废），"
+            "务必写足三要素（主体 + 动作 + 结果）；②**四类都要有候选**，"
+            "尤其别把“政策发布”和“投融资”漏掉；③不要选英文原标题直接照抄的素材。"
         )
     return f"""今天是{today_cn}。下面是从各大科技媒体抓取的 AI 相关新闻素材，每条含标题、正文摘要与来源 URL。{temp_note}
 
@@ -685,30 +728,33 @@ def build_select_prompt(material, today_cn, attempt=0):
 
 请从中挑选当日最有产业价值的 AI 新闻，输出选题清单（**只出选题与标题，正文由后续步骤单独撰写**）。
 
-**请输出 10 条候选**（比最终需要的 8 条多 2 条，因为系统会做一轮硬性过滤，
-剔除消费电子/编造数字/英文残留的条目，需要留有冗余）。
-**候选必须按产业价值从高到低排序**，最终会取靠前的条目。
+**请输出 {CANDIDATE_ITEMS} 条候选**（比最终需要的 8 条多出不少，因为系统会做一轮
+硬性过滤——剔除消费电子/编造数字/英文残留的条目，需要留有足够冗余）。
+**候选必须按产业价值从高到低排序**，最终会优先取靠前的条目。
 
-10 条候选尽量覆盖 4 类，参考配比：
-- policy 政策发布 2-3 条：政府部门、监管机构、行业标准、法律法规相关
-- tech 技术突破 2-3 条：模型/算法/芯片/算力/产品技术本身的进展
-- industry 产业动态 2-3 条：企业合作、产品上市、产能布局、行业趋势、企业业绩
-- capital 投融资 2-3 条：融资、并购、IPO、估值变化
+{CANDIDATE_ITEMS} 条候选必须覆盖 4 类，**每类至少 3 条候选**（这样即使过滤掉几条，
+最终仍能凑齐"四类各 2 条"）：
+- policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
+- tech 技术突破：模型/算法/芯片/算力/产品技术本身的进展
+- industry 产业动态：企业合作、产品上市、产能布局、行业趋势、企业业绩
+- capital 投融资：融资、并购、IPO、估值变化
 
 分类口径（必须严格按新闻实质判断，宁缺勿错）：
 - 若某一类当日确实没有对应新闻（极少），该类允许为 1 条，其它类补足；
-- **不要为了凑齐"每类 2-3 条"而错标分类**，错标分类比数量不均衡严重得多；
+- **不要为了凑齐"每类 3 条"而错标分类**，错标分类比数量不均衡严重得多；
 - 企业发生安全事故、被攻击、被罚款等负面事件属于"产业动态"，不要标成"技术突破"；
   只有当新闻本身是技术能力/模型能力的进展时才用"技术突破"。
 
 ============== 标题写作标准（本项目定版风格，务必逐条对齐）==============
 
-【标题：20-30 字，三要素齐全】
+【标题：20-32 字，三要素齐全】
 1. **主体 + 动作 + 结果**齐全。主体必须是具体机构名或公司名（如"国家发改委""交通运输部""Stripe""宇树科技"），禁止"某公司""相关部门""相关负责人"这类模糊主体。
 2. **尽量带数字**：金额、数量、规模、时间、比例。参考基准：定版风格中 56% 的标题含数字。
 3. **约三分之一的标题使用双分句**（逗号连接）：前半句陈述事实，后半句点出结果或意义。
 4. 可用冒号引出细节（如"国家发改委：加快人工智能法立法进程"）。
 5. 严禁丢掉主体或事件信息的空泛写法。
+6. **标题里不得出现素材摘要中没有的数字**——系统会逐条核验，对不上就作废。
+7. **必须译成中文**：素材标题是英文的，先理解再重写为中文标题，禁止直接把英文原句当标题（如"Rapidly scaling online storage"这种一律作废）。
 
 ✅ 标题范例（照此风格撰写）：
 - 两部门联合发布AI计量体系指引，破解测不准与数据荒
@@ -721,6 +767,7 @@ def build_select_prompt(material, today_cn, attempt=0):
 - "AI政策窗口开放"（未说明是谁提出的什么政策）
 - "Nvidia解释增长原因"（未说明向谁解释、解释哪项增长）
 - "某公司面临挑战"
+- "Rapidly scaling online storage"（英文原句未翻译）
 
 【选题纪律】
 1. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、操作系统更新（Windows/iOS/安卓的系统或功能更新）、产品与发布会预告、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
@@ -732,10 +779,10 @@ def build_select_prompt(material, today_cn, attempt=0):
 硬性要求：
 1. 只输出一个 JSON 对象，不要任何其他文字、不要 markdown 代码块标记。
 2. 对象格式严格为：
-{{"summary":"一句话概括今日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题20-30字","source":"媒体名","url":"https://原文链接"}},...]}}
+{{"summary":"一句话概括今日AI产业要点，不超过80字","items":[{{"cat":"policy","title":"标题20-32字","source":"媒体名","url":"https://原文链接"}},...]}}
    **注意：items 里不要写 desc 字段**，正文留待后续步骤生成。
 3. source 填媒体简称（如 IT之家、TechCrunch、The Verge），url 必须从上方素材中挑选真实 URL，禁止编造、拼接或改写。**同一条素材只能出现一次**。
-4. title 用中文，控制在 20-30 字，须是新闻事实的准确概括，不要加评价性形容词。
+4. title 用中文，控制在 20-32 字，须是新闻事实的准确概括，不要加评价性形容词。
 5. **summary 只能概括本次 items 里实际收录的条目**，不得提及未收录的新闻。系统会核对，出现未收录内容视为错误。"""
 
 
@@ -767,25 +814,95 @@ def clean_desc_output(text):
     return t.strip()
 
 
-def build_desc_prompt(m, attempt=0):
-    """阶段 B：单条素材 → 100-160 字正文（三段结构化填空）。
+def _cn_amount(v):
+    """把绝对数值还原成中文口径的金额表述（120亿元 / 5000万元 / 3000元）。
+
+    [2026-09-14] 修复提示里必须用"人话"点名那个数字。
+    最初直接格式化绝对值，模型收到的是"金额约12,000,000,000"——
+    既与它自己写的"120亿元"对不上号，也容易被当成两个不同的数字。
+    """
+    if v >= 1e8:
+        return f"{v / 1e8:g}亿元"
+    if v >= 1e4:
+        return f"{v / 1e4:g}万元"
+    return f"{v:,.0f}元"
+
+
+def _fmt_token(tok):
+    """把 risky_tokens 的 token 还原成人话，供重写提示指名点姓地引用。"""
+    try:
+        kind, _, val = str(tok).partition(":")
+        v = float(val)
+    except Exception:
+        return str(tok)
+    if kind == "amt":
+        return f"金额约{_cn_amount(v)}"
+    if kind == "pct":
+        return f"百分比{v:g}%"
+    if kind == "x":
+        return f"倍数{v:g}倍"
+    if kind == "mag":
+        return f"数字{_cn_amount(v)}" if v >= 1e4 else f"数字{v:,.0f}"
+    return str(tok)
+
+
+def build_desc_prompt(m, attempt=0, fix=None):
+    """阶段 B：单条素材 → 110-150 字正文（三段结构化填空）。
 
     [2026-09-14] 用"三段结构化填空 + 自数字数"而不是笼统说"写长一点"：
     实测笼统要求（完整提示词 13983 字符）产出正文均 51 字，
     而把任务窄化成"单条素材、三段配比、不足 110 字必须回填细节"后，
     模型才会真正把摘要里的事实细节铺开。
+
+    fix 是上一轮的体检结果（dict），用于把笼统重试改成定向修复：
+      · {"short": True}                    → 字数不够
+      · {"numbers": {"amt:...", "pct:40"}} → 用了素材里没有的数字
+      · {"english": True}                  → 残留整句英文
+    这样每一条被拦下的正文都有机会救回来，而不是像改造前那样直接丢弃整条新闻。
     """
     title = (m.get("title") or "").strip()
     sm = (m.get("summary") or "").strip()[:600]
     src = m.get("source") or ""
     retry_note = ""
-    if attempt:
-        retry_note = (
-            "\n\n【上一轮太短，本次必须写足】上一轮正文不足 80 字被判废。"
-            "请把第二部分（关键细节）充分展开：把原文摘要里所有可核验的事实"
-            "（金额、数量、时间、占比、技术规格、覆盖范围、合作方）逐条写进去，"
-            "写完先数一遍字数，**不足 120 字就继续补充事实细节**。"
-        )
+    if attempt == 0 or not fix:
+        # 首轮，或调用方没给出具体问题 → 用通用的"写足"提示
+        if attempt:
+            retry_note = (
+                "\n\n【上一轮太短，本次必须写足】上一轮正文不足 80 字被判废。"
+                "请把第二部分（关键细节）充分展开：把原文摘要里所有可核验的事实"
+                "（金额、数量、时间、占比、技术规格、覆盖范围、合作方）逐条写进去，"
+                "写完先数一遍字数，**不足 120 字就继续补充事实细节**。"
+            )
+    else:
+        parts = []
+        if fix.get("short"):
+            parts.append(
+                "- **字数不足**：上一轮不足 110 字。请把第二部分（关键细节）"
+                "充分展开，把摘要里所有可核验的事实（金额、数量、时间、占比、"
+                "技术规格、覆盖范围、合作方）逐条写进去。"
+            )
+        bad = fix.get("numbers") or set()
+        if bad:
+            # 同一个金额会同时产出 amt: 与 mag: 两个 token，展示时只留更具体的 amt:
+            ams = {t.split(":", 1)[1] for t in bad if t.startswith("amt:")}
+            shown = {t for t in bad
+                     if not (t.startswith("mag:") and t.split(":", 1)[1] in ams)}
+            names = "、".join(sorted(_fmt_token(t) for t in shown))
+            parts.append(
+                f"- **数字对不上**：上一轮写入了这些数字：{names}。"
+                "但原文摘要里**并没有**这些数字。请二选一：①改用摘要中真实出现的"
+                "数字；②删掉这个数字，改写成不含该数字的事实表述。"
+                "**绝不能保留摘要里查不到的数字**（系统会校验，保留则整条作废）。"
+            )
+        if fix.get("english"):
+            parts.append(
+                "- **英文残留**：上一轮正文里夹了整句英文。请把整句英文全部译成中文，"
+                "只保留公司名/产品名/模型名/技术术语的英文原名。"
+            )
+        if parts:
+            retry_note = (
+                "\n\n【上一轮不合格，本次必须逐条修正】\n" + "\n".join(parts)
+            )
     return f"""请把下面这条新闻写成一段中文产业动态正文，用于行业简报。
 
 标题：{title}
@@ -806,6 +923,23 @@ def build_desc_prompt(m, attempt=0):
 - 不要加引号包裹，不要写"正文："之类的前缀。
 
 正文："""
+
+
+def desc_issues(desc, material_text):
+    """体检一段正文，返回问题字典（空 dict = 合格）。
+
+    把原来"任一不合格就丢弃整条"的三道硬门槛，收敛成一份可修复清单，
+    交给 build_desc_prompt 做定向重写。只有重写若干轮仍不合格才真正丢弃。
+    """
+    issues = {}
+    if len(desc) < MIN_DESC_LEN:
+        issues["short"] = True
+    bad = ungrounded_numbers(desc, material_text)
+    if bad:
+        issues["numbers"] = bad
+    if stray_english_count(desc) >= 3:
+        issues["english"] = True
+    return issues
 
 
 def parse_llm_json(content):
@@ -990,6 +1124,32 @@ def fallback_summary(items):
     return "、".join(str(it.get("title", "")) for it in items[:3])[:110]
 
 
+def interleave_by_category(cands, prefer=3):
+    """把候选按"每类轮转"重排，让阶段 B 早写的条目天然覆盖四类。
+
+    [2026-09-14 新增] 阶段 B 现在是"写满 DESC_TARGET=12 条就停手"，
+    若照候选原顺序（按产业价值降序）写，前 12 条很可能集中在"产业动态"，
+    等轮到"投融资"时已经收工了，四类必然缺项——真实 API 实测
+    （run 34818610548）就出现过"只有政策发布 2 条 + 产业动态 1 条"。
+    轮转后前 8 条就是"每类 2 条"，无论何时停手四类都是齐的。
+    类内仍保持价值降序，所以整体价值序不会被破坏太多。
+    """
+    by_cat = {}
+    for i, c in enumerate(cands):
+        by_cat.setdefault(c["cat"], []).append(i)
+    order, used = [], set()
+    for want in range(1, prefer + 1):
+        for cat in CAT_LABELS:
+            pool = by_cat.get(cat, [])
+            if len(pool) >= want:
+                order.append(pool[want - 1])
+                used.add(pool[want - 1])
+    for i in range(len(cands)):            # 同类的第 4 条起，按原价值序补在后面
+        if i not in used:
+            order.append(i)
+    return [cands[i] for i in order]
+
+
 def select_balanced(cands, target=MAX_ITEMS, prefer=2):
     """从候选里挑 target 条，尽量做到四类均衡；返回结果保持原价值序。
 
@@ -1063,9 +1223,17 @@ def generate_news(material, today_cn, attempt=0):
         title = clean_for_js(it.get("title", ""))[:60]
         if not title:
             continue
-        # 8 月定版标准：标题 20-30 字（9 月实测出现过 8 字标题），低于下限直接丢弃
+        # 8 月定版标准：标题 20-32 字（9 月实测出现过 8 字标题），低于下限直接丢弃
         if len(title) < MIN_TITLE_LEN:
             log(f"  丢弃标题过短的条目（{len(title)}字）: {title}")
+            continue
+        # 上界：实测出现过 52 字的失控长标题，超过 40 字说明没有压缩过
+        if len(title) > MAX_TITLE_LEN:
+            log(f"  丢弃标题过长的条目（{len(title)}字）: {title[:30]}")
+            continue
+        # 英文原句未翻译（如 "Rapidly scaling online storage"）→ 阶段 A 就筛掉
+        if title_english_residue(title):
+            log(f"  丢弃标题未翻译的条目: {title[:30]}")
             continue
         # 聚合类 / 消费电子类标题
         if title_blocked(title):
@@ -1076,39 +1244,66 @@ def generate_news(material, today_cn, attempt=0):
             "title": title,
             "source": clean_for_js(it.get("source", ""))[:30] or by_url[url]["source"],
             "url": url,
+            # 记住候选的价值序（阶段 A 的排序），阶段 B 轮转处理后要还原回来
+            "_rank": len(cands),
         })
 
-    # —— 阶段 B：逐条素材单独撰写 100-160 字正文 ——
-    log(f"  选题完成：{len(cands)} 条候选，开始逐条撰写正文")
+    # —— 阶段 B：逐条素材单独撰写 110-150 字正文 ——
+    # [2026-09-14] 由"一次不成即丢弃"改为"定向重写至多 3 轮"。
+    # 实测（run 34818610548）10 条候选最终只剩 3 条，其中 4 条死于
+    # "数字不可核实"、2 条死于"英文残留"——这些都是重写一次就能修好的问题，
+    # 直接丢弃等于每天白扔 5-6 条可用新闻。现在把体检结果（desc_issues）
+    # 原样回灌进提示词，指名要求改掉那个数字/那句英文。
+    log(f"  选题完成：{len(cands)} 条候选，开始逐条撰写正文（写满 {DESC_TARGET} 条即停）")
+    # 按类轮转排序，保证无论写到哪里停手，四类都是齐的
+    cands = interleave_by_category(cands)
     out = []
     for ci, c in enumerate(cands):
+        if len(out) >= DESC_TARGET:
+            log(f"  已写满 {DESC_TARGET} 条合格正文，其余候选不再调用")
+            break
         if ci:
-            # 阶段 B 调用密集（每天 10-20 次），主动留出间隔，
+            # 阶段 B 调用密集（每天 10-30 次），主动留出间隔，
             # 比撞上限流再退避更省时间也更容易成功
             time.sleep(1.0)
         m = by_url[c["url"]]
-        desc = ""
-        # 单条最多两次：首次不合格则按"太短"提示重写一次
-        for b in range(2):
+        desc, issues, got_any = "", {}, False
+        # 至多 3 轮：首轮通用提示，之后按体检结果定向修复
+        for b in range(3):
             try:
-                got = call_glm(build_desc_prompt(m, attempt=b), temperature=0.5)
+                got = call_glm(
+                    build_desc_prompt(m, attempt=b, fix=issues if b else None),
+                    temperature=0.5 if b == 0 else 0.35,
+                )
             except Exception as e:
                 log(f"  正文生成调用失败（{c['title'][:20]}）: {e}")
                 continue
-            desc = clean_for_js(clean_desc_output(got))[:400]
-            if len(desc) >= MIN_DESC_LEN:
+            got_any = True
+            cand_desc = clean_for_js(clean_desc_output(got))[:400]
+            if not cand_desc:
+                continue
+            desc = cand_desc
+            issues = desc_issues(desc, material_text)
+            if not issues:
                 break
-            log(f"  正文过短（{len(desc)}字）重写: {c['title'][:22]}")
-        if len(desc) < MIN_DESC_LEN:
-            log(f"  丢弃正文始终过短的条目: {c['title'][:26]}")
+            why = []
+            if issues.get("short"):
+                why.append(f"过短{len(desc)}字")
+            if issues.get("numbers"):
+                why.append("数字对不上:" + ",".join(sorted(issues["numbers"])))
+            if issues.get("english"):
+                why.append("英文残留")
+            log(f"  正文待修（第{b+1}轮）{'｜'.join(why)}: {c['title'][:22]}")
+        if not got_any:
+            log(f"  丢弃调用全失败的条目: {c['title'][:26]}")
             continue
-        # 数字溯源：金额/估值/百分比/倍数必须能在素材里找到，否则丢弃该条
-        if not numbers_grounded(c["title"], material_text) or not numbers_grounded(desc, material_text):
-            log(f"  丢弃数字不可核实的条目: {c['title'][:30]}")
+        # 三轮都没救回来 → 才是真正不可用
+        if issues:
+            log(f"  丢弃三轮重写仍不合格的条目: {c['title'][:26]}")
             continue
-        # desc 残留英文句子 → 翻译未完成
-        if stray_english_count(desc) >= 3:
-            log(f"  丢弃英文残留的条目: {c['title'][:30]}")
+        # 标题侧的数字溯源是最后一道保险（标题由阶段 A 产出，此前只查了长度）
+        if ungrounded_numbers(c["title"], material_text):
+            log(f"  丢弃标题数字不可核实的条目: {c['title'][:30]}")
             continue
         # 分类确定性纠偏（模型常为"四类均衡"而错标）
         fixed = normalize_category(c["cat"], c["title"], desc)
@@ -1121,9 +1316,14 @@ def generate_news(material, today_cn, attempt=0):
             "desc": desc,
             "source": c["source"],
             "url": c["url"],
+            "_rank": c.get("_rank", 999),
         })
     # 候选 → 最终 8 条：四类均衡选取（必须在 summary 校验之前，
     # 否则摘要可能提及被裁掉的条目）
+    # 先按阶段 A 的价值序还原（阶段 B 为了四类覆盖做了轮转排序）
+    out.sort(key=lambda x: x.get("_rank", 999))
+    for x in out:
+        x.pop("_rank", None)
     out = select_balanced(out)
     summary = clean_for_js(obj.get("summary", ""))[:120] if isinstance(obj, dict) else ""
     if out and not summary_consistent(summary, out):
