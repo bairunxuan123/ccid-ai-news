@@ -55,6 +55,8 @@ STRONG_EN = [
     "openai", "anthropic", "chatgpt", "gemini", "claude", "llama", "deepseek",
     "mistral", "nvidia", "copilot", "llm", "hbm", "token", "machine learning",
     "neural", "transformer", "generative ai", "robotaxi", "agentic",
+    "grok", "xai", "qwen", "midjourney", "stable diffusion", "hugging face",
+    "artificial intelligence", "foundation model", "gpu", "datacenter",
 ]
 STRONG_CN = [
     "人工智能", "大模型", "大语言模型", "智能体", "多模态", "自动驾驶", "智驾",
@@ -69,20 +71,46 @@ ADJACENT_CN = [
     "智能驾驶", "语音", "模型", "算法", "具身", "数据库", "数字人", "视觉识别",
 ]
 BLOCK_CN = [
+    # 消费电子 / 外设
     "相机", "手机", "镜头", "耳机", "电视", "扫地", "戒指", "手表", "键盘",
     "鼠标", "显示器", "爆料", "评测", "显卡", "笔记本", "平板", "手机壳",
     "充电", "家电", "彩电", "空调", "冰箱", "洗衣机", "家居",
+    # 汽车新品与传闻
     "官图", "试驾", "新车", "mpv", "suv", "座舱", "灯效", "rgb", "影音",
-    "装机", "散热", "跑分", "屏幕", "电池", "发布会预告", "渲染图",
+    "装机", "散热", "跑分", "屏幕", "电池", "渲染图",
+    # 智能家居 / 众筹类硬件
+    "众筹", "晾衣", "灯板", "英寸", "按摩仪", "空气净化", "除湿",
+    # 产品预告（无实质内容）
+    "预告", "即将发布", "新品发布",
+    # 操作系统与终端系统更新（非 AI 产业事件）
+    "win11", "win10", "windows 11", "windows 10", "ios1", "ios2", "ipados",
+    "macos", "iphone", "ipad", "android", "安卓", "鸿蒙", "麒麟", "系统更新",
+    # 政治人物 / 党务 / 选举（与产业技术无关，不适合收录）
+    "奥巴马", "特朗普", "拜登", "哈里斯", "民主党", "共和党", "白宫", "总统",
+    "大选", "选举", "国会", "参议院", "众议院", "议员", "首相", "内阁",
+    "obama", "trump", "biden", "harris", "democrat", "republican",
+    "congress", "senate", "white house", "parliament",
 ]
+
+# 匹配前先去掉空格/连字符等分隔符：使 "iOS 27" 能命中 "ios2"、"Win 11" 命中 "win11"
+_BLOCK_NS = [re.sub(r"[\s\-_·]+", "", b) for b in BLOCK_CN]
+
+
+def hard_blocked(title):
+    """硬性排除：消费电子、汽车新品、产品预告、系统更新、政治人物等"""
+    t = re.sub(r"[\s\-_·]+", "", (title or "").lower())
+    return any(b in t for b in _BLOCK_NS)
 
 
 def is_ai_related(title):
     """标题是否为 AI 相关。
 
+    先做硬性排除（消费电子/汽车新品/产品预告/系统更新/政治人物），再做相关性判定。
     英文 ai 用前后非字母判定（避免 "email"/"said" 误伤，也兼容 "AI行业" 这类中英混排）。
     """
     t = title.lower()
+    if hard_blocked(title):
+        return False
     if re.search(r"(?<![a-z])ai(?![a-z])", t):
         return True
     if any(k in t for k in STRONG_EN):
@@ -90,7 +118,7 @@ def is_ai_related(title):
     if any(k in t for k in STRONG_CN):
         return True
     if any(k in t for k in WEAK_CN):
-        return not any(b in t for b in BLOCK_CN)
+        return True
     return False
 
 
@@ -99,7 +127,7 @@ def is_ai_adjacent(title):
     t = title.lower()
     if is_ai_related(title):
         return True
-    if any(b in t for b in BLOCK_CN):
+    if hard_blocked(title):
         return False
     return any(k in t for k in ADJACENT_CN)
 
@@ -339,7 +367,7 @@ def build_prompt(material, today_cn):
 素材：
 {lines}
 
-请从中挑选 4-8 条当日最有产业价值的 AI 新闻，整理成"人工智能产业动态"。**质量优先于数量：当日 AI 素材少就少写几条（4 条即可），绝不要为凑数收录无关新闻。**
+请从中挑选 4-8 条当日最有产业价值的 AI 新闻，整理成"人工智能产业动态"。**质量优先于数量：当日 AI 素材少就少写几条（4 条即可），绝不要为凑数收录无关新闻。** 若当日确实素材稀少（例如周末），可以少于 4 条，最少 2 条；但任何情况下都不得为了凑数收录与 AI 产业无关的内容。
 
 分类口径（必须严格按新闻实质判断，宁缺勿错）：
 - policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
@@ -355,12 +383,15 @@ def build_prompt(material, today_cn):
 4. title 用中文，控制在 30 字内，须是新闻事实的准确概括，不要加评价性形容词；desc 用中文书面语客观陈述，不要口语和感叹号。
 5. **不要为了凑齐"每类 2 条"而错标分类**。若某一类当日确实没有对应新闻，该类可以为 0 条，四类数量允许不均衡（例如 3/3/2/0）。错标分类比数量不均衡严重得多。
 6. 输出前逐条自查：这条新闻的实质与所标分类是否一致？不一致就改正分类或换掉该条。
-7. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
-8. 选题限于产业与技术范畴：不收录人物言论、集会活动、非产业类社会话题等与 AI 产业价值无关的内容。
+7. **绝对排除**与 AI 产业无关的内容：消费电子新品（手机/相机/耳机/显示器/笔记本）、汽车新车与试驾（含 MPV/SUV 官图）、灯光与外设软件、操作系统更新（Windows/iOS/安卓的系统或功能更新）、产品与发布会预告、游戏影视娱乐、体育赛事、社会新闻——素材里出现也不要选。
+8. 选题限于产业与技术范畴：判断标准是"这条新闻是否直接反映 AI 产业或技术本身的变化"。凡属个人公开表态、社会活动、与产业无关的公共事务，一律不选。
 9. 素材只有标题（没有正文），因此 title 与 desc 中**不得出现素材里没有的金额、估值、百分比、增长倍数**（如"50亿美元""2万亿美元""增长70%"）。需要表达程度时改用定性描述（如"大幅增长""估值处于高位"）。系统会校验并丢弃含无法核实数字的条目。
 10. **标题必须忠实于原文事实**：素材多为英文，须准确理解后再译为中文，不得截取英文原句、不得把原文没有的判断归纳进标题。例如原文讲"为 AI 供电是架构问题"，就不能写成"AI 在音频内容中的应用"。
 11. **desc 必须全部使用中文**（OpenAI、ChatGPT 等专有名词除外），不得残留英文句子或英文短语。系统会校验并丢弃英文残留过多的条目。
-12. 不要选用"早报/日报/盘点/汇总/速览"这类聚合内容，也不要选消费电子（iOS/iPhone/手机/相机/耳机）与汽车新品——素材里出现也不要选。"""
+12. 不要选用"早报/日报/盘点/汇总/速览"这类聚合内容，也不要选消费电子（iOS/iPhone/手机/相机/耳机）与汽车新品——素材里出现也不要选。
+13. **标题不得泛化**：必须保留原文的核心主体与事件（谁做了什么），禁止写成"OpenAI寻求技术突破""某公司面临挑战"这类丢掉具体信息的空泛标题。原文若讲的是具体的竞赛、事件、人物加入、计划，就如实写出。
+14. **summary 只能概括本次 items 里实际收录的条目**，不得提及未收录的新闻。系统会核对，出现未收录内容视为错误。
+15. 分类补充口径：企业发生安全事故、被攻击、被罚款等负面事件属于"产业动态"，不要标成"技术突破"；只有当新闻本身是技术能力/模型能力的进展时才用"技术突破"。"""
 
 
 def parse_llm_json(content):
@@ -380,6 +411,36 @@ def clean_for_js(value):
     if not isinstance(value, str):
         value = str(value)
     return value.replace('"', "“").strip()
+
+
+# 摘要校验时豁免的通用词
+_SUMMARY_OK = {"ai", "openai", "chatgpt", "api", "gpt", "ceo", "ipo", "llm", "it"}
+
+
+def summary_consistent(summary, items):
+    """摘要是否只提及本次实际收录的条目。
+
+    摘要是模型自由生成的，容易把没收录的新闻（如"苹果iOS27升级Siri"）
+    也写进去。这里检查摘要中出现的英文/版本号标识能否在条目里找到，
+    找不到就判定摘要跑偏，改为用条目标题拼装的兜底摘要。
+    """
+    if not summary:
+        return True
+    body = " ".join(
+        str(it.get("title", "")) + " " + str(it.get("desc", "")) for it in items
+    ).lower()
+    for m in re.finditer(r"[a-z]{2,}\d*", summary.lower()):
+        tok = m.group(0)
+        if tok in _SUMMARY_OK:
+            continue
+        if tok not in body:
+            return False
+    return True
+
+
+def fallback_summary(items):
+    """由已收录条目拼装的兜底摘要，保证与条目一致"""
+    return "、".join(str(it.get("title", "")) for it in items[:3])[:110]
 
 
 def generate_news(material, today_cn):
@@ -425,6 +486,9 @@ def generate_news(material, today_cn):
             "url": url,
         })
     summary = clean_for_js(obj.get("summary", ""))[:120] if isinstance(obj, dict) else ""
+    if out and not summary_consistent(summary, out):
+        log("  摘要提及了未收录内容，改用条目标题兜底摘要")
+        summary = clean_for_js(fallback_summary(out))
     return summary, out
 
 
@@ -564,8 +628,8 @@ def main():
 
     # 1. 抓素材
     material = collect_material(hours=36)
-    if len(material) < 6:
-        log("素材不足（<6 条），本次跳过，避免生成低质/编造内容")
+    if len(material) < 4:
+        log("素材不足（<4 条），本次跳过，避免生成低质/编造内容")
         return 0
 
     # 2. LLM 生成 8 条
@@ -574,7 +638,7 @@ def main():
     except Exception as e:
         log(f"LLM 生成失败: {e}")
         return 1
-    if len(items) < 4:
+    if len(items) < 3:
         log(f"生成条目过少（{len(items)}），放弃本次写入")
         return 1
     # 3. 构造 JS 块并写入两文件
