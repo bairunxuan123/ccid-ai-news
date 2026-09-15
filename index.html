@@ -2592,6 +2592,21 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-09-15",
+    weekday: "星期二",
+    summary: "AI-eSIM团体标准编制启动，三大运营商参与、首届蚂蚁灵波具身大模型挑战赛正式启动、微软发布AI行为准则，禁止模型黑客系统或欺骗人类",
+    items: [
+      { cat: "policy", catLabel: "政策发布", title: "AI-eSIM团体标准编制启动，三大运营商参与", desc: "中国通信企业协会主办的信息通信行业6G+人工智能创新发展研讨会上，启动了AI-eSIM团体标准编制，中国移动、联通、电信三大运营商参与其中。此次标准编制旨在规范AI-eSIM全产业链核心环节，明确各模块的接口定义、交互流程及操作准则，以降低智能物联终端互联互通的成本。标准起草组将遵循中国通信企业协会团体标准管理规范推进编制工作，并吸纳芯片等产业链上下游企业参与。", source: "IT之家", url: "https://www.ithome.com/1/002/375.htm" },
+      { cat: "industry", catLabel: "产业动态", title: "首届蚂蚁灵波具身大模型挑战赛正式启动", desc: "蚂蚁集团启动了首届蚂蚁灵波具身大模型挑战赛，旨在推广LingBot-VLA技术。该挑战赛将覆盖更广泛的开发者社区和高校科研社区，以进一步推动LingBot-VLA的发展。", source: "量子位", url: "https://www.qbitai.com/2026/09/489105.html" },
+      { cat: "industry", catLabel: "产业动态", title: "微软发布AI行为准则，禁止模型黑客系统或欺骗人类", desc: "微软发布了新的AI“行为准则”，规定AI模型不应黑客攻击系统或欺骗人类。该准则明确了AI模型应遵循的通用原则，例如支持人类而非取代人类，并加速人类繁荣，同时还包括了具体的安全限制以实施这些原则。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/14/microsofts-new-ai-code-of-conduct-tells-models-not-to-hack-systems-or-trick-humans/" },
+      { cat: "industry", catLabel: "产业动态", title: "全国唯一！商汤大装置临港AIDC获“算效+算电”双5A认证", desc: "商汤科技发布业界首个5A算电协同认证，其大装置临港AIDC荣获“算效+算电”双5A认证。该认证标志着商汤科技在人工智能领域的技术实力和产业应用水平达到行业领先。", source: "量子位", url: "https://www.qbitai.com/2026/09/489106.html" },
+      { cat: "capital", catLabel: "投融资", title: "一年连融三轮，金融AI公司拿下超3亿B轮", desc: "金融AI公司FinAI成功完成超3亿B轮融资，险资、券商与头部创投持续加码。本轮融资由险资、券商与头部创投共同投资，具体金额未公开。FinAI自去年以来已连续完成三轮融资，累计融资额超过3亿。此次融资将用于扩大业务规模、研发新技术和拓展市场。", source: "量子位", url: "https://www.qbitai.com/2026/09/488912.html" },
+      { cat: "capital", catLabel: "投融资", title: "Superhuman收购笔记记录器Fathom，推动生产力平台向代理工作发展", desc: "Superhuman收购了由YC支持的笔记应用Fathom，该应用提供慷慨的免费计划，已有超过40万月活跃用户，至今已有超过100万人记录了会议。此举反映出生产力平台正推动代理工作模式的发展。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/14/superhuman-acquires-yc-backed-notetaker-fathom-as-productivity-platforms-push-for-agentic-work/" },
+      { cat: "industry", catLabel: "产业动态", title: "OpenAI联合创始人：人类已进入通用人工智能时代", desc: "OpenAI联合创始人格雷格·布罗克曼表示，人类已迈入通用人工智能（AGI）时代。OpenAI定义的AGI是高度自主、在多数经济活动中表现超过人类的系统，GPT-6 Astra等模型已具备长时程自主执行与电脑操作能力。OpenAI暂停原有项目，投入系统防御和安全架构升级，修复多项严重问题，并发现新问题进入“饱和”。", source: "IT之家", url: "https://www.ithome.com/1/002/341.htm" },
+      { cat: "capital", catLabel: "投融资", title: "OpenAI CEO：2026年上市不合适", desc: "OpenAI CEO Sam Altman在接受《财富》杂志采访时确认，OpenAI不会在2026年进行IPO。在45分钟的访谈中，Altman讨论了包括Hugging Face黑客事件、递归自我改进以及构建超越人类控制的AI的可能性等话题。他表示，虽然后者“绝对”可能实现，但承诺将采取措施防止这种情况发生，甚至不惜暂停训练，强调“我们有责任确保人类不会承担不应承担的风险”。OpenAI不急于上市。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/994384/sam-altman-no-openai-ipo-ill-advised" }
+    ]
+  },
+  {
     date: "2026-09-14",
     weekday: "星期一",
     summary: "我国发布首个人工智能脑机接口标准，特斯拉Robotaxi开始全天候运营，OpenAI年内不上市。",
