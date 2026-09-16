@@ -2592,6 +2592,21 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-09-16",
+    weekday: "星期三",
+    summary: "今日AI产业动态丰富，涵盖政策、技术、产业和资本等多个方面，重点关注AI安全、数据中心建设、AI人才流动等。",
+    items: [
+      { cat: "industry", catLabel: "产业动态", title: "OpenAI发布AI伦理守则，强调人机共荣", desc: "微软发布了新的AI“行为准则”，规定AI模型不得黑客系统或欺骗人类。该准则明确了AI模型应遵循的通用原则，如支持人类而非取代人类，以及加速人类繁荣，同时包含实施这些原则的具体安全限制。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/14/microsofts-new-ai-code-of-conduct-tells-models-not-to-hack-systems-or-trick-humans/" },
+      { cat: "policy", catLabel: "政策发布", title: "英伟达黄仁勋：AI行业不需要新法律，开发可兼得速度和安全", desc: "英伟达首席执行官黄仁勋在Salesforce活动中表示，AI开发不应被理解为“速度”和“安全”二选一。他认为AI行业不需要为AI安全制定新的法律或监管规定，安全与速度可以兼得。黄仁勋强调，企业可以依靠市场机制，在推进创新的同时确保产品安全，并根据产品成熟度控制发布节奏，对于可能造成危害的产品可以选择不发布。市场竞争、用户选择和商业声誉将促使企业改进产品安全。", source: "IT之家", url: "https://www.ithome.com/1/002/834.htm" },
+      { cat: "tech", catLabel: "技术突破", title: "谷歌TPU AI基建规模迈入100万级，核心瓶颈从“缺芯”转向“缺电”", desc: "谷歌宣布其TPU系统已扩展至100万芯片级规模，电力供应成为AI基础设施扩张的核心瓶颈。该技术突破支持最多100万颗TPU芯片连接成统一计算集群，实现协同工作。谷歌首席技术官阿明·瓦赫达特指出，AI算力的天花板正从“造不出芯片”变成“找不到电”，AI已进入“智能体人工智能”时代，交互模型转向“智能体与智能体”的自动化对话，推动人工智能应用呈指数级增长。", source: "IT之家", url: "https://www.ithome.com/1/002/828.htm" },
+      { cat: "industry", catLabel: "产业动态", title: "Meta 扎克伯格：保障AI安全应依靠引入独立外部评估，而不是放缓AI发展", desc: "Meta CEO 扎克伯格在 X 平台发文，强调保障 AI 安全应依靠引入独立外部评估，而非放缓 AI 发展。他指出，各大 AI 实验室有内在动力提升模型对齐水平，Meta 将 Muse 的发布推迟数月以确保功能安全。Meta 已在多个业务领域引入独立的外部评估机构，并取得显著成效。建立更大规模的评估生态系统对全行业有益。", source: "IT之家", url: "https://www.ithome.com/1/002/854.htm" },
+      { cat: "policy", catLabel: "政策发布", title: "OpenAI 奥尔特曼回应监管：相信行业能安全开发，不会伤害公众", desc: "OpenAI CEO 萨姆 · 奥尔特曼在 Dreamforce 大会上回应监管，表示相信 AI 公司能安全开发技术，不会伤害公众。奥尔特曼认为，公司及整个行业有能力安全地做到这一点。这一表态正值政策制定者和业内其他人士就 AI 监管展开辩论之际。OpenAI 正与 Anthropic 及谷歌 DeepMind 合作解决安全问题，但奥尔特曼强调，AI 公司应能独立安全地改进 AI 模型。", source: "IT之家", url: "https://www.ithome.com/1/002/831.htm" },
+      { cat: "tech", catLabel: "技术突破", title: "OpenAI 奥尔特曼称 AI 行业自律可守住安全底线", desc: "OpenAI 首席执行官萨姆 · 奥尔特曼在 Salesforce 活动中表示，AI 公司行业自律可掌控研发风险，不会对民众造成重大伤害。他强调，AI 安全需同步提升模型能力、对齐、安全性和保密性，OpenAI 曾推迟强化学习训练，转向监控、安全护栏和风险评估。奥尔特曼认为，通过行业协作、独立评估和严格安全流程，可在政府监管外建立安全保障机制，推进前沿 AI 研究。", source: "IT之家", url: "https://www.ithome.com/1/002/838.htm" },
+      { cat: "industry", catLabel: "产业动态", title: "微软 AI 发布 Humanist AI 行为准则，强调以人为本", desc: "微软AI发布了《人文主义AI行为准则》草案，开启为期六周的公开咨询，该草案旨在规范模型训练和部署的操作限制。该草案作为一份技术手册，定义了MAI前沿模型的行为、操作边界和监管协议。这一举措建立在去年11月宣布的人文主义超级智能框架基础上，为模型商业发布前设立了评估标准。微软的这一发布紧随近期涉及自主软件的企业安全事件之后。", source: "AI News", url: "https://www.artificialintelligence-news.com/news/microsoft-ai-opens-review-humanist-ai-code-of-conduct/" },
+      { cat: "policy", catLabel: "政策发布", title: "国家发改委：加快人工智能法立法进程", desc: "DeepSeek v4.1 的主 Attention 算子负责人刘胜在9月14日发表《我不得不把才华埋葬在昨天》一文，引发网络热议，该文在微信公众号获得10万+阅读量，冲上知乎热榜第一，并在X上引发讨论。文中提到AI在算子设计、编写领域进步迅速，一年内从文档查阅助手蜕变为独立优化算子的算子大师。刘胜与表示，他自豪于DeepSeek v4.1的成功，但预计AI将在半年或一年内写出与人类同样优秀的算子。", source: "IT之家", url: "https://www.ithome.com/1/002/864.htm" }
+    ]
+  },
+  {
     date: "2026-09-15",
     weekday: "星期二",
     summary: "AI-eSIM团体标准编制启动，三大运营商参与、首届蚂蚁灵波具身大模型挑战赛正式启动、微软发布AI行为准则，禁止模型黑客系统或欺骗人类",
