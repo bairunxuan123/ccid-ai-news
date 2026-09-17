@@ -2602,6 +2602,21 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-09-17",
+    weekday: "星期四",
+    summary: "今日AI产业聚焦政策监管、技术突破、产业动态和投融资，涵盖AI芯片、大模型、自动驾驶等领域。",
+    items: [
+      { cat: "industry", catLabel: "产业动态", title: "零跑汽车发布世界模型智能辅助驾驶，覆盖全系车型", desc: "零跑汽车发布了自研的世界模型智能辅助驾驶，宣称该智驾达到“全行业第一梯队”水平，覆盖A、B、C、D全系车型，老车主也可升级。内部三条路线PK确定使用世界模型，智驾4.0以综合接管率仅为头部车企三分之一的表现胜出。零跑高级副总裁周洪涛表示，智驾4.0有望实现跻身头部目标，2024年成立智能技术研究院，人员规模近700人，算力资源增长2倍，训练服务器近600台。", source: "IT之家", url: "https://www.ithome.com/1/003/377.htm" },
+      { cat: "industry", catLabel: "产业动态", title: "基元律动与无问芯穹达成战略合作，推进高质量Token供给与应用", desc: "基元律动（TokenRhythm）与无问芯穹（Infinigence AI）于2026年9月15日签署战略合作协议，共同推进高质量Token供给与应用。此次合作旨在通过双方的技术优势，提升Token的稳定性和安全性，预计将覆盖更广泛的用户群体。", source: "量子位", url: "https://www.qbitai.com/2026/09/490750.html" },
+      { cat: "policy", catLabel: "政策发布", title: "Anthropic CEO提议引入“银行式监管”，专家称评估员无权叫停AI", desc: "Anthropic CEO Dario Amodei 提出将独立第三方安全评估员长期嵌入前沿 AI 公司，赋予其接近内部风险团队的访问权限，并在有限删减前提下自主发布调查结果的权力。他明确援引银行业嵌入式监管作为先例，但多位银行业监管专家和 AI 评估从业者指出，这一方案缺乏银行监管者所拥有的强制执行权，评估员无法阻止模型的训练或发布。Amodei 在上周末发表的长文中提出上述计划，并承诺 Anthropic 将向第三方评估员提供与内部风险团队相当的系统访问权，警告未来 6 到 12 个月内，一个错位的智能体群可能抢占互联网的大部分，并造成数千亿美元损失。", source: "IT之家", url: "https://www.ithome.com/1/003/354.htm" },
+      { cat: "tech", catLabel: "技术突破", title: "ChatGPT先驱推出Jev模型，自动化程序逻辑", desc: "TypeSafe公司，由ChatGPT共同发明者创立，正式推出Jev模型，旨在通过并行采样架构自动化程序化决策。该模型由ChatGPT共同发明者、OpenAI前员工Diogo Almeida耗时两年研发，专为执行结构化概率决策而设计，可直接嵌入生产代码库，摒弃文本和字符串生成。", source: "AI News", url: "https://www.artificialintelligence-news.com/news/chatgpt-pioneer-launches-jev-model-for-programmatic-logic/" },
+      { cat: "industry", catLabel: "产业动态", title: "AI大模型工场举办AI产业生态大会，探讨智能生长与产业共生", desc: "AI大模型工场主办的“2026 AI产业生态大会”于9月15日在北京举行，大会聚焦智能生长与产业共生，多位行业大咖共探AI产业发展。此次大会吸引了众多业界人士参与，共同探讨AI技术如何推动产业创新。", source: "量子位", url: "https://www.qbitai.com/2026/09/490760.html" },
+      { cat: "capital", catLabel: "投融资", title: "前Infosys CEO的AI创业公司获得5300万美元融资", desc: "前infosys首席执行官创立的AI初创公司近日成功融资5300万美元，宣布在成立后数月内已获得多份七位数企业合同。该帕洛阿托初创公司表示，其AI技术已迅速在市场上获得认可，为企业客户带来显著价值。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/16/former-infosys-chiefs-ai-startup-adds-50m-to-seed-weeks-after-initial-raise/" },
+      { cat: "policy", catLabel: "政策发布", title: "联合国秘书长呼吁AI安全领域全球合作", desc: "联合国秘书长古特雷斯呼吁各国共同推进AI监管，并加强对技术的监督。他强调，世界不能承受在AI安全领域的恶性竞争，需要真正的国际合作和协调一致的全球行动。古特雷斯透露，自己会与各国元首讨论AI风险，并在联合国大会发言时谈到应为AI设立的安全边界。今年早些时候，他还启动了“国际人工智能独立科学小组”，并指出AI的影响跨越国界，必须建立更严格的安全措施。", source: "IT之家", url: "https://www.ithome.com/1/003/338.htm" },
+      { cat: "tech", catLabel: "技术突破", title: "ZDTaichu5.0-9B模型跻身全球多模态第一梯队", desc: "智谱AI发布了ZDTaichu5.0-9B国产开源模型，在九大空间测试中8项成绩领先，跻身全球多模态第一梯队。该模型规模达10B，通用能力不打折，空间具身智能领先。", source: "量子位", url: "https://www.qbitai.com/2026/09/490839.html" }
+    ]
+  },
+  {
     date: "2026-09-16",
     weekday: "星期三",
     summary: "今日AI产业动态丰富，涵盖政策、技术、产业和资本等多个方面，重点关注AI安全、数据中心建设、AI人才流动等。",
