@@ -2592,6 +2592,21 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-09-19",
+    weekday: "星期六",
+    summary: "今日AI产业聚焦政策发布、技术突破、产业动态及投融资等多个方面。",
+    items: [
+      { cat: "industry", catLabel: "产业动态", title: "美国AI巨头提议开发减速，欧洲同行和政界并不认同", desc: "美国AI巨头阿莫迪、奥尔特曼和马斯克提议减速AI发展，但欧洲企业和官员对此表示怀疑。法国初创企业Mistral指出，风险早已明确，部分市场参与者利用时机巩固市场地位。欧洲高度依赖OpenAI、Anthropic和微软的模型，对继续依赖美国科技公司保持警惕。Hugging Face CEO克莱芒·德朗格反对减速，认为应加速发展。", source: "IT之家", url: "https://www.ithome.com/1/004/334.htm" },
+      { cat: "tech", catLabel: "技术突破", title: "Gartner列出仓库自动化四个AI级别", desc: "Gartner发布了仓库自动化四个AI等级的分析报告，指出物流基础设施已达到明确的采用门槛。报告显示，物流运营商正从软件试验转向实际设施部署，自动化系统因持续的劳动力短缺而成为必要。同时，软件商业模型初始资本需求降低，算法和自主机械同时发展。", source: "AI News", url: "https://www.artificialintelligence-news.com/news/gartner-outlines-four-ai-tiers-in-warehouse-automation/" },
+      { cat: "industry", catLabel: "产业动态", title: "谷歌新'CC'是一款帮助家庭管理家务的AI代理", desc: "Google发布了新的AI代理“CC”，专注于家庭协调，允许家庭成员共享电子邮件、日程和任务，AI可管理日历、填写表格、制作购物清单、规划餐食等。该代理旨在帮助家庭更高效地管理家务。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/18/googles-new-cc-is-an-ai-agent-that-helps-families-run-their-households/" },
+      { cat: "capital", catLabel: "投融资", title: "Crusoe筹集39亿美元，用于建设大型数据中心和小型模块化'AI工厂'", desc: "Crusoe公司成功融资39亿美元，用于建设大型数据中心和微型模块化“AI工厂”，此轮融资将公司估值提升至309亿美元。公司计划利用这笔资金扩大其数据中心规模，并推动AI技术的应用。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/17/crusoe-raises-3-9b-to-build-massive-data-centers-and-small-modular-ai-factories/" },
+      { cat: "policy", catLabel: "政策发布", title: "加州州长Gavin Newsom推动AI'杀手开关'", desc: "加州州长Gavin Newsom推动AI监管，发布新行政命令，要求成立专家小组，两个月内提出加强AI安全措施的法规建议。小组将考虑要求AI公司设立现场独立验证小组进行定期审计，并使透明度报告和风险评估符合独立标准。", source: "The Verge", url: "https://www.theverge.com/policy/997516/california-governor-newsom-ai-kill-switch" },
+      { cat: "capital", catLabel: "投融资", title: "Anthropic在美国旧金山湾区设立一座湿实验室，用于开展实际生物学实验", desc: "Anthropic 在美国旧金山湾区设立了湿实验室，用于开展生物学实验，并探索利用其 AI 模型辅助完成研究流程。该实验室已投入运营，运作方式与大多数生物技术实验室类似，目前主要方向是基础生物学研究，而非药物研发，以避免与客户和合作伙伴形成直接竞争。此次布局与 Anthropic 近年来进入生命科学领域的动作相呼应，公司在今年 4 月以约 4 亿美元收购了 AI 生物技术公司 Coefficient Bio。", source: "IT之家", url: "https://www.ithome.com/1/004/376.htm" },
+      { cat: "industry", catLabel: "产业动态", title: "长安汽车首席专家谭欢：未来要用机器人造车、卖车，让机器人上车、造机器人", desc: "长安汽车首席专家谭欢在第22届中国汽车产业发展（泰达）国际论坛上指出，长安汽车将布局机器人造车、卖车，并实现机器人造机器人。长安汽车计划首先实现汽车部件组件化，再走向智能出行生态机器人，覆盖搬运、物流等环节，并拓展巡检、安防等极限场景。今年4月，长安天枢智能机器人公司正式成立，旨在以具身智能重塑出行生态。", source: "IT之家", url: "https://www.ithome.com/1/004/337.htm" },
+      { cat: "policy", catLabel: "政策发布", title: "迪士尼首位首席技术官领导了一家它曾经指责抄袭其角色的AI初创公司", desc: "迪士尼前CEO，曾因涉嫌抄袭迪士尼角色而收到迪士尼禁令的公司Character.AI的首席执行官，将担任该公司首位首席技术官。Character.AI此前曾收到迪士尼的停止侵权通知。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/18/disneys-first-cto-led-an-ai-startup-it-once-accused-of-copying-its-characters/" }
+    ]
+  },
+  {
     date: "2026-09-17",
     weekday: "星期四",
     summary: "今日AI产业聚焦政策监管、技术突破、产业动态和投融资，涵盖AI芯片、大模型、自动驾驶等领域。",
