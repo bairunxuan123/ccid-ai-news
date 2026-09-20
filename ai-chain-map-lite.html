@@ -2602,6 +2602,21 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-09-20",
+    weekday: "星期日",
+    summary: "今日AI产业动态丰富，涵盖政策、技术、产业和资本等多个方面。",
+    items: [
+      { cat: "policy", catLabel: "政策发布", title: "美国联邦航空管理局斥资8.75亿美元打造AI空管系统", desc: "美国联邦航空管理局（FAA）斥资8.75亿美元打造AI空管系统Smart，最快于当地时间21日上线，旨在减少航班延误与取消，并预测空中交通流量，待全面覆盖美国空域后，系统将扮演类似全美空中交通管制体系“大脑”的角色。", source: "IT之家", url: "https://www.ithome.com/1/004/569.htm" },
+      { cat: "policy", catLabel: "政策发布", title: "加州州长推动AI监管，考虑强制实施AI'杀戮开关'", desc: "加州州长Gavin Newsom推动AI监管，发布新行政命令要求设立“关闭开关”，并召集专家小组在两个月内提出加强AI安全措施的建议。该小组将考虑要求AI公司设立现场独立验证小组进行定期审计，并使透明度报告和风险评估符合独立标准。", source: "The Verge", url: "https://www.theverge.com/policy/997516/california-governor-newsom-ai-kill-switch" },
+      { cat: "policy", catLabel: "政策发布", title: "美国弗吉尼亚州州长成立AI特别工作组，限制数据中心发展", desc: "弗吉尼亚州州长阿比盖尔·斯潘伯格下令，要求州政府采取措施，赋予当地社区在数据中心发展中的更大话语权，并放慢审批速度。行政命令22号禁止行政部门官员签署与数据中心项目相关的保密协议，要求加快噪声法规的执行，并要求审查数据中心使用的备用发电操作，以及其他要求。此外，该命令还设立了一个AI特别工作组，负责评估该州如何应对人工智能的发展。", source: "The Verge", url: "https://www.theverge.com/policy/997573/virginia-governor-spanberger-data-center-ai-task-force" },
+      { cat: "tech", catLabel: "技术突破", title: "华为汪涛：华为要打造AI算力底座，只做好一颗芯片远远不够", desc: "华为宣布要打造AI算力底座，汪涛强调只做好一颗芯片远远不够。华为云CANN跨过拐点，成功补上软件生态，为AI算力提供全面支持。这一举措标志着华为在AI领域的布局更加完善，有望推动行业进一步发展。", source: "量子位", url: "https://www.qbitai.com/2026/09/492476.html" },
+      { cat: "tech", catLabel: "技术突破", title: "苹果M6芯片GPU跑分曝光，相比M5提升约20%", desc: "苹果公司发布了M6芯片，其在Geekbench跑分数据库中，12核CPU分别录得4071分、22783分的单核/多核成绩，GPU跑分达到92000分，相比M5提升约20%。尽管Metal API为苹果独有，无法与其他显卡直接对比，但M6芯片的GPU性能提升十分明显。", source: "IT之家", url: "https://www.ithome.com/1/004/576.htm" },
+      { cat: "industry", catLabel: "产业动态", title: "Gartner概述仓库自动化AI四个层级", desc: "Gartner发布了仓库自动化AI四个层级分析报告。报告显示，随着物流运营商从软件试用过渡到实际设施部署，仓库自动化现在涵盖四个操作AI层级。该研究机构分析认为，物流基础设施已达到明确的采用门槛。三个压力推动这一变化：持续的劳动力短缺使得自动化系统对物流设施成为必要，同时，软件商业模式现在具有更低的初始资本要求。此外，底层算法和自主机械同时发展。", source: "AI News", url: "https://www.artificialintelligence-news.com/news/gartner-outlines-four-ai-tiers-in-warehouse-automation/" },
+      { cat: "industry", catLabel: "产业动态", title: "迪士尼任命首位首席技术官，强化AI布局", desc: "迪士尼宣布任命原Character.AI CEO卡兰迪普·阿南德为高级执行副总裁兼首位首席技术官，将于10月2日上任，直接向CEO乔什·达马罗汇报。阿南德将负责企业技术、基础设施、数据和AI平台，以及产品与工程业务，推动技术现代化。此前，阿南德带领Character.AI高速增长，建立起全球用户活跃度最高的消费级AI用户群体之一。", source: "IT之家", url: "https://www.ithome.com/1/004/570.htm" },
+      { cat: "capital", catLabel: "投融资", title: "新创公司UP.Labs融资1亿美元，专注于物理AI", desc: "UP.Labs，现更名为Vantora，专注于为工业公司构建初创企业，近日成功融资1亿美元，全力投入物理人工智能领域。该公司致力于为工业公司打造初创企业，以推动技术创新和业务拓展。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/18/a-startup-that-builds-other-startups-raised-100m-and-is-all-in-on-physical-ai/" }
+    ]
+  },
+  {
     date: "2026-09-19",
     weekday: "星期六",
     summary: "今日AI产业聚焦政策发布、技术突破、产业动态及投融资等多个方面。",
