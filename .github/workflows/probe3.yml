@@ -1,0 +1,52 @@
+name: Probe3（双板块真实API复验）
+
+# 用途：跑 probe3.py 真实 API 复验两阶段生成能否产出 16 条 / 八格齐
+# 与 daily-news.yml 不同：
+#   · 不写 HTML（probe3 是只读诊断脚本）
+#   · 不 commit / push
+#   · 输出全部走 stdout，可在 Actions 日志里看
+# 触发：workflow_dispatch（手动），也可 schedule 每周自动跑一次
+on:
+  workflow_dispatch: {}
+  schedule:
+    # 每周一上午 10:30（北京时间），给周末/意外积累留出重试窗口
+    - cron: "30 2 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  probe3:
+    runs-on: ubuntu-latest
+    # 真实 API 复验：16 条正文 + 50+ 次调用，约 15-20 分钟
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run probe3.py（真实 API 跑两阶段生成）
+        env:
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+        run: |
+          echo "开始 probe3 真实 API 复验..."
+          python3 probe3.py 2>&1 | tee probe3_output.log
+          EXIT_CODE=$?
+          echo "---"
+          echo "probe3 退出码: $EXIT_CODE"
+
+      - name: Upload probe3 output log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: probe3-output
+          path: probe3_output.log
+          if-no-files-found: warn
+
+      - name: Fail if probe3 failed
+        if: ${{ env.PROBE3_EXIT != '0' }}
+        run: exit 1
