@@ -2,8 +2,15 @@ name: Daily AI News Pipeline
 
 on:
   schedule:
-    # 每天北京时间 09:30 = UTC 01:30
+    # 每天北京时间 09:30 = UTC 01:30（主跑）；14:30 = UTC 06:30（自动补跑）
+    # [2026-09-18] 新增补跑时段：真实 API 上有过整天不达标就整体失败的情况
+    # （2026-09-18 那次跑了 16 分钟仍不足 6 条，线上停在 09-17），
+    # 单次调度失败后当天就再无机会。加一趟补跑，失败当天下午自动重试。
+    # news_pipeline 有幂等前置检查：当天已写入时立刻退出、不抓素材不调模型，
+    # 所以补跑在正常情况下几乎零成本；通知步骤也只在"有变更"时才发，
+    # 不会给用户多推一条。
     - cron: "30 1 * * *"
+    - cron: "30 6 * * *"
   workflow_dispatch: {}
 
 permissions:
@@ -15,7 +22,9 @@ jobs:
     # [2026-09-14] 由 20 放宽到 40。改成两阶段后每天调用次数从 1-2 次
     # 升到 25-45 次（14 条候选 × 逐条写正文 + 不合格定向重写），
     # 单次调用 12-15s，最坏情况需要 12-15 分钟，留足余量避免被超时掐断。
-    timeout-minutes: 40
+    # [2026-09-21] 由 40 放宽到 60。双板块后两阶段各跑两次（每地域一次选题），
+    # 候选 32 条 + 16 条正文 + 3 轮重写 = 50+ 次调用，理论 15-20 分钟。
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,6 +51,7 @@ jobs:
         run: cp -f ai-chain-map.html index.html
 
       - name: Commit & push
+        id: commit
         if: steps.pipeline.outcome == 'success'
         run: |
           git config user.name "daily-news-bot"
@@ -49,13 +59,17 @@ jobs:
           git add -A
           if git diff --cached --quiet; then
             echo "无变更（当天已写入或生成失败），跳过提交"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "chore: 更新 $(date +%F) 产业动态"
             git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Notify WeChat via Server酱（推送到用户手机微信）
-        if: always()
+        # [2026-09-18] 补跑时段引入后，必须避免"成功但无新内容"也推一条：
+        # 只有"流水线失败"或"确实提交了新内容"才通知。
+        if: always() && (steps.pipeline.outcome != 'success' || steps.commit.outputs.changed == 'true')
         env:
           SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
           PIPELINE_OUTCOME: ${{ steps.pipeline.outcome }}
