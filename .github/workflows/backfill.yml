@@ -20,7 +20,9 @@ permissions:
 jobs:
   backfill:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # [2026-09-21] 由 40 放宽到 60。每次回溯按天走两阶段生成（每地域一次选题 +
+    # 16 条正文 + 3 轮重写），6 天约 60+ 次调用。
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
