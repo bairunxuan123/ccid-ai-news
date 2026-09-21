@@ -1,11 +1,7 @@
-name: Probe3（双板块真实API复验）
+name: Probe3 Real API Validation
 
-# 用途：跑 probe3.py 真实 API 复验两阶段生成能否产出 16 条 / 八格齐
-# 与 daily-news.yml 不同：
-#   · 不写 HTML（probe3 是只读诊断脚本）
-#   · 不 commit / push
-#   · 输出全部走 stdout，可在 Actions 日志里看
-# 触发：workflow_dispatch（手动），也可 schedule 每周自动跑一次
+# Real API validation: run probe3.py to verify dual-region pipeline produces
+# 16 items / 8 cells. Does not write HTML, does not commit, does not push.
 on:
   workflow_dispatch: {}
   schedule:
@@ -18,7 +14,7 @@ permissions:
 jobs:
   probe3:
     runs-on: ubuntu-latest
-    # 真实 API 复验：16 条正文 + 50+ 次调用，约 15-20 分钟
+    # Real API: 16 descs + 50+ calls, ~15-20 minutes
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -29,15 +25,15 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run probe3.py（真实 API 跑两阶段生成）
+      - name: Run probe3.py
         env:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
         run: |
-          echo "开始 probe3 真实 API 复验..."
+          echo "Starting probe3 real API validation..."
           python3 probe3.py 2>&1 | tee probe3_output.log
-          EXIT_CODE=$?
+          EXIT_CODE=${PIPESTATUS[0]}
           echo "---"
-          echo "probe3 退出码: $EXIT_CODE"
+          echo "probe3 exit code: $EXIT_CODE"
 
       - name: Upload probe3 output log
         if: always()
@@ -48,5 +44,10 @@ jobs:
           if-no-files-found: warn
 
       - name: Fail if probe3 failed
-        if: ${{ env.PROBE3_EXIT != '0' }}
-        run: exit 1
+        if: hashFiles('probe3_output.log') != ''
+        run: |
+          if grep -q "^RESULT: FAIL" probe3_output.log; then
+            echo "probe3 result FAIL"
+            exit 1
+          fi
+          echo "probe3 result PASS or no items"
