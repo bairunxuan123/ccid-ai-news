@@ -2304,6 +2304,9 @@ def write_into_html(html_path, block, date_str):
     with open(html_path, "r", encoding="utf-8") as f:
         content = f.read()
 
+    if "var NEWS_DATA = var NEWS_DATA" in content:
+        raise RuntimeError(f"{html_path} 存在 NEWS_DATA 前缀重复（历史污染），先修复再写入")
+
     if f'date: "{date_str}"' in content:
         log(f"  {html_path} 已含 {date_str}，跳过写入")
         return False
@@ -2327,9 +2330,15 @@ def check_js_syntax(html_path):
     """
     js_check = (
         "const s=require('fs').readFileSync(process.argv[1],'utf8');"
+        "if(s.includes('var NEWS_DATA = var NEWS_DATA')){"
+        "console.error('NEWS_DATA 前缀重复');process.exit(3)}"
         "const m=s.match(/var NEWS_DATA = (\\[[\\s\\S]*?\\]);/);"
         "if(!m){console.error('未找到 NEWS_DATA');process.exit(1)}"
         "JSON.parse(JSON.stringify(eval('('+m[1]+')')));"
+        "const scripts=[...s.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)].map(x=>x[1]);"
+        "for(let i=0;i<scripts.length;i++){"
+        "try{new Function(scripts[i]);}catch(e){"
+        "console.error('script['+i+'] 语法错误: '+e.message);process.exit(2)}}"
         "console.log('OK')"
     )
     code = (
