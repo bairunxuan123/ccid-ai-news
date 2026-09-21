@@ -2592,6 +2592,21 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-09-21",
+    weekday: "星期一",
+    summary: "今日AI产业动态丰富，涵盖政策、技术突破、产业动态和投融资等多个方面。",
+    items: [
+      { cat: "industry", catLabel: "产业动态", title: "特斯拉得州Optimus机器人工厂主结构完工", desc: "特斯拉得州超级工厂的Optimus机器人工厂主结构已接近完工，预计年产能达1,000万台，生产工作将于2027年晚些时候开始。目前，工厂上方的三层楼正在浇筑混凝土，更多区域也在铺设钢筋。然而，特斯拉官方表示，这些工厂距离实际投产仍有一定距离。", source: "IT之家", url: "https://www.ithome.com/1/005/052.htm" },
+      { cat: "industry", catLabel: "产业动态", title: "Gartner发布仓库自动化AI层级", desc: "Gartner发布报告指出，仓库自动化已涵盖四个操作AI层级，物流运营商正从软件试验过渡到现场设施部署。该报告显示，物流基础设施已达到明确的采用门槛，这一变化由持续的人力短缺、软件商业模式的初始资本要求降低以及底层算法和自主机械的同步发展驱动。", source: "AI News", url: "https://www.artificialintelligence-news.com/news/gartner-outlines-four-ai-tiers-in-warehouse-automation/" },
+      { cat: "policy", catLabel: "政策发布", title: "加州政府推动AI监管，考虑强制设置'停止开关'", desc: "加州州长Gavin Newsom推动AI监管，发布新行政命令，要求成立专家小组，两个月内提出加强AI安全措施的立法建议。该小组将考虑要求AI公司设立现场独立验证小组进行定期审计，并使透明度报告和风险评估符合独立标准。", source: "The Verge", url: "https://www.theverge.com/policy/997516/california-governor-newsom-ai-kill-switch" },
+      { cat: "tech", catLabel: "技术突破", title: "英伟达显卡包含数十个RISC-V核心", desc: "英伟达发布了包含数十个 RISC-V 核心的 GPU，其中部分核心已接管图形驱动执行，每块 GPU 内部拥有 10-40 个这种核心，用户无法对这些核心进行编程。据悉，英伟达在使用 RISC-V 核心之前使用的是 Falcon，这种核心采用流水线设计，支持可变长度指令集，其设计目标并非追求极致速度，而是降低芯片面积以及应对较长的内存访问延迟。", source: "IT之家", url: "https://www.ithome.com/1/005/039.htm" },
+      { cat: "tech", catLabel: "技术突破", title: "阿里千问开源Qwen-Image-2.1图像模型", desc: "阿里巴巴集团旗下千问实验室今日发布开源图像模型Qwen-Image-2.1，该模型集文生图与图像编辑功能于一体，视觉生成部分仅7B参数，原生支持透明图像生成与编辑。新版本主要特色包括小模强效、原生透明、全能编辑和实质感提升，支持最多10张参考图，增强局部编辑和人像商品保真。", source: "IT之家", url: "https://www.ithome.com/1/004/989.htm" },
+      { cat: "industry", catLabel: "产业动态", title: "2026年上半年我国制造业AI应用普及率达34.2%", desc: "国家工业信息安全发展研究中心发布《制造业数智化转型能力水平（2026）》，显示2026年上半年，我国制造业人工智能重点场景应用普及率达34.2%，全国两化融合发展水平达到67.1，数字化底座持续夯实，研发设计、生产制造、经营管理等环节实现数字化普及的企业比例分别为86.3%、69.5%、81.4%；网络化融通纵深拓展，全国近五成的企业开展网络化协同，智能化应用加速普及，较上年增长5.5个百分点，10.6%的规上制造业企业依托人工智能大模型赋能业务革新。", source: "IT之家", url: "https://www.ithome.com/1/004/991.htm" },
+      { cat: "capital", catLabel: "投融资", title: "UP.Labs融资1亿美元，押注物理AI", desc: "UP.Labs，现更名为Vantora，专注于为工业企业构建初创公司，成功融资1亿美元，全力投入物理人工智能领域。该公司致力于为工业公司构建初创企业，以推动技术创新和业务增长。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/18/a-startup-that-builds-other-startups-raised-100m-and-is-all-in-on-physical-ai/" },
+      { cat: "industry", catLabel: "产业动态", title: "Anthropic运营生物实验实验室", desc: "Anthropic正在运营一个进行生物学实验的实验室。AI领导们一直承诺AI是治愈人类疾病的关键，而Anthropic的研究人员也警告AI可能会杀死我们所有人。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/18/anthropic-is-operating-a-lab-that-conducts-biology-experiments/" }
+    ]
+  },
+  {
     date: "2026-09-20",
     weekday: "星期日",
     summary: "今日AI产业动态丰富，涵盖政策、技术、产业和资本等多个方面。",
