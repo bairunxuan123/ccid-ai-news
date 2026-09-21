@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""诊断脚本 3：用真实 API 跑一遍改造后的两阶段生成，验证 8 月标准能否落地。
+"""诊断脚本 3：用真实 API 跑一遍改造后的两阶段生成，验证双板块基线能否落地。
 
 与 mock 的区别：走真实 glm-4-flash + 真实素材 + 真实过滤链，
 但不写任何文件（不碰 HTML、不提交）。
 
-输出：条数 / 标题字数分布 / 正文字数分布 / 四类分布 / 逐条正文原文，
+输出：条数 / 标题字数分布 / 正文字数分布 / 板块×四类分布 / 逐条正文原文，
 以及【过滤漏斗】——阶段 A 拦了几条、阶段 B 修了几轮、最终丢弃几条及原因，
 便于人工判断是否真的回到 8 月定版的写法。
 
@@ -20,6 +20,12 @@ P0：正文里抄进了提示词指令、四类缺了"产业动态"整类。这�
   · 阶段 B 各类合格正文数（判断是不是写不出/被筛掉）
   · 修复原因细分到 5 项（字数/数字/英文/混入指令/空泛表述）
   · 成品逐条的 leak / vague 复检（成品里一次都不许出现）
+
+[2026-09-21 三次迭代] 双板块（国内 8 + 国外 8 = 16 条 / 八格各 2）：
+  · 阶段 A 候选分布按 (region, cat) 八格统计
+  · 收工条数目标 16，八格各 2 条作为硬门槛
+  · 标题/正文质量阈值与 8 月基线一致（25 / 118.9）
+  · 摘要按地域合成「【国内】... 【国外】...」
 """
 import os
 import re
@@ -37,7 +43,7 @@ def _capture(msg):
 
 
 def _funnel():
-    """按原因归类过滤日志，还原"素材 → 落地 8 条"的漏斗。"""
+    """按原因归类过滤日志，还原"素材 → 落地 16 条"的漏斗。"""
     pats = [
         ("编造 URL", "丢弃编造 URL"),
         ("重复素材", "丢弃重复素材"),
@@ -50,6 +56,7 @@ def _funnel():
         ("调用全失败", "丢弃调用全失败"),
         ("三轮仍不合格", "丢弃三轮重写仍不合格"),
         ("标题数字不可核实", "丢弃标题数字不可核实"),
+        ("地域不足", "丢弃地域不足"),
     ]
     out = []
     for label, key in pats:
@@ -67,14 +74,13 @@ def _funnel():
 
 
 def _stage_a_lines():
-    """截取阶段 A 每轮的候选分布行，例如：
-    '阶段 A 第1轮：候选 11 条 政策发布3 技术突破4 产业动态1 投融资3｜仍缺 产业动态'"""
-    return [m for m in _LOG if "阶段 A 第" in m]
+    """截取阶段 A 每轮的候选分布行（双板块：'【国内】第1轮：候选 16 条 ...'）。"""
+    return [m for m in _LOG if "阶段 A 第" in m or "阶段 A【" in m]
 
 
 def _stage_b_lines():
     """截取阶段 B 各类合格正文数（由 news_pipeline 在收工时打印）"""
-    return [m for m in _LOG if "阶段 B 合格正文" in m]
+    return [m for m in _LOG if "阶段 B 合格正文" in m or "八格" in m]
 
 
 def main():
@@ -82,15 +88,15 @@ def main():
         print("缺少 ZHIPU_API_KEY")
         return 2
     np.log = _capture          # 打桩收日志
-    day_cn = "2026年9月14日"
+    day_cn = "2026年9月22日"
     print("=" * 74)
-    print(f"诊断 3：真实 API 跑两阶段生成（{day_cn}）")
+    print(f"诊断 3：真实 API 跑两阶段生成（{day_cn}，双板块目标 16 条）")
     print("=" * 74)
 
     mat = np.collect_material(hours=72)
     print(f"素材 {len(mat)} 条\n")
-    if len(mat) < 8:
-        print("素材不足，终止")
+    if len(mat) < np.PER_REGION_ITEMS:    # 双板块起码要 12 条素材
+        print(f"素材不足（<{np.PER_REGION_ITEMS}），终止")
         return 1
 
     t0 = time.time()
@@ -98,7 +104,8 @@ def main():
     dt = time.time() - t0
 
     print(f"\n{'=' * 74}")
-    print(f"结果：{len(items)} 条 / 目标 8 ｜ 耗时 {dt:.0f}s")
+    print(f"结果：{len(items)} 条 / 目标 {np.MAX_ITEMS}（国内 8 + 国外 8）"
+          f" ｜ 耗时 {dt:.0f}s")
     print("=" * 74)
 
     drops, rep = _funnel()
@@ -108,19 +115,20 @@ def main():
             print(f"  · {label}: {n} 条")
     else:
         print("  · 无丢弃")
-    print("阶段 B 定向修复：" + " ｜ ".join(f"{k} {v} 次" for k, v in rep.items()))
+    if any(rep.values()):
+        print("阶段 B 定向修复：" + " ｜ ".join(f"{k} {v} 次" for k, v in rep.items() if v))
 
-    # 缺类定位：先看候选阶段（阶段 A）够不够，再看撰写阶段（阶段 B）有没有写出来。
-    # 这两处的修法完全不同 —— 候选不足要改提示词/补选，写不出要改正文体检门槛。
+    # 缺类/缺板块定位：先看候选阶段（阶段 A）够不够，再看撰写阶段（阶段 B）有没有写出来。
     a_lines = _stage_a_lines()
     if a_lines:
-        print("\n阶段 A 候选分布（每类不足 %d 条会触发补选）：" % np.MIN_CANDS_PER_CAT)
+        print("\n阶段 A 候选分布（按地域×四类，每格不足 %d 条会触发补选）："
+              % np.MIN_CANDS_PER_CELL)
         for m in a_lines:
             print("    " + m.strip())
     b_lines = _stage_b_lines()
     if b_lines:
-        print("阶段 B 合格正文分布（每类不足 %d 条说明该类被门槛筛掉了）："
-              % np.MIN_PER_CAT_DESC)
+        print("阶段 B 合格正文分布（每格不足 %d 条说明该格被门槛筛掉）："
+              % np.MIN_PER_CELL_DESC)
         for m in b_lines:
             print("    " + m.strip())
 
@@ -133,18 +141,31 @@ def main():
 
     tl = [len(i["title"]) for i in items]
     dl = [len(i["desc"]) for i in items]
-    dist = {}
+    # 双板块×四类分布
+    cell_dist = {}
     for i in items:
-        dist[i["catLabel"]] = dist.get(i["catLabel"], 0) + 1
-    print(f"\n标题字数 平均 {sum(tl)/len(tl):.1f}｜区间 {min(tl)}-{max(tl)}（8月基准 25.0）")
-    print(f"正文字数 平均 {sum(dl)/len(dl):.1f}｜区间 {min(dl)}-{max(dl)}（8月基准 118.9）")
+        k = (i.get("region", "?"), i["cat"])
+        cell_dist[k] = cell_dist.get(k, 0) + 1
+    region_dist = {}
+    for i in items:
+        r = i.get("region", "?")
+        region_dist[r] = region_dist.get(r, 0) + 1
+    print(f"\n板块分布：{region_dist}（目标 国内 8 / 国外 8）")
+    print("八格分布：")
+    for region in np.REGIONS:
+        cells = " ".join(
+            f"{cat}{cell_dist.get((region, cat), 0)}"
+            for cat in np.CAT_LABELS
+        )
+        print(f"  {np.REGION_LABELS[region]}: {cells}")
+    print(f"\n标题字数 平均 {sum(tl)/len(tl):.1f}｜区间 {min(tl)}-{max(tl)}"
+          f"（8月基准 {np.BASE_TITLE_AVG if hasattr(np, 'BASE_TITLE_AVG') else 25.0}）")
+    print(f"正文字数 平均 {sum(dl)/len(dl):.1f}｜区间 {min(dl)}-{max(dl)}"
+          f"（8月基准 118.9）")
     dual = sum(1 for i in items if "，" in i["title"])
     print(f"标题双分句 {dual}/{len(items)}（8月基准约 1/3）")
-    print(f"四类分布 {dist}")
     print(f"摘要：{summary}\n")
 
-    material_text = " ".join(
-        (m.get("title", "") + " " + (m.get("summary") or "")) for m in mat)
     leaks, vagues, shorts = [], [], []
     for it in items:
         lk = np.prompt_leak(it["desc"])
@@ -156,19 +177,32 @@ def main():
         if len(it["desc"]) < np.MIN_DESC_LEN:
             shorts.append(it["title"][:20])
 
-    for i, it in enumerate(items, 1):
-        print(f"--- {i}. [{it['catLabel']}] {it['title']}（{len(it['title'])}字）")
-        print(f"    来源 {it['source']} ｜ {it['url']}")
-        print(f"    正文（{len(it['desc'])}字）：{it['desc']}\n")
+    # 逐条正文展示（按板块分组）
+    for region in np.REGIONS:
+        region_items = [i for i in items if i.get("region") == region]
+        if not region_items:
+            continue
+        print(f"\n{'─' * 30} {np.REGION_LABELS[region]}板块"
+              f"（{len(region_items)} 条） {'─' * 30}")
+        for k, it in enumerate(region_items, 1):
+            print(f"  {k}. [{it['catLabel']}] {it['title']}（{len(it['title'])}字）")
+            print(f"      来源 {it['source']} ｜ {it['url']}")
+            print(f"      正文（{len(it['desc'])}字）：{it['desc']}\n")
 
-    cat_counts = [dist.get(np.CAT_LABELS[k], 0) for k in np.CAT_LABELS]
+    # 八格检查
+    eight_cells = [(r, c) for r in np.REGIONS for c in np.CAT_LABELS]
+    cell_ok = all(cell_dist.get(k, 0) >= np.MIN_PER_CELL_DESC for k in eight_cells)
+
     checks = [
-        ("产出 8 条", len(items) == 8),
-        ("标题均 ≥15 字且 ≤40 字", min(tl) >= 15 and max(tl) <= 40),
-        ("正文均 ≥80 字", min(dl) >= 80),
+        (f"产出 {np.MAX_ITEMS} 条（双板块满载）", len(items) == np.MAX_ITEMS),
+        ("国内 8 条 + 国外 8 条",
+         region_dist.get("cn", 0) == np.PER_REGION_ITEMS
+         and region_dist.get("intl", 0) == np.PER_REGION_ITEMS),
+        ("八格各 ≥2 条", cell_ok),
+        ("标题均 ≥15 字", min(tl) >= 15),
+        ("标题均 ≤40 字", max(tl) <= 40),
+        ("正文最短 ≥80 字", min(dl) >= 80),
         ("正文均值 ≥110 字（贴近 8 月 118.9）", sum(dl) / len(dl) >= 110),
-        ("四类齐全", len(dist) == 4),
-        ("四类各 ≥2 条（用户硬要求）", all(c >= 2 for c in cat_counts)),
         ("成品无提示词指令泄露", not leaks),
         ("成品无空泛评价", not vagues),
         ("成品无过短正文", not shorts),
@@ -183,6 +217,16 @@ def main():
     for name, good in checks:
         print(f"  {'✅' if good else '❌'} {name}")
     print("=" * 74)
+
+    # 完整链路日志【无条件打印】。
+    # [2026-09-14] 上一版只在"一条都没产出"时才打印，结果 run 34821688274 产出 6 条
+    # 却四类不均衡（技术突破/产业动态/投融资各 1 条），而"为什么另外 9 条候选被丢掉"
+    # 的关键信息全在被吞掉的日志里 —— 只能重跑一次真实 API（约 6 分钟、40+ 次调用）。
+    # 诊断脚本的价值就在于一次跑完能定位，所以这里永远打印。
+    print("\n—— 完整链路日志（阶段 A 候选 / 阶段 B 逐条体检与丢弃原因）——")
+    for m in _LOG:
+        print("  " + m)
+
     ok = all(g for _, g in checks)
     print("RESULT: " + ("PASS" if ok else "FAIL"))
     return 0 if ok else 1
