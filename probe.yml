@@ -1,0 +1,44 @@
+name: Probe GLM model capability (manual, diagnostic)
+
+# 仅手动触发的一次性诊断任务：查清模型为何写不出 100+ 字正文。
+# 定位完成后可删除本文件与 probe_model.py。
+on:
+  workflow_dispatch:
+    inputs:
+      script:
+        description: "要运行的诊断脚本"
+        required: false
+        default: "probe_model.py"
+      day:
+        description: "诊断用的日期（YYYY-MM-DD），留空用今天"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run probe
+        env:
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+          DAY: ${{ inputs.day }}
+          SCRIPT: ${{ inputs.script }}
+        run: |
+          S="${SCRIPT:-probe_model.py}"
+          if [ -n "$DAY" ]; then
+            python "$S" "$DAY"
+          else
+            python "$S"
+          fi
