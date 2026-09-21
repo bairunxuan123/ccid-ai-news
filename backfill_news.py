@@ -73,6 +73,20 @@ def day_material(all_items, day):
     # AI 相关性预过滤 + 消费电子剔除：与日常流水线口径一致
     near = [it for it in near
             if np.is_ai_related(it["title"]) and not np.title_blocked(it["title"])]
+    # 官方政策（2026-09-18 新增）：回填历史日期时只取该日（含）之前发布的政策
+    # （before=day），否则会把"未来"的政策写进过去的简报里。
+    # 放在最前面，让它们优先进入 prompt 前部。
+    try:
+        official = np.collect_official_policies(before=day)
+    except Exception as e:
+        np.log(f"  官方政策检索失败（{day}）: {e}")
+        official = []
+    near_urls = {x["url"] for x in near}
+    official = [it for it in official
+                if it["url"] not in near_urls and not np.title_blocked(it["title"])]
+    if official:
+        np.log(f"  {day}: 官方政策素材 {len(official)} 条（中国政府网政策文件库）")
+    near = official + near
     # 按源轮转交错：build_day_prompt 只截取前 N 条，不重排则列表前部会被 IT之家 占满
     buckets = {}
     for m in near:
@@ -87,8 +101,43 @@ def day_material(all_items, day):
     return inter, len(same_day)
 
 
-def build_day_prompt(material, day_str, attempt=0):
+
+# —— 两个地域的"政策发布"口径（与日常流水线 build_select_prompt 保持一致）——
+# 国内板块只认中国官方发文；国外板块只认境外政府/监管机构的正式规则。
+POLICY_CLAUSE_CN = (
+    "- policy 政策发布：**中国政府部门/机构发布的、与人工智能相关的政策文件**——\n"
+    "  国务院/中办国办/工信部/国家发展改革委/中央网信办/科技部/国家数据局等部委，\n"
+    "  或省级、市级人民政府及主管部门；标题要写出**发布主体 + 文件名**"
+)
+POLICY_CLAUSE_INTL = (
+    "- policy 政策发布：**境外政府或官方监管机构正式发布的、与人工智能相关的法规、\n"
+    "  行政令、监管规则或国家战略**——如欧盟委员会/欧洲议会、美国白宫与联邦机构\n"
+    "  （FTC/商务部/NIST）、英国、日本、韩国、新加坡等政府部门的正式文件。\n"
+    "  标题里要写出**发布主体 + 法规或文件名称**；企业合规声明、行业倡议、高管表态都不算"
+)
+POLICY_STRICT_CN = (
+    "- 只有**中国官方主体**发布的政策才算 policy；素材来源标注\"中国政府网\"的就是\n"
+    "  政策文件库原文，是 policy 的首选。\n"
+    "- **外国的法案/监管/行政令不算本批的政策发布**（本批只要国内的），\n"
+    "  请归入 **industry 产业动态**。\n"
+    "- 仅出现\"监管/标准/合规/政策\"这类泛词的新闻也**不算** policy。"
+)
+POLICY_STRICT_INTL = (
+    "- 只有**境外政府部门/官方监管机构**正式发布的法规或行政令才算 policy。\n"
+    "- 若素材里其实是国内部委发文，本批不要选它（另一次选题会收）。\n"
+    "- 仅出现\"监管/标准/合规\"这类泛词、或只是企业表态的新闻**不算** policy。"
+)
+
+
+def build_day_prompt(material, day_str, attempt=0, region="cn"):
+    """回填某一天的阶段 A 选题 prompt（按地域分批调用，与日常流水线一致）。
+
+    [2026-09-21] 页面拆成国内/国外两个板块后，回填也要各出 8 条。
+    material 传入的已经是该地域专属的素材池（见 split_material_by_region），
+    一次只要一个地域的候选，模型没有"选哪边"的余地。
+    """
     weekday = np.WEEKDAYS[datetime.strptime(day_str, "%Y-%m-%d").weekday()]
+    rlabel = np.REGION_LABELS[region]
 
     def fmt(i, m):
         sm = (m.get("summary") or "").strip()[:np.SUMMARY_IN_PROMPT]
@@ -127,16 +176,22 @@ def build_day_prompt(material, day_str, attempt=0):
 
 请从中挑选 AI 产业相关的新闻，整理成"人工智能产业动态"。{temp_note}
 
-**请输出 {np.CANDIDATE_ITEMS} 条候选**（比最终需要的 8 条多出不少，因为系统会做一轮硬性过滤，
-剔除消费电子/编造数字/英文残留的条目，需要留有足够冗余），
-**并按产业价值从高到低排序**，系统会按四类均衡选取前 8 条：
+**本次只要「{rlabel}」的 {np.CANDIDATE_ITEMS} 条候选，不要输出另一个地域的新闻**
+（另一个地域由另一次独立选题负责）。条数比最终需要的 {np.PER_REGION_ITEMS} 条多出不少，
+因为系统会做一轮硬性过滤，剔除消费电子/编造数字/英文残留的条目，需要留有足够冗余，
+**并按产业价值从高到低排序**，系统会按（地域 × 维度）八格均衡选取：
 
 {np.CANDIDATE_ITEMS} 条候选必须覆盖 4 类，**每类至少 3 条候选**（这样即使过滤掉几条，
-最终仍能凑齐"四类各 2 条"）：
-- policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
+最终仍能凑齐"该地域四类各 2 条"）：
+{POLICY_CLAUSE_CN if region == "cn" else POLICY_CLAUSE_INTL}
 - tech 技术突破：模型/算法/芯片/算力/产品技术本身的进展
 - industry 产业动态：企业合作、产品上市、产能布局、行业趋势、企业业绩
 - capital 投融资：融资、并购、IPO、估值变化
+
+**「政策发布」的严格口径（务必遵守）**：
+{POLICY_STRICT_CN if region == "cn" else POLICY_STRICT_INTL}
+- **宁缺勿滥**：当日确实没有合格的政策发布时，policy 可以只给 1 条甚至 0 条，
+  **绝不能拿别的动态来充当政策发布**。
 
 **重要：素材含 ±1 天邻域和非 AI 内容**。优先用当天素材；当天不足时可选用邻日（昨天/今天）的重大新闻，但 desc 中要按事件实际日期表述（"昨日/今日..."）。
 
@@ -147,7 +202,8 @@ def build_day_prompt(material, day_str, attempt=0):
   绝对不要整类不写——系统按类均衡选取，缺了哪一类最终成品就会缺哪一类。
 
 分类口径（必须严格按新闻实质判断，宁缺勿错）：
-- policy 政策发布：政府部门、监管机构、行业标准、法律法规相关
+- policy 政策发布：**仅限中国官方主体发布的 AI 相关政策文件**（见上文严格口径）；
+  外国的法案与泛泛的"监管/标准"类新闻一律不算，归 industry
 - tech 技术突破：模型/算法/芯片/算力/产品技术本身的进展
 - industry 产业动态：企业合作、产品上市、产能布局、行业趋势、企业业绩
 - capital 投融资：融资、并购、IPO、估值变化
@@ -196,97 +252,110 @@ def build_day_prompt(material, day_str, attempt=0):
 
 
 def gen_day(material, day_str):
-    """某天生成，最多重试 3 次；后两次逐步收紧（禁数字 → 只取最稳妥的条目）"""
+    """某天生成（国内 + 国外各 8 条），最多重试 3 次；后两次逐步收紧。
+
+    [2026-09-21 与日常流水线同步] 素材池先按地域劈成两份，每个地域单独跑
+    阶段 A 选题（各 16 条候选），合并后统一进入阶段 B 逐条写正文；
+    轮转键是 (region, cat)，收工条件是 8 格各满 MIN_PER_CELL_DESC 条。
+    """
     valid_urls = {m["url"] for m in material}
     # [2026-09-14] 纳入正文摘要：否则模型按 8 月标准写出摘要里的真实数字，
     # 会被 numbers_grounded 判为"编造数字"整条丢弃（反向 bug）。
     material_text = " ".join(
         (m.get("title", "") + " " + (m.get("summary") or "")) for m in material
     )
-    for attempt in range(3):
-        try:
-            prompt = build_day_prompt(material, day_str, attempt=attempt)
-            if attempt == 2:
-                # 末次尝试：允许放宽数字口径（中英文金额换算已归一化，此处仅提示更保守）
-                prompt += (
-                    "\n\n【本次为最后一次尝试，请务必满足条数要求】"
-                    "请优先挑选不涉及金额、估值、百分比的新闻，"
-                    "若确实需要提及金额请使用素材中的原始写法（如 $500M 写作 5亿美元）。"
-                )
-            # 重试时把 temperature 从 0.4 提到 0.6，扩大选题多样性
-            raw = np.call_glm(prompt, temperature=0.4 if attempt == 0 else 0.6)
-            obj = np.parse_llm_json(raw)
-        except Exception as e:
-            np.log(f"  {day_str} 第{attempt+1}次生成失败: {e}")
-            time.sleep(3)
-            continue
-        # —— 阶段 A 过滤：分类 / URL 白名单 / 标题长度 / 硬拦截 ——
-        cands, seen = [], set()
-        for it in (obj.get("items") or []):
-            cat = str(it.get("cat", "")).strip().lower()
-            url = str(it.get("url", "")).strip()
-            if cat not in np.CAT_LABELS:
-                continue
-            if url not in valid_urls:
-                np.log(f"  丢弃编造 URL: {str(it.get('title',''))[:26]}")
-                continue
-            if url in seen:
-                np.log(f"  丢弃重复素材: {str(it.get('title',''))[:26]}")
-                continue
-            seen.add(url)
-            title = np.clean_for_js(it.get("title", ""))[:60]
-            if not title:
-                continue
-            # 8 月定版标准：标题 20-32 字（9 月实测出现过 8 字标题），低于下限直接丢弃
-            if len(title) < np.MIN_TITLE_LEN:
-                np.log(f"  丢弃标题过短（{len(title)}字）: {title}")
-                continue
-            if len(title) > np.MAX_TITLE_LEN:
-                np.log(f"  丢弃标题过长（{len(title)}字）: {title[:26]}")
-                continue
-            if np.title_english_residue(title):
-                np.log(f"  丢弃标题未翻译: {title[:26]}")
-                continue
-            # [2026-09-14 同步] 标题混入提示词指令的候选必须拦下。
-            # 真实复验（run 34819377914）里模型把"上一轮不合格，本次必须逐条修正"
-            # 当正文抄进了成品，标题侧同样可能被污染，与日常流水线口径保持一致。
-            if np.prompt_leak(title):
-                np.log(f"  丢弃标题混入提示词的条目: {title[:26]}")
-                continue
-            # 硬拦截：消费电子/汽车新品/系统更新/政治人物（与 daily pipeline 保持一致）
-            if np.hard_blocked(title):
-                np.log(f"  硬拦截: {title[:26]}")
-                continue
-            if np.title_blocked(title):
-                np.log(f"  丢弃聚合或消费电子类条目: {title[:26]}")
-                continue
-            cands.append({
-                "cat": cat, "title": title,
-                "source": np.clean_for_js(it.get("source", ""))[:30],
-                "url": url,
-                "_rank": len(cands),
-            })
+    by_url = {m["url"]: m for m in material}
+    pools = np.split_material_by_region(material)
+    np.log(f"  {day_str} 素材地域拆分：" + " ".join(
+        f"{np.REGION_LABELS[r]}池 {len(pools[r])} 条" for r in np.REGIONS))
 
-        # —— 阶段 B：逐条素材单独撰写 110-150 字正文 ——
-        # [2026-09-14] 与 news_pipeline 同步：免费模型 glm-4-flash 在批量任务里
-        # 会把每条正文压到 50 字上下（实测批量 3 条 → 均 63 字），
-        # 拆成单条窄任务后可稳定产出 170-210 字，才能达到 8 月定版的 118.9 字。
-        # 同时把"一次不成即丢弃"改为"定向重写至多 3 轮"（见 np.desc_issues）。
+    for attempt in range(3):
+        # —— 阶段 A：按地域各选题一次 ——
+        cands, seen, summaries = [], set(), {}
+        for region in np.REGIONS:
+            mat_r = pools[region]
+            if not mat_r:
+                np.log(f"  {day_str} {np.REGION_LABELS[region]}池为空，跳过选题")
+                continue
+            try:
+                prompt = build_day_prompt(mat_r, day_str, attempt=attempt,
+                                          region=region)
+                if attempt == 2:
+                    prompt += (
+                        "\n\n【本次为最后一次尝试，请务必满足条数要求】"
+                        "请优先挑选不涉及金额、估值、百分比的新闻，"
+                        "若确实需要提及金额请使用素材中的原始写法（如 $500M 写作 5亿美元）。"
+                    )
+                raw = np.call_glm(prompt, temperature=0.4 if attempt == 0 else 0.6)
+                obj_r = np.parse_llm_json(raw)
+            except Exception as e:
+                np.log(f"  {day_str} {np.REGION_LABELS[region]}第{attempt+1}次生成失败: {e}")
+                continue
+            if not isinstance(obj_r, dict):
+                continue
+            s = np.clean_for_js(obj_r.get("summary", ""))[:70]
+            if s:
+                summaries[region] = s
+            base = len(cands)
+            for it in (obj_r.get("items") or []):
+                cat = str(it.get("cat", "")).strip().lower()
+                url = str(it.get("url", "")).strip()
+                if cat not in np.CAT_LABELS:
+                    continue
+                if url not in valid_urls:
+                    np.log(f"  丢弃编造 URL: {str(it.get('title',''))[:26]}")
+                    continue
+                if url in seen:
+                    np.log(f"  丢弃重复素材: {str(it.get('title',''))[:26]}")
+                    continue
+                seen.add(url)
+                title = np.clean_for_js(it.get("title", ""))[:60]
+                if not title:
+                    continue
+                if len(title) < np.MIN_TITLE_LEN:
+                    np.log(f"  丢弃标题过短（{len(title)}字）: {title}")
+                    continue
+                if len(title) > np.MAX_TITLE_LEN:
+                    np.log(f"  丢弃标题过长（{len(title)}字）: {title[:26]}")
+                    continue
+                if np.title_english_residue(title):
+                    np.log(f"  丢弃标题未翻译: {title[:26]}")
+                    continue
+                if np.prompt_leak(title):
+                    np.log(f"  丢弃标题混入提示词的条目: {title[:26]}")
+                    continue
+                if np.hard_blocked(title):
+                    np.log(f"  硬拦截: {title[:26]}")
+                    continue
+                if np.title_blocked(title):
+                    np.log(f"  丢弃聚合或消费电子类条目: {title[:26]}")
+                    continue
+                m = by_url[url]
+                # 地域：官方政策原文必为国内；其余以本批地域为准
+                reg = "cn" if (m.get("source") == "中国政府网"
+                               or "gov.cn" in str(m.get("url", ""))) else region
+                cands.append({
+                    "cat": cat, "region": reg, "title": title,
+                    "source": np.clean_for_js(it.get("source", ""))[:30] or m["source"],
+                    "url": url, "_rank": base + len(cands),
+                })
+        if not cands:
+            np.log(f"  {day_str} 第{attempt+1}次选题无可用候选，重试")
+            time.sleep(2)
+            continue
+
+        # —— 阶段 B：逐条素材单独撰写正文 ——
         np.log(f"  {day_str} 阶段A {len(cands)} 条候选，开始逐条写正文"
-               f"（四类各满 {np.MIN_PER_CAT_DESC} 条才收工，上限 {np.DESC_TARGET} 条）")
-        by_url = {m["url"]: m for m in material}
-        # 按类轮转，保证无论写到哪里停手四类都是齐的
-        cands = np.interleave_by_category(cands, prefer=np.MIN_PER_CAT_DESC)
+               f"（8 格各满 {np.MIN_PER_CELL_DESC} 条才收工，上限 {np.DESC_TARGET} 条）")
+        # 按（地域 × 维度）轮转，保证无论写到哪里停手两个板块都是齐的
+        cands = np.interleave_by_cell(cands, prefer=np.MIN_PER_CELL_DESC)
         items = []
         for ci, c in enumerate(cands):
             if len(items) >= np.DESC_TARGET:
                 np.log(f"  已达上限 {np.DESC_TARGET} 条，其余候选不再调用")
                 break
-            # [2026-09-14 同步] 收工条件不只是"凑够条数"，还要四类都各有
-            # MIN_PER_CAT_DESC 条供 select_balanced 均衡选取 —— 否则回填出来的
-            # 某天会出现四类缺项（真实复验 run 34819377914 缺的就是"产业动态"）。
-            if len(items) >= np.MAX_ITEMS and np._cat_ready(items, np.MIN_PER_CAT_DESC):
-                np.log(f"  已写满 {len(items)} 条且四类齐备，其余候选不再调用")
+            if len(items) >= np.MAX_ITEMS and np._cell_ready(items, np.MIN_PER_CELL_DESC):
+                np.log(f"  已写满 {len(items)} 条且 8 格齐备，其余候选不再调用")
                 break
             if ci:
                 time.sleep(1.0)
@@ -308,8 +377,6 @@ def gen_day(material, day_str):
                 issues = np.desc_issues(desc, material_text)
                 if not issues:
                     break
-                # 用公共函数汇总原因：5 项体检（长度/数字/英文/混入指令/空泛表述）
-                # 任何一项漏打印，日志就会指向"无理由地重写"
                 np.log(f"  正文待修（第{b+1}轮）{np.issues_brief(issues)}: {c['title'][:20]}")
             if not got_any or issues:
                 np.log(f"  丢弃重写仍不合格的条目: {c['title'][:26]}")
@@ -317,37 +384,33 @@ def gen_day(material, day_str):
             if np.ungrounded_numbers(c["title"], material_text):
                 np.log(f"  丢弃标题数字不可核实的条目: {c['title'][:26]}")
                 continue
-            # 分类确定性纠偏
-            fixed = np.normalize_category(c["cat"], c["title"], desc)
+            # 分类确定性纠偏必须带地域：两个板块的"政策发布"判据不同
+            fixed = np.normalize_category(c["cat"], c["title"], desc, c.get("region", "cn"))
             if fixed != c["cat"]:
-                np.log(f"  分类纠偏: {c['cat']}→{fixed}  {c['title'][:24]}")
+                np.log(f"  分类纠偏: {np.REGION_LABELS[c.get('region', 'cn')]} "
+                       f"{c['cat']}→{fixed}  {c['title'][:24]}")
             items.append({
-                "cat": fixed, "catLabel": np.CAT_LABELS[fixed],
+                "cat": fixed, "region": c.get("region", "cn"),
+                "catLabel": np.CAT_LABELS[fixed],
                 "title": c["title"], "desc": desc,
                 "source": c["source"] or m["source"], "url": c["url"],
                 "_rank": c.get("_rank", 999),
             })
-        if len(items) >= 6:
-            # 各类实际写出多少条合格正文（排查"四类缺项"的分界信息，与日常流水线一致）
-            _dist = {}
-            for x in items:
-                _dist[x["cat"]] = _dist.get(x["cat"], 0) + 1
-            np.log(f"  {day_str} 阶段B 合格正文：" + " ".join(
-                f"{np.CAT_LABELS[k]}{_dist.get(k, 0)}" for k in np.CAT_LABELS))
-            # 先还原阶段 A 的价值序，再去话题重复项、最后四类均衡选取（须在摘要校验前）
+        if len(items) >= 12:
+            np._log_cell_dist(f"{day_str} 阶段B 合格正文", items)
             items.sort(key=lambda x: x.get("_rank", 999))
             for x in items:
                 x.pop("_rank", None)
-            # [2026-09-14 同步] 同主体同类的重复话题只留价值序靠前的一条
-            # （真实复验里 OpenAI 上市/控速两条白占了两个名额）
             items = np.dedupe_similar(items)
             items = np.select_balanced(items)
-            summary = np.clean_for_js(obj.get("summary", ""))[:120]
+            parts = [f"【{np.REGION_LABELS[r]}】{summaries[r]}"
+                     for r in np.REGIONS if summaries.get(r)]
+            summary = np.clean_for_js("　".join(parts))[:160]
             if not np.summary_consistent(summary, items):
                 np.log("  摘要提及了未收录内容，改用条目标题兜底摘要")
                 summary = np.clean_for_js(np.fallback_summary(items))
             return summary, items
-        np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条（<6 硬底线），重试")
+        np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条（<12 硬底线），重试")
         time.sleep(2)
     return "", []
 
@@ -356,6 +419,7 @@ def js_block(day_str, weekday, summary, items):
     """按现有 HTML 的缩进风格构造条目块"""
     per = [",\n".join(
         "      {\n"
+        f'        region: "{i.get("region", "cn")}",\n'
         f'        cat: "{i["cat"]}",\n'
         f'        catLabel: "{i["catLabel"]}",\n'
         f'        title: "{i["title"]}",\n'
@@ -367,6 +431,7 @@ def js_block(day_str, weekday, summary, items):
         "  {\n"
         f'    date: "{day_str}",\n'
         f'    weekday: "{weekday}",\n'
+        "    regioned: true,\n"
         f'    summary: "{summary}",\n'
         "    items: [\n"
         + ",\n".join(per) + "\n"
