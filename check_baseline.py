@@ -9,8 +9,12 @@
 量化成下面这套基线。此后每次改提示词、换模型、调参数，都用它验收，
 避免再出现"9 月正文均值掉到 22 字"却没人发现的情况。
 
-8 月定版基线（2026-08-01 ~ 2026-08-29，236 条实测）
---------------------------------------------------
+[2026-09-21] 用户提出新诉求："每日产业动态按照国内和国外分开（重新设计一下页面，
+国内国外两个板块，国内四个维度8条动态，国外四个维度8条动态）"。
+本脚本随之改为核查「16 条 / 8 格」(2 地域 × 4 维度，每格 ≥2 条)。
+
+8 月定版基线（2026-08-01 ~ 2026-08-29，236 条实测，**旧版 8 条/天**）
+----------------------------------------------------
   条数/天      8 条（四类各 2 条）
   标题均值     25.0 字（中位 24，区间 11-55）
   正文均值     118.9 字（中位 114，区间 71-189）
@@ -26,6 +30,13 @@
   9-09 ~ 9-14  正文均 22.4-36.0（崩盘）
   根因不是提示词，是 9-08 云端接管后模型由"WorkBuddy 智能体 + 联网搜索"
   换成免费 glm-4-flash；批量一次生成 10 条时模型会把每条压到 51 字左右。
+
+新基线（2026-09-21 起，16 条/天 × 双板块）
+  条数/天      16 条（国内 8 + 国外 8，四类各 2 条 × 2 地域）
+  标题均值     与 8 月基线同（25.0）
+  正文均值     与 8 月基线同（118.9）
+  双板块布局   左侧国内（青绿）/ 右侧国外（靛蓝）
+  八格检查     每 (地域, 维度) ≥ 2 条
 
 用法
 ----
@@ -43,7 +54,7 @@ from collections import Counter
 
 DEFAULT_URL = "https://bairunxuan123.github.io/ccid-ai-news/ai-chain-map.html"
 
-# —— 8 月定版实测基线 ——
+# —— 8 月定版实测基线（标题/正文质量）——
 # 注意：这几个 MIN/MAX 是"报警线"，取 8 月真实区间的下限再留一点余量，
 # 不是 8 月的平均值。判据口径见 judge() 的 docstring。
 BASE_TITLE_AVG = 25.0
@@ -52,8 +63,13 @@ BASE_TITLE_MAX = 40      # 生成端的上限（news_pipeline.MAX_TITLE_LEN）�
 BASE_DESC_AVG = 118.9
 BASE_DESC_MIN = 70       # 单条正文短于此值判异常（8 月最短 71 字）
 BASE_DESC_MAX = 300      # 生成端兜底上限，核查不判
-TARGET_ITEMS = 8         # 用户硬要求：每天 8 条（只判下限）
+
+# —— 双板块新基线（2026-09-21 起）——
+TARGET_ITEMS = 16            # 用户硬要求：每天 16 条（国内 8 + 国外 8）
+MIN_PER_CELL = 2             # 每 (地域, 维度) ≥ 2 条（八格全满才收工）
 CAT_LABELS = ("policy", "tech", "industry", "capital")
+REGIONS = ("cn", "intl")
+REGION_LABELS = {"cn": "国内", "intl": "国外"}
 
 
 def load(src):
@@ -63,6 +79,18 @@ def load(src):
         return out.stdout.decode("utf-8", "replace")
     with open(src, encoding="utf-8") as f:
         return f.read()
+
+
+def _extract_region(blk, fallback_cn_zh_count=0):
+    """从一条 day block 中提取 region 字段；缺省时按旧版（2026-09-21 前）当国内处理。
+
+    2026-09-21 前的数据没有 region 字段（旧版 8 条/天，国内 4 类各 2 条）。
+    回溯校验时不报错，按"全算国内"处理，仅在分布里标 'legacy'。
+    """
+    m = re.search(r'region:\s*"([^"]*)"', blk)
+    if m:
+        return m.group(1)
+    return None
 
 
 def parse(src):
@@ -81,15 +109,32 @@ def parse(src):
         titles = re.findall(r'title: "([^"]*)"', blk)
         descs = re.findall(r'desc: "([^"]*)"', blk)
         cats = re.findall(r'cat: "([^"]*)"', blk)
+        # region 字段（2026-09-21 后才有）；旧版缺失 → 当作全国内兜底
+        day_region = _extract_region(blk)  # day 级 region 字段（双板块标记）
+        item_regions = re.findall(r'region:\s*"([^"]*)"', blk)  # 每个 item 也有
         if not titles:
             continue
         tl = [len(t) for t in titles]
         dl = [len(x) for x in descs] or [0]
+        # 逐 item 的 (region, cat) 八格分布
+        cell_dist = Counter()
+        for r, c in zip(item_regions, cats):
+            if r in REGIONS and c in CAT_LABELS:
+                cell_dist[(r, c)] += 1
+        # 若 day_regioned 标记存在但 item region 缺失（迁移未完成），
+        # 按 day_regioned 把所有 item 归到对应板块
+        regioned_marker = bool(re.search(r"regioned:\s*true", blk))
+        if regioned_marker and not cell_dist and day_region in REGIONS:
+            for c in cats:
+                if c in CAT_LABELS:
+                    cell_dist[(day_region, c)] += 1
         rows.append(dict(
             date=d, n=len(titles),
             tavg=sum(tl) / len(tl), tmin=min(tl), tmax=max(tl),
             davg=sum(dl) / len(dl), dmin=min(dl), dmax=max(dl),
             dist=dict(Counter(cats)),
+            cell_dist=dict(cell_dist),
+            dual_panel=regioned_marker,
             # 双分句：8 月有 38% 的标题是"前半句，后半句"结构
             two_clause=sum(1 for t in titles if "，" in t) / len(titles),
             # 含数字：8 月标题 56% / 正文 81%
@@ -102,17 +147,17 @@ def parse(src):
 def judge(r):
     """返回问题列表（空 = 达标）。
 
-    阈值取 8 月的**真实区间**，而不是我拍的整数线 —— 否则 8 月下旬
-    "9 条新闻""标题 41 字"这类正常波动天天报警，脚本就没人看了。
-    实测 8 月区间：标题 11-55（单日均值 18.9-35.9）、正文 71-189
-    （单日均值 102.4-164.0），故：
-      · 条数只判下限 8（用户硬要求），多于 8 条是好现象，不判
-      · 标题最长不判（8 月本身就有 55 字的个案）
-      · 正文最长不判（8 月有 189 字的长条目）
+    新基线（2026-09-21 起，16 条 / 双板块）：
+      · 总条数 ≥16，少于 16 即报警（多于是好现象，不判）
+      · 每 (地域, 维度) 格 ≥ 2 条；任意一格 < 2 即报警（标"国内·投融资只1条"）
+      · 标题均 ≥15 字（用户硬要求，低于此判异常）
+      · 标题最短 ≥10 字
+      · 正文均 ≥95 字（贴合 8 月 118.9 的 0.8）
+      · 正文最短 ≥70 字
     """
     bad = []
     if r["n"] < TARGET_ITEMS:
-        bad.append(f"仅{r['n']}条")
+        bad.append(f"仅{r['n']}条(<{TARGET_ITEMS})")
     if r["tavg"] < BASE_TITLE_AVG * 0.6:          # <15 字
         bad.append(f"标题均{r['tavg']:.0f}")
     if r["tmin"] < BASE_TITLE_MIN:                # <10 字
@@ -121,7 +166,29 @@ def judge(r):
         bad.append(f"正文均{r['davg']:.0f}")
     if r["dmin"] < BASE_DESC_MIN:                 # <70 字
         bad.append(f"正文最短{r['dmin']}")
+    # 八格检查：仅在「双板块日 且 总条数达 16」时严格检查。
+    # 旧版数据（2026-09-21 前的 8 条/天）虽然补了 region 字段，但实际条数
+    # 不够支撑八格各 2 条（数学上必失败），所以放过；新格式日（n ≥ TARGET_ITEMS
+    # 且 dual_panel=True）才逐格检查。
+    if r["dual_panel"] and r["n"] >= TARGET_ITEMS:
+        for region in REGIONS:
+            for cat in CAT_LABELS:
+                c = r["cell_dist"].get((region, cat), 0)
+                if c < MIN_PER_CELL:
+                    bad.append(f"{REGION_LABELS[region]}·{cat}只{c}条")
     return bad
+
+
+def _cell_dist_str(r):
+    """把 cell_dist 序列化成 "国内policy2 tech2 industry2 capital2｜国外..."。"""
+    parts = []
+    for region in REGIONS:
+        sub = " ".join(
+            f"{cat}{r['cell_dist'].get((region, cat), 0)}"
+            for cat in CAT_LABELS
+        )
+        parts.append(f"{REGION_LABELS[region]}{sub}")
+    return "｜".join(parts)
 
 
 def main():
@@ -136,11 +203,12 @@ def main():
     if since:
         rows = [r for r in rows if r["date"] >= since]
     print(f"数据源: {src}")
-    print(f"共 {len(rows)} 天\n")
+    print(f"共 {len(rows)} 天（双板块基线：{TARGET_ITEMS} 条/天 × {len(REGIONS)} 地域，"
+          f"每格 ≥ {MIN_PER_CELL}）\n")
     hdr = (f"{'日期':<12}{'条数':>5}{'标题均':>8}{'标题区':>12}{'正文均':>8}"
-           f"{'正文区':>12}{'双分句':>8}{'数字率':>8}  类别分布")
+           f"{'正文区':>12}{'双分句':>8}{'数字率':>8}  八格(国内|国外)")
     print(hdr)
-    print("-" * 108)
+    print("-" * 130)
     bad = []
     for r in rows:
         issues = judge(r)
@@ -150,11 +218,13 @@ def main():
         mark = "OK" if not issues else "⚠ " + ",".join(issues)
         tspan = f"{r['tmin']}-{r['tmax']}"
         dspan = f"{r['dmin']}-{r['dmax']}"
+        cell_str = _cell_dist_str(r) if r["dual_panel"] else "legacy(单板块)"
         print(f"{r['date']:<12}{r['n']:>5}{r['tavg']:>8.1f}{tspan:>12}"
               f"{r['davg']:>8.1f}{dspan:>12}"
-              f"{r['two_clause'] * 100:>7.0f}%{r['t_num'] * 100:>7.0f}%  {dist:<24}{mark}")
+              f"{r['two_clause'] * 100:>7.0f}%{r['t_num'] * 100:>7.0f}%  "
+              f"{cell_str:<48}{mark}")
     n = len(rows) or 1
-    print("-" * 108)
+    print("-" * 130)
     print(f"标题均 {sum(r['tavg'] for r in rows) / n:.1f} 字（8月基线 {BASE_TITLE_AVG}）"
           f"｜正文均 {sum(r['davg'] for r in rows) / n:.1f} 字（8月基线 {BASE_DESC_AVG}）"
           f"｜双分句 {sum(r['two_clause'] for r in rows) / n * 100:.0f}%（8月 38%）")
@@ -163,7 +233,7 @@ def main():
         for d, iss in bad:
             print(f"    {d}  {'，'.join(iss)}")
         return 1
-    print("\n🎉 全部日期均达到 8 月定版标准")
+    print("\n🎉 全部日期均达到双板块基线（八格各 ≥2，标题/正文符合 8 月定版）")
     return 0
 
 
