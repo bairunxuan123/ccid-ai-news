@@ -473,6 +473,8 @@ def insert_blocks(html_path, blocks, days, replace=False):
     """
     with open(html_path, "r", encoding="utf-8") as f:
         content = f.read()
+    if "var NEWS_DATA = var NEWS_DATA" in content:
+        raise RuntimeError(f"{html_path} 存在 NEWS_DATA 前缀重复（历史污染），先修复再写入")
     anchor = "var NEWS_DATA = [\n"
     idx = content.find(anchor)
     if idx == -1:
