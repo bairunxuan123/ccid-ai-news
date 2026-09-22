@@ -2637,6 +2637,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-09-22",
+    weekday: "星期二",
+    regioned: true,
+    summary: "【国内】中国AI产业政策密集出台，技术突破与产业动态活跃。　【国外】AI行业政策加强，技术突破不断，产业动态活跃，投融资持续升温。",
+    items: [
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "工信部印发《智能网联新能源汽车产业发展“十五五”规划》", desc: "工业和信息化部等九部门联合发布《智能网联新能源汽车产业发展“十五五”规划》，规划编号为工信部联规函〔2026〕305号，旨在推动新能源汽车产业高质量发展。该规划明确了产业发展目标、重点任务和保障措施，为未来五年我国智能网联新能源汽车产业发展指明了方向。", source: "中国政府网", url: "https://www.gov.cn/zhengce/zhengceku/202609/content_7080845.htm" },
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "工信部印发《“人工智能+软件”专项行动实施方案》", desc: "工业和信息化部发布了《“人工智能+软件”专项行动实施方案》，该方案编号为工信部信发〔2026〕209号，旨在推动人工智能与软件行业的深度融合。该方案明确了具体的时间安排和后续计划，对行业发展具有指导意义。", source: "中国政府网", url: "https://www.gov.cn/zhengce/zhengceku/202609/content_7080773.htm" },
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "人力资源社会保障部等四部门关于加快推进“人工智能＋人社”应用发展的实施意见", desc: "人力资源社会保障部、国家发展改革委、工业和信息化部、国家数据局联合发布《关于加快推进“人工智能＋人社”应用发展的实施意见》（人社部发〔2026〕40号），旨在推动各省、自治区、直辖市及新疆生产建设兵团人力资源社会保障厅（局）加快人工智能在人社领域的应用。该意见将促进人工智能技术在人社领域的深入应用，提升服务效率和质量。", source: "中国政府网", url: "https://www.gov.cn/gongbao/2026/issue_12966/202609/content_7080501.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "长三角安全人工智能安徽省实验室发布星界、星驭、星鉴三大AI安全解决方案", desc: "安徽省实验室在第一届中国网络空间安全大会（CCSC 2026）上发布了星界、星驭、星鉴三大AI安全解决方案。这些解决方案旨在提升网络安全防护能力，具体涵盖了数据安全、模型安全和系统安全等多个方面。相较于之前的技术预测，此次发布的技术解决方案将有助于进一步巩固长三角地区在人工智能安全领域的领先地位。", source: "量子位", url: "https://www.qbitai.com/2026/09/493235.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "汽车行业首个AI超级智能体“迪迪虾”来了！腾势多款车型即将OTA", desc: "比亚迪近日重磅发布了AI超级智能体「迪迪虾」，首搭腾势N8L纯电车型上，预计覆盖腾势多款车型。这一创新技术将进一步提升车辆智能化水平，为消费者带来更丰富的驾驶体验。", source: "量子位", url: "https://www.qbitai.com/2026/09/493091.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "范式智能AI算力管理平台评估第一，综合评分领先", desc: "IDC发布《中国AI算力管理平台技术能力评估，2026》，范式智能在四项维度均获满分，综合评分位列第一。该评估结果显示，范式智能在AI算力管理领域的技术实力领先业界。", source: "量子位", url: "https://www.qbitai.com/2026/09/493109.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "联合国：AI安全防范不能等待确定性", desc: "联合国科学小组在首次对OpenAI今年初对Hugging Face的攻击进行重大评估时警告，各国政府需要在完全了解AI风险之前对其进行管控。本周，随着各国领导人齐聚纽约参加联合国大会，中美就AI展开会谈，AI成为全球外交议程上的焦点。上周，联合国秘书长安东尼奥·古特雷斯呼吁各国政府合作应对AI威胁。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/998090/un-ai-panel-hugging-face-hack-precautionary-principle" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI成立数学与AI顾问组", desc: "OpenAI 发布成立“数学与 AI 顾问组”，该顾问组由九位数学家组成，设在普林斯顿高等研究院，独立于 OpenAI 运作。神秘模型在 24 天内攻破 100 多个世界级难题，包括纳维-斯托克斯千年大奖难题。OpenAI 正研究如何更广泛地部署与数学相关的 AI 能力，并强调需稳重推进。", source: "IT之家", url: "https://www.ithome.com/1/005/500.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "GPT-6 Astra助力Higgsfield AI视频广告创作", desc: "Higgsfield AI发布了GPT-6 Astra，使视频广告创作对小型企业更加便捷，并将新创意工具快速推向市场。GPT-6 Astra在一天内推出了新视频功能，为小型企业简化了视频广告创作流程，并加速了创意工具的上市速度。", source: "OpenAI", url: "https://openai.com/index/higgsfield-from-prompt-to-production-with-astra" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "索尼申请“AI自修复系统”专利", desc: "索尼SIE近日提交了一项基于AI的PlayStation自动诊断和修复系统专利，该系统可实时监测联网设备，发现软件问题后由AI服务器生成诊断固件，直接部署到故障主机上，旨在减少用户联系客服的需求。该系统旨在减少保修申请、客服工单以及传统故障排查过程中需要用户反复操作的步骤。然而，AI直接生成并部署消费级硬件固件存在风险，且服务器安全、代码验证及部署权限控制将成为关键环节。", source: "IT之家", url: "https://www.ithome.com/1/005/501.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "多智能体AI系统接管供应链执行", desc: "AI News报道称，多智能体AI系统正接管供应链执行。企业网络面临静态仪表板的边际收益递减，推动物流总监转向自主执行。预测需求模型显示推荐，但人类规划者仍需批准每项行动。多智能体系统取代了针对目标操作边界的审批阶段。独立软件模型不再等待每周调度运行，而是实时获取来自承运人预计到达时间、场院摄像头和仓库管理系统事件的实时遥测数据。这些智能体执行货运重新路由、安全库存等任务。", source: "AI News", url: "https://www.artificialintelligence-news.com/news/multi-agent-ai-systems-supply-chain-execution/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Meta Muse AI助手超越ChatGPT移动版", desc: "Meta公司发布了新的AI代理Muse，据Appfigures的最新估计，Muse在美国和加拿大的下载量和日活跃用户数超过了ChatGPT在移动端发布后的同一时期，具体下载量和日活跃用户数未公开。这一数据显示，Muse的受欢迎程度超过了ChatGPT。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/21/metas-muse-is-outpacing-chatgpts-early-mobile-launch/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "亚马逊封禁Meta Muse AI助手", desc: "Meta的Muse AI代理被Amazon阻止在用户代表下购物，GeekWire报道称，周日开始，Muse用户在购物时出现弹窗提示，称“未经授权的AI代理持续访问违反了Amazon的使用条件，我们的客户已同意这些条件。”Meta未通知Amazon Muse将访问其商店。Amazon还表示，对Muse在浏览时未能识别自己以及似乎捕获客户凭证表示隐私和安全担忧。", source: "The Verge", url: "https://www.theverge.com/tech/998078/amazon-blocks-meta-muse-ai-agent-shopping" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "加州加强AI数据中心能源和水使用监管", desc: "加州州长加文·纽森签署了七项法案，旨在防止人工智能数据中心将公用事业成本转嫁给居民。这些法案要求加州公用事业委员会为数据中心引入新的费率分类，并强制其支付升级当地电网和供水系统的费用。此外，法案还要求拟议中的数据中心向地方政府披露其预计的水使用量，以及关于能源效率和干旱规划的信息。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/998453/california-ai-data-center-bills" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "马斯克SpaceXAI发布Grok 4.7模型", desc: "SpaceXAI发布旗下最强编码和知识处理模型Grok 4.7，主打编程和知识工作场景。该模型采用全新更大规模基础模型，通过更长时间的强化学习训练提升复杂任务处理能力，速度是同类模型的两倍，价格却只有一半。Grok 4.7在CursorBench 4.0测试中表现优异，运行速度和定价与Grok 4.6相同。", source: "IT之家", url: "https://www.ithome.com/1/005/494.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI扩展OpenAI学院学习路径", desc: "OpenAI发布了新的学习路径，为员工、开发者、领导者、教育者和学生提供构建和展示实用人工智能技能的机会。这些路径旨在扩展OpenAI Academy，以适应不同群体的需求。", source: "OpenAI", url: "https://openai.com/index/expanding-openai-academy-with-new-learning-paths" }
+    ]
+  },
+  {
     date: "2026-09-14",
     weekday: "星期一",
     regioned: true,
