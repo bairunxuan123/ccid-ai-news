@@ -2627,6 +2627,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-09-24",
+    weekday: "星期四",
+    regioned: true,
+    summary: "【国内】今日国内AI产业动态丰富，涵盖政策发布、技术突破、产业动态和投融资等多个方面。　【国外】今日AI产业动态丰富，涵盖政策、技术突破、产业动态和投融资等多个方面。",
+    items: [
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "工信部发布《人工智能+软件》专项行动实施方案", desc: "欧康诺与海光信息联合打造国产化内存、存储芯片测试平台，预计年底发布。该平台以海光信息CPU为核心，欧康诺对接国内头部存储芯片厂商，由后者提供DRAM芯片底层测试技术，搭配欧康诺自研国产测试整机。目前项目进入最后联合调试阶段，预计10月底产品成熟并对外开放。", source: "IT之家", url: "https://www.ithome.com/1/006/739.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "智元第20000台具身智能机器人下线", desc: "智元机器人第20000台通用具身智能机器人远征A3 Ultra在横琴长隆飞船乐园下线，并交付长隆集团。该款机器人搭载360°全域感知系统、700 TOPS算力平台，机身高度174厘米。智元2023年6台原型样机，2024年8月规模化量产，2025年1月突破1000台，年底达5000台。此次交付标志着智元具身智能产品从研发验证迈向批量生产和常态化运营。", source: "IT之家", url: "https://www.ithome.com/1/006/710.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "汇智智能发布Hellome，国内首个FDE直连智能体服务平台", desc: "汇智智能发布国内首个FDE直连智能体服务平台Hellome，将AI交付周期压缩至“周”，标志着企业AI服务进入平台化交付时代。该平台旨在加速AI技术的应用和普及。", source: "量子位", url: "https://www.qbitai.com/2026/09/496493.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "华为官宣小艺Work上线，首次使用31天限时免费享1000AI点", desc: "华为发布小艺 Work，支持市场调研、文档处理等场景，首次使用31天限时免费享1000 AI点。该服务定位为面向日常办公、代码开发和创意创作的AI工作助理，支持鸿蒙手机、平板和电脑，可接收用户目标，自主拆解任务、安排步骤、调用工具并推进执行。", source: "IT之家", url: "https://www.ithome.com/1/006/695.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "联想亮相阿里云栖大会，联想天禧AI把超级组织落地到端侧", desc: "联想集团在阿里云栖大会上发布了联想天禧AI，携全场景多端产品矩阵亮相，展示了其在AI领域的最新成果。该产品矩阵涵盖了包括端侧在内的多个应用场景，将超级组织落地到端侧，为用户提供了全面的AI解决方案。此次亮相标志着联想在AI领域的进一步拓展和深化，预计将推动相关市场的快速发展。", source: "量子位", url: "https://www.qbitai.com/2026/09/496609.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "出海Agent“小元AI”入驻腾讯WorkBuddy", desc: "小元AI，一家专注于出海服务的智能代理公司，正式入驻腾讯WorkBuddy平台，提供找买家、写开发信、谈生意等服务。该平台旨在帮助用户更好地进行海外市场拓展，通过智能记忆和自进化能力，提升出海效率。小元AI的加入，将为腾讯WorkBuddy的用户提供更便捷的出海服务，助力企业拓展国际市场。", source: "量子位", url: "https://www.qbitai.com/2026/09/496740.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "京东七鲜大厨专业版首发价19888元", desc: "京东旗下七鲜大厨发布“七鲜大厨专业版”服务，首发价19888元，包含16000元智能烹饪机器人、10800元Health Brain家庭健康膳食管理系统及15000元家庭膳食权益。服务涵盖Health Brain膳食AI模型、品质净菜供应链和智能炒菜机器人，首批预售覆盖北京、上海、广州、深圳等城市。", source: "IT之家", url: "https://www.ithome.com/1/006/724.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "阿里达摩院发布食管癌AI模型，“不插管”发现早期和癌前病变", desc: "阿里巴巴达摩院发布食管癌AI模型DAMO EAGLE，该模型无需插管和造影，从平扫CT上识别食管癌，包括早期和癌前恶性病变，已在3个国家8万多病例上获得验证。相关论文于9月22日登上国际顶级期刊《自然·医学》。较此前食管癌标准筛查手段，DAMO EAGLE可提高早期诊断率。", source: "IT之家", url: "https://www.ithome.com/1/006/720.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "外媒关注中国直播带货，李佳琦称AI无法取代真人主播", desc: "路透社发文关注中国直播带货行业，指出AI虽在降低成本，但“口红一哥”李佳琦认为真人主播不可或缺。中国直播年商品交易总额近7万亿元，2025年线上零售销售额占比将超36%。京东免费提供AI主播服务，三个月内采用率大幅提升。", source: "IT之家", url: "https://www.ithome.com/1/006/712.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "豆包公关负责人刘星回应“裁员、对话团队砍掉一半”传闻：不实，系分工组织调整", desc: "豆包公关负责人刘星回应称，豆包Session团队组织调整并非裁员，而是分工组织调整，涉及11人，其中3人离职。此次调整将部分职能拆分至豆包的交易和豆包工作团队，优化交易对话体验。豆包凭借超2亿DAU，成为国内日活跃用户数最高的AI应用之一，但对话类产品开始显现商业化瓶颈。", source: "IT之家", url: "https://www.ithome.com/1/006/610.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI发布AI标准建设路径", desc: "OpenAI发布了AI下一阶段的标准，呼吁协调评估、报告和治理以提升安全性。该标准旨在构建共享的全球AI标准，涉及协调评估、报告和治理等方面。此举将有助于提高AI技术的安全性。", source: "OpenAI", url: "https://openai.com/index/building-standards-next-phase-ai" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI推出GPT-6 Sol和Luna模型，降低成本和错误率", desc: "OpenAI发布了两款新模型GPT-6 Sol和Luna，声称其与Astra模型同出一辙。这两款模型在成本和错误率方面均有显著提升，旨在为用户提供更高效、更准确的服务。与之前的模型相比，GPT-6 Sol和Luna在性能上有了显著提升，预计将进一步提升OpenAI在人工智能领域的竞争力。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/22/openai-launches-gpt-6-sol-and-luna/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Meta推出无摄像头AI眼镜，电池寿命达12小时", desc: "Meta公司发布了无摄像头的AI眼镜，这款眼镜重量更轻，电池续航可达12小时。这一创新产品在技术上有所突破，为用户提供了更加隐私保护的使用体验。与之前的产品相比，Meta此次推出的眼镜在重量和续航方面均有显著提升，预计将受到市场的欢迎。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/23/meta-introduces-camera-free-ai-glasses/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Ema融资7700万美元，AI侵蚀企业软件和服务市场", desc: "Ema公司成功融资7700万美元，截至目前已累计融资1.4亿美元，拥有超过50家企业客户，包括谷歌和微软。这一融资将助力Ema在人工智能领域进一步拓展企业软件和服务市场。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/23/ema-raises-77m-as-ai-starts-eating-into-enterprise-software-and-services/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI扩展乌克兰民用基础设施网络防御", desc: "OpenAI宣布将其Daybreak项目扩展至乌克兰政府，以支持民用基础设施的网络安全防御。该项目将为乌克兰政府提供关键的技术支持，以加强其民用基础设施的网络安全防护能力。这一举措将对乌克兰的网络安全防御产生积极影响，有助于提升其民用基础设施的安全水平。", source: "OpenAI", url: "https://openai.com/index/openai-extends-cyber-access-to-ukraine-for-civilian-defense" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "ChatGPT移动端新增基于语音的智能体功能", desc: "OpenAI公司发布，ChatGPT移动端新增基于语音的智能体功能，Pro和Plus订阅用户可语音撰写文档、总结邮件，还可执行创建网站、制作PPT等操作。Free和Go订阅用户可使用插件和已连接应用。语音对话提供更丰富的文本输出，Plus订阅用户可轻松切换文本和语音，或先在手机上处理工作，再转移到电脑继续。", source: "IT之家", url: "https://www.ithome.com/1/006/776.htm" }
+    ]
+  },
+  {
     date: "2026-09-22",
     weekday: "星期二",
     regioned: true,
