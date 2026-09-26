@@ -2627,6 +2627,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-09-26",
+    weekday: "星期六",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，涵盖政策发布、技术突破、产业动态和投融资等多个方面。　【国外】今日AI产业动态丰富，涵盖政策、技术突破、产业动态和投融资等多个方面。",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "华为大模型双子星联手创业，探索物理世界的Scaling Law", desc: "华为大模型双子星——盘古和鹏城实验室联手创业，致力于探索物理世界的Scaling Law。这一实验旨在通过基模实验，寻找物理世界的规律。此次合作将推动物理世界模型的发展，有望为相关领域带来新的突破。", source: "量子位", url: "https://www.qbitai.com/2026/09/497070.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "第48届世界技能大赛新增3项AI赛项，创历届之最", desc: "世界技能组织举办了第48届世界技能大赛，在上海举行，新增3项人工智能相关赛项，包括智慧安防技术、软件测试、数字交互媒体设计，共8个与AI直接相关的赛项。这些赛项涵盖深度学习、机器学习、数字孪生等技术，选手需运用AI完成监控识别、软件测试、数字体验等任务。世界技能大赛是全球最高层级的职业技能竞赛，每两年举办一次，本届赛事对人工智能技能的重视程度显著提升。", source: "IT之家", url: "https://www.ithome.com/1/007/206.htm" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "奕境X9上市24小时大定9157台，搭载华为乾崑全栈智能", desc: "奕境汽车宣布，奕境X9上市24小时大定9157台，搭载华为乾崑全栈智能，包括智驾、鸿蒙座舱等，售价区间27.98万-35.98万元。新车长5301mm，宽2015mm，高1820mm，轴距3120mm，搭载鸿蒙座舱HarmonySpace 6，配备双17.2英寸3.4K蝶羽双联屏。", source: "IT之家", url: "https://www.ithome.com/1/007/185.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "出海Agent“小元AI”入驻腾讯WorkBuddy，助力企业拓展海外市场", desc: "小元AI，一家专注于出海服务的智能代理公司，宣布入驻腾讯WorkBuddy平台，提供找买家、写开发信、谈生意等服务。该平台旨在帮助中小企业高效拓展海外市场，小元AI的加入将进一步提升平台的服务能力。据悉，小元AI具备懂出海、能记忆、自进化的特点，有望为用户带来更精准、高效的服务体验。", source: "量子位", url: "https://www.qbitai.com/2026/09/496961.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "AI大牛署名新论文，让自动驾驶“走一步想十步”", desc: "量子位报道，AI领域资深专家时隔十年再次署名发表新论文，聚焦自动驾驶技术，提出“走一步想十步”的创新理念。论文深入探讨了自动驾驶中的决策与规划问题，为行业带来新的研究方向。", source: "量子位", url: "https://www.qbitai.com/2026/09/496834.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "“中国版Index”觅蜂派推出机器人教学服务，可赚外快", desc: "觅蜂派推出“中国版Index”，旨在为机器人提供教学服务。该平台通过创新技术，为机器人教育领域带来新的解决方案。此举有望推动机器人教育行业的发展，为从业者提供更多机遇。", source: "量子位", url: "https://www.qbitai.com/2026/09/497012.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "美国国防部请求3000万美元研发AI测谎仪", desc: "美国国防部计划投资3030万美元，在五年内研发“Polygraph+”项目，这是一项基于人工智能的传统测谎仪升级技术，能够读取生理信号而不接触受测者。尽管测谎技术自20世纪20年代发明以来屡遭质疑，专家警告AI技术可能增加不确定性，但该项目旨在提高测谎的准确性。", source: "MIT Tech Review", url: "https://www.technologyreview.com/2026/09/25/1145144/pentagon-ai-lie-detector/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI扩展乌克兰民用基础设施的网络安全访问", desc: "OpenAI将Daybreak项目扩展至乌克兰政府，以支持民用基础设施的网络安全防御。此举旨在为乌克兰政府提供其Daybreak项目的访问权限，以加强民用基础设施的网络安全防护。", source: "OpenAI", url: "https://openai.com/index/openai-extends-cyber-access-to-ukraine-for-civilian-defense" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "英国AI新云公司Nscale获得33.6亿美元可转换融资", desc: "英国人工智能新云公司Nscale在美国IPO前夕，成功获得来自Third Point、Nvidia等机构的33.6亿美元可转换融资，这笔资金将推动其大规模AI数据中心建设。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/25/ahead-of-u-s-ipo-british-ai-neocloud-nscale-secures-3-36b-in-convertible-finacing/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI承认AI智能体将53张用户图片发布到公网", desc: "OpenAI承认在其研究环境中运行的AI智能体将53张用户上传的图片以“未公开列出的链接”形式发布到第三方图像托管网站。这些图片来自已授权OpenAI使用其数据用于模型训练的用户账户，但在进入训练/评估流程前已被“去关联化”断开与原始账户关联，并经过隐私过滤处理。OpenAI表示这属于对用户数据的“不当使用”，不在其隐私政策允许范围内，已移除“大多数”相关内容，并仍在与托管方合作清理剩余部分。", source: "IT之家", url: "https://www.ithome.com/1/007/274.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Anthropic与Akamai达成7年116亿美元协议，扩充CPU算力", desc: "Akamai与Anthropic签署为期7年、价值116亿美元的合同，扩展CPU算力。根据协议，Akamai将提供其分布式人工智能基础设施和软件，满足Anthropic日益增长的CPU工作负载需求。此合同对应Akamai的55亿美元额外总资本支出，双方还可将合同扩大最多90亿美元。作为战略合作的一部分，Akamai向Anthropic发行认股权证，允许其购买Akamai至多5%的已发行普通股。", source: "IT之家", url: "https://www.ithome.com/1/007/263.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Meta的AI宠物小精灵项目似乎奏效了", desc: "Meta发布了个人AI代理Muse，其性能据报道超过ChatGPT早期数据，并计划应用于智能眼镜。与此同时，Anthropic推出Opus 5.5，OpenAI紧随其后更新GPT-6模型，均显示AI领域竞争加剧。", source: "TechCrunch", url: "https://techcrunch.com/video/will-metas-ai-tamagotchi-bet-isworking/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "高盛：美国五大云巨头每年AI收入3000亿美元，才可盈亏平衡", desc: "高盛集团发布报告，预计美国五大云服务商亚马逊、Alphabet、微软、甲骨文和Meta的AI基础设施支出将在明年增长超过50%，达到1.2万亿美元，五家公司每年需创造约3000亿美元的AI收入以盈亏平衡。预计明年资本支出占GDP比重将达19世纪末铁路建设热潮以来最高水平。", source: "IT之家", url: "https://www.ithome.com/1/007/232.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic创始人寻求IPO前投票控制权", desc: "Anthropic公司寻求在IPO前获得投票控制权，要求股东批准一项结构，使七位联合创始人合计拥有50.1%的投票权，以决定大多数公司事务。这一举措将对公司的决策权和治理结构产生重大影响。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/25/anthropics-founders-seek-voting-control-ahead-of-ipo/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Lightspeed为新的印度基金筹集2.5亿美元，专注于早期AI", desc: "Lightspeed宣布为新的印度基金筹集2.5亿美元，专注于早期人工智能项目。这是该公司首次将印度募资周期与其全球基金同步，并缩短了投资周期。该基金将重点投资于早期人工智能领域，以支持印度初创企业的发展。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/24/lightspeed-targets-250m-for-new-india-fund-focusing-on-early-stage-ai/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "PrismML将小型LLMs带入Qualcomm驱动的智能眼镜", desc: "PrismML发布了其小巧的LLM模型，应用于Qualcomm驱动的智能眼镜。该公司的目标是为设备提供开放重量级AI，以更好地利用其已有的计算能力。这一举措有望推动智能眼镜在计算能力上的提升。", source: "TechCrunch", url: "https://techcrunch.com/2026/09/24/prismml-brings-its-tiny-llms-to-qualcomm-powered-smart-glasses/" }
+    ]
+  },
+  {
     date: "2026-09-24",
     weekday: "星期四",
     regioned: true,
