@@ -2627,6 +2627,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-06",
+    weekday: "星期二",
+    regioned: true,
+    summary: "【国内】今日国内AI产业投融资活跃，技术突破与政策发布并进。　【国外】OpenAI融资300亿美元，意大利总理申请声音商标，英伟达黄仁勋AI视频爆火。",
+    items: [
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "DeepSeek融资800亿，腾讯宁德时代重金参与", desc: "DeepSeek即将完成至少800亿元融资，腾讯、宁德时代重金参与。此次融资规模超出原定目标，市场投资者认购热情高涨，最终总额可能逼近1000亿元。DeepSeek计划于2027年初开展IPO，该笔融资为其上市进程打下基础。自V4-Flash模型推出后，公司发展势头强劲，已可同海外头部厂商竞争。", source: "IT之家", url: "https://www.ithome.com/1/009/990.htm" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "月之暗面估值500亿，计划明年一季度赴港IPO", desc: "月之暗面（Moonshot AI）完成上市前最后一轮私募融资，估值约500亿美元，计划明年一季度赴港IPO。该公司已开始筹备投资者摸底沟通，最早本月开展先期意向会议。今年7月，Kimi K3开源大模型发布，估值较此前315亿美元翻倍。监管机构已启动数据安全调查，对IPO时间进度或产生影响。", source: "IT之家", url: "https://www.ithome.com/1/009/971.htm" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "快手可灵AI赴港IPO，拟募资至少10亿美元", desc: "快手科技旗下可灵AI选定投行筹备赴港IPO，拟募资至少10亿美元。据悉，可灵AI正与中金公司、高盛集团以及瑞银集团合作推进股票发行事宜，目标最早明年上市。今年7月，可灵AI完成28亿美元融资，投前估值约150亿美元，竞争对手包括字节跳动旗下的Seedance等。尽管香港股市行情走弱，但AI相关交易带动港股IPO市场回暖。", source: "IT之家", url: "https://www.ithome.com/1/009/964.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "我国应用下一代通信关键技术空心光纤，AI算力时代光信号造出“磁悬浮”高速轨道", desc: "央视新闻发布微博称，我国下一代通信关键技术“空心光纤”已率先在宁夏中卫的智算中心间投入商用，传输时延与损耗直降30%以上，该光纤直径不足0.4毫米，内部嵌入20根微型玻璃圆柱，可为光信号提供低损耗、高速传输通道，有望实现超低时延、超大带宽，提升跨区域算力网络传输效率。相较于传统实心光纤，空心光纤实现了超低时延、超低损耗和超大带宽的统一，为远距离无损传输扫清了最大障碍。", source: "IT之家", url: "https://www.ithome.com/1/009/941.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "马斯克更相信中国制造，AI算力硬合作混搭台积电与英特尔", desc: "英特尔推出混搭的AI算力解决方案，前端采用14A先进工艺，后端接台积电以提升工厂运营、良率、封装能力。此举标志着英特尔在AI算力领域对中国制造的信任加深，有望进一步推动行业进步。", source: "量子位", url: "https://www.qbitai.com/2026/10/501605.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "挪威政府拟在部分敏感区域实施人工智能眼镜临时禁令", desc: "挪威政府计划向议会提交临时禁止在部分敏感区域使用人工智能眼镜的草案，这些敏感区域可能包括公园、海滩、博物馆、购物中心、学校、幼儿园、游乐场、课外活动中心、医疗机构和设有更衣淋浴设施的健身场所。该禁令的适用设备范围将进行评估，并考虑是否涵盖高等院校及其它教育机构。数字化和公共管理部长Torgeir Micaelsen表示，此举是为了防止人们在不知情的情况下被拍照、录像或录音，并为制定长效监管措施奠定基础。", source: "IT之家", url: "https://www.ithome.com/1/009/945.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "OpenAI融资300亿美元，阿联酋基金入局", desc: "OpenAI 正在与阿联酋多家投资基金磋商，计划完成一轮规模300亿美元的融资，其中阿联酋基金可能出资100亿美元，贝莱德集团也参与洽谈。本轮融资估值约1.4万亿美元，OpenAI将推迟IPO计划至明年。", source: "IT之家", url: "https://www.ithome.com/1/009/961.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "意大利总理申请声音商标，防范AI深度伪造", desc: "意大利总理焦尔吉娅·梅洛尼向欧盟知识产权局提交申请，希望将自己的声音注册为商标，以防范AI生成的深度伪造内容。申请材料中附带一段时长4秒的录音，录音中梅洛尼用意大利语重复说了两遍：“我是焦尔吉娅·梅洛尼。”目前该申请仍处于审核阶段。即便该项声音商标申请最终获准，也无法完全阻止他人利用她的语音制作AI深度伪造音频，但能够给那些试图复刻其嗓音的造假者增设更多法律障碍。", source: "IT之家", url: "https://www.ithome.com/1/009/979.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "英伟达黄仁勋AI视频爆火，马斯克调侃内存涨价原因", desc: "英伟达CEO黄仁勋发布“世界巡演”AI视频，引发海内外热议，播放量超百万。视频素材来自迈克尔·杰克逊演唱会，网友将其中的迈克尔·杰克逊与观众替换为知名人物。黄仁勋曾表示，内存供应稀缺对英伟达是“极好的消息”，并锁定了大规模部署“AI工厂”所需的关键组件。", source: "IT之家", url: "https://www.ithome.com/1/009/953.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "麦当劳被诉用AI操纵菜单价格，涉嫌违法", desc: "麦当劳被指控在美遭集体诉讼，被指利用AI系统非法操纵菜单价格。原告指控麦当劳借助一套人工智能定价系统，非法协调其特许经营店和直营餐厅的菜单价格，涉及近14,000家门店。诉状称，麦当劳与独立特许经营商合谋，利用基于非公开数据训练的算法操纵价格，违反了美国反垄断法。麦当劳否认指控，称价格由特许加盟商自主制定。近年来，美国多起集体诉讼指控企业利用算法或人工智能非法价格协同。", source: "IT之家", url: "https://www.ithome.com/1/009/924.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "谷歌冻结开源漏洞赏金计划，AI提交激增", desc: "Google 决定冻结其开源漏洞赏金计划，原因是AI提交数量出现“显著增长”。TechCrunch 报道称，AI垃圾似乎正在淹没漏洞赏金计划。具体来说，AI提交的数量较之前有显著增加，这一变化对Google的漏洞赏金计划产生了影响。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/04/google-froze-its-open-source-bug-bounty-program-due-to-a-significant-rise-in-ai-submissions/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "希捷与东芝竞购TDK硬盘磁头业务，争夺AI存储供应链", desc: "希捷科技控股和东芝公司正在竞购TDK的硬盘磁头业务。这笔交易价值最高可达数十亿美元，双方竞争激烈。TDK是全球唯一一家独立生产硬盘磁记录磁头制造商，其磁头是硬盘内部实际完成数据读写的零部件。此次竞购对于两家公司跟上AI数据中心存储设备的旺盛需求至关重要，若成功，将掌控硬盘供应链关键一环。", source: "IT之家", url: "https://www.ithome.com/1/009/975.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "TikTok推出AI购物助手和一键结账功能", desc: "TikTok发布了一款名为“购物助手”的对话式AI助手，旨在帮助用户发现和购买产品。这款AI助手能够提供个性化的购物建议，并实现一键结账功能。该助手基于先进的对话式AI技术，旨在提升用户的购物体验。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/05/tiktok-rolls-out-an-ai-shopping-assistant-and-one-click-checkout/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Instinct将AI智能体引入群聊，为无账户朋友提供支持", desc: "Instinct 推出了支持多人组聊的AI助手功能，允许朋友共同使用AI代理进行行程规划、拼车组织和活动协调等任务。公司强调个人账户保持独立，且需获得许可后方可共享信息或采取行动。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/05/instinct-brings-its-ai-agent-to-group-chats-even-for-friends-without-an-account/" },
+      { region: "intl", cat: "policy", catLabel: "政策发布", title: "欧盟委员会发布AI法案，ChatGPT文本将打水印", desc: "OpenAI将开始在欧盟对ChatGPT和Codex生成的文本添加水印，以符合欧盟的AI法案。据称，编辑可能会使这些不可见的水印更难检测，此举旨在提高文本生成的透明度和可追溯性。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/05/openai-will-start-watermarking-chatgpts-text-in-the-eu/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Reflection发布开放权重AI模型Beam，对标中国模型", desc: "Reflection AI发布旗下首款开放权重AI模型Beam，总参数量达5010亿，激活参数量仅230亿，性能与智谱AI的GLM-5.2和千问3.8-Max相近。Beam采用稀疏激活架构，实现更快推理速度和降低成本，旨在与DeepSeek、Kimi等中国AI模型竞争。", source: "IT之家", url: "https://www.ithome.com/1/009/932.htm" }
+    ]
+  },
+  {
     date: "2026-09-28",
     weekday: "星期一",
     regioned: true,
