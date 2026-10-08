@@ -238,11 +238,33 @@ _AI_HW_SIGNAL = [
 # 匹配前先去掉空格/连字符等分隔符：使 "iOS 27" 能命中 "ios2"、"Win 11" 命中 "win11"
 _BLOCK_NS = [re.sub(r"[\s\-_·]+", "", b) for b in BLOCK_CN]
 
+# [2026-10-08] 自媒体吐槽体/标题党/含糊主体（工信部下属咨询单位，须严肃媒体口径）
+# 来源：10-08 线上出现"晕...这年头还有说人话的AI不""这家AI影视公司全球第二！"
+# 两类漏网：前者是吐槽体，后者是感叹号堆砌+"这家"含糊主体+无出处排名。
+GOSSIP_BLOCK = [
+    # 吐槽/情绪词
+    "晕", "绷不住", "笑死", "离谱", "逆天", "无语", "破防", "麻了",
+    "蚌埠", "这年头", "说人话", "人话", "整活", "吐槽", "翻车", "塌房",
+    "吃瓜", "辣眼睛", "沙雕", "神操作", "骚操作", "抽象",
+    # 含糊主体（主体必须是具体机构名/公司名）
+    "这家", "某公司", "某企业", "某厂商", "某产品", "某团队",
+]
+
+_GOSSIP_NS = [re.sub(r"[\s\-_·]+", "", b) for b in GOSSIP_BLOCK]
+
 
 def hard_blocked(title):
-    """硬性排除：消费电子、汽车新品、产品预告、系统更新、政治人物等"""
+    """硬性排除：消费电子、汽车新品、产品预告、系统更新、政治人物、吐槽体等"""
     t = re.sub(r"[\s\-_·]+", "", (title or "").lower())
-    return any(b in t for b in _BLOCK_NS)
+    if any(b in t for b in _BLOCK_NS):
+        return True
+    # [2026-10-08] 吐槽体/含糊主体（GOSSIP_BLOCK 同样去分隔符匹配）
+    if any(b in t for b in _GOSSIP_NS):
+        return True
+    # [2026-10-08] 感叹号堆砌（>=2 个）的自媒体煽动体标题
+    if title and (title.count("！") + title.count("!")) >= 2:
+        return True
+    return False
 
 
 def is_ai_related(title):
