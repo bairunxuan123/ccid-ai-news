@@ -2637,6 +2637,27 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-09",
+    weekday: "星期五",
+    regioned: true,
+    summary: "【国内】今日国内AI产业动态丰富，政策、技术、产业和投融资领域均有重要进展。　【国外】英伟达高管晋升，OpenAI研究人员争议，AI在核电站应用，谷歌AI办公助手发布。",
+    items: [
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "工信部印发《“人工智能+软件”专项行动实施方案》", desc: "豆包新增“生活缴费”功能，用户可通过语音或打字方式发起缴费指令。据悉，豆包正逐步建设包括出行服务、生活缴费等生活场景下的办事能力。IT之家测试发现，缴费界面划分电费、水费、燃气费三大品类，目前青岛地区三项服务均显示“暂未开通”。对话唤起仅触发服务，后续绑定户号、确认、支付等步骤依旧保留。", source: "IT之家", url: "https://www.ithome.com/1/010/784.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "字节Seed团队发现DeepSeek“抽风”原因，长上下文可能性能漂移", desc: "字节 Seed 团队发布了关于 DeepSeek“抽风”原因的研究论文，指出分块 KV 缓存压缩引入的相位敏感性导致长上下文检索准确度在各个阶段之间可能相差高达 40 个百分点，揭示了平均基准分数可能掩盖的周期性弱点。", source: "IT之家", url: "https://www.ithome.com/1/010/780.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "新思科技拟寻求与中国AI实验室合作，在华加速芯片设计", desc: "新思科技计划与中国AI实验室合作，加速芯片设计。公司宣布与OpenAI签署多年期合作协议，打造专用AI模型GPT-Synopsys，旨在实现芯片设计流程自动化并缩短开发周期。预计2027财年公司营收将同比增长15%，达到111.5亿美元。新思科技正探索与中国AI实验室建立合作关系，为中国市场量身定制设计工具。", source: "IT之家", url: "https://www.ithome.com/1/010/777.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "阿里巴巴蔡崇信：五年后AI将如今天的互联网，融入社会的每个环节", desc: "阿里巴巴集团主席蔡崇信在意大利都灵国际科技与投资盛会中预测，五年后AI将如今天的互联网般融入社会每个环节。他以2023年为界，将公司发展划分为“公元前”和“公元后”两个阶段，明确聚焦电商与全栈AI。阿里巴巴依托阿里云构建计算能力，自主开发大模型，并将AI应用于产品与服务。蔡崇信认为，AI将开启发展的新纪元，并刚拉开序幕。", source: "IT之家", url: "https://www.ithome.com/1/010/763.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "福田汽车与卓驭科技战略签约，在商用车高阶智能驾驶领域开展合作", desc: "北汽福田汽车股份有限公司与深圳市卓驭科技有限公司正式签署战略合作协议，聚焦商用车全场景智能驾驶落地，合作范围涵盖重卡高速及国道领航辅助驾驶、城际高速NOA、无人物流车Robovan、轻型商用车城市NOA、海外高阶智能驾驶推广，以及L3/L4级智能网联汽车准入试点等核心领域。双方将联合开发适配重卡、轻商、无人物流车等车型的智能驾驶解决方案，分阶段推进技术迭代与量产落地，打造高性价比、可规模化推广的商用车智驾产品，并协同推进高阶自动驾驶合规试点申报与示范运营，共同拓展海外市场。", source: "IT之家", url: "https://www.ithome.com/1/010/762.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "阿里巴巴推出AI客服助手，提升客户服务效率", desc: "Anthropic发布新使用政策，禁止用户虐待Claude AI模型。该政策将于2026年11月12日生效，首次加入禁止“持续且不必要的虐待或残忍行为”条款，主要执行方式为终止对话。同时，Anthropic扩大武器禁令范围，涵盖使武器运转的软件与组件，以及武装无人机和其他自主车辆等行为。监控条款明确禁止未经同意追踪个人。", source: "IT之家", url: "https://www.ithome.com/1/010/759.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "美国核管会：AI在核电站应用需遵循严格安全标准", desc: "IEEE Spectrum报道，核能行业传统上对风险持谨慎态度，但近期多家公司开始提供人工智能解决方案。今年，近一半的核电站开始探索AI应用，显示出核能行业对AI技术的开放态度。这一变化预示着核能行业在技术应用上的新趋势。", source: "IEEE Spectrum", url: "https://spectrum.ieee.org/ai-assistants-nuclear-power-plant" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI研究人员公开信：公司做法或引发‘寒蝉效应’", desc: "OpenAI 三名前研究员米基塔·巴莱斯尼、托梅克·科尔巴克和贾斯敏·王发表公开信，称被解雇后担心此举会让其他员工不敢公开表达意见，对 OpenAI 的企业文化产生“寒蝉效应”。信中指出，员工能够放心地与外部机构合作解决安全问题，是 OpenAI 工作文化的重要组成部分。OpenAI 发言人回应称，三人违反了敏感信息访问和处理规定。", source: "IT之家", url: "https://www.ithome.com/1/010/760.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "谷歌发布办公Agent，支持调用Claude", desc: "谷歌发布了办公Agent，支持调用Claude。这一新发布的“缝合怪”旨在提升办公效率，为用户提供更加便捷的办公体验。与之前的产品相比，此次发布的产品在功能上有所突破，为用户带来了更多便利。", source: "量子位", url: "https://www.qbitai.com/2026/10/502083.html" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "OpenAI年化营收被曝接近500亿美元，比预期少了约200亿", desc: "OpenAI最新财务文件显示，其年化营收逼近500亿美元，较此前预期少了约200亿美元。截至9月底，这一数字大幅低于上月媒体报道的700亿美元。知情人士透露，数据差异源于财务统计口径不同，OpenAI剔除了与云厂商合作产生的收入。这一营收数据是评估全球AI市场需求的关键风向标，对巨额算力基础设施投资与二级股票市场上涨有重要支撑。金融时报报道后，美股科技板块应声大跌。", source: "IT之家", url: "https://www.ithome.com/1/010/751.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Meta首席AI官：不要指望Muse会自动帮你赚1万美元", desc: "Meta首席AI官汪滔表示将继续改进Muse智能体，提醒用户智能体无法自动帮其赚取1万美元。据悉，Muse上线一个月后仍位居苹果App Store免费应用榜首。Meta希望提升Muse的记忆能力，帮助用户处理更复杂的任务。", source: "IT之家", url: "https://www.ithome.com/1/010/754.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Anthropic推出AI安全扫描服务", desc: "Anthropic发布了名为OSS Scanner的新服务，为开源项目提供免费AI安全扫描。该服务承诺为加入的项目提供“全面、定期的免费安全扫描”。然而，这些扫描报告将完全由模型生成，不包含人工审查。这意味着开源项目可以更早地发现潜在的安全问题，但牺牲了人工审查的准确性。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1008521/anthropic-open-source-oss-scanner" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Google推出Gemini AI助手", desc: "Google将Gemini转变为一个AI代理，能够规划、执行任务，并在商业应用程序和系统中协同工作。该代理可以委派任务给子代理，使用多个AI模型，并拥有自己的工作场所身份，包括电子邮件地址。这一举措标志着Google在AI领域的进一步扩展，为商业应用带来了更加智能化的工作体验。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/08/google-brings-agentic-ai-to-gemini-starting-with-businesses/" }
+    ]
+  },
+  {
     date: "2026-10-08",
     weekday: "星期四",
     regioned: true,
