@@ -2637,6 +2637,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-12",
+    weekday: "星期一",
+    regioned: true,
+    summary: "【国内】今日国内AI产业动态丰富，政策、技术、产业和投融资领域均有重要进展。　【国外】AI行业政策、技术突破、产业动态和投融资均有新进展，关注数据中心、AI芯片、AI模型安全等问题。",
+    items: [
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "工信部印发《“人工智能+软件”专项行动实施方案》", desc: "唯品会发布了自研AI助手“AI小唯”，支持文字与语音对话，提供找商品、查活动、问优惠等服务。公司正在高薪招募大模型核心岗位，月薪50K-80K，年薪60万至96万，以加强团队建设。唯品会正在灰度迭代“AI商品对比”功能，用户可对比购物车中商品或通过AI小唯选择对比商品。", source: "IT之家", url: "https://www.ithome.com/1/011/927.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "“AI教父”杨立昆：下一代AI须理解现实世界", desc: "AMI Labs 创始人兼董事长杨立昆在首尔表示，AI 的下一次突破将来自理解、预测物理世界的系统。他指出，大语言模型在理解现实世界方面存在局限，并主张开发世界模型，使 AI 学习物理规律和因果关系，预测行动可能产生的结果。杨立昆认为，机器理解语言容易，但理解现实世界并不容易，这表明 AI 在理解语言和理解现实世界之间存在巨大差距。", source: "IT之家", url: "https://www.ithome.com/1/011/891.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "百度世界2026定档11月12日，将有重磅嘉宾、企业级AI产品亮相", desc: "百度官方宣布，百度世界2026将于11月12日在北京国家会议中心二期举办，大会以“下一幕，智能组织”为主题，将带来N个重磅发布，包括重磅嘉宾和企业级AI产品集中亮相，12场分论坛，30+公开课，以及6000m²展区，预计将吸引广泛关注。", source: "IT之家", url: "https://www.ithome.com/1/011/859.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "华为终端创新技术沟通会彩蛋揭晓，真·麒麟9050 Pro芯片亮相", desc: "华为终端创新技术沟通会在上海练秋湖举行，华为终端 BG CTO 李小龙揭晓惊喜彩蛋——采用麒麟 9050 Pro 芯片制作的伴手礼，IT之家现场获得真 · 麒麟 9050 Pro 芯片。", source: "IT之家", url: "https://www.ithome.com/1/011/855.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "丘成桐数学与人工智能实验室联盟在清华大学成立，推动AI与数学深度融合", desc: "清华大学丘成桐数学与人工智能实验室联盟成立，将攻关AI与数学深度融合，发布10余项“AI+数学”重点成果和研究方向，涵盖几何、量子计算等领域。AI辅助探索证明策略、简化计算，助力解决退化阿诺德猜想等问题，推动数学学科发展。", source: "IT之家", url: "https://www.ithome.com/1/011/814.htm" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "无问芯穹完成23亿元C轮融资，AI基础设施赛道融资纪录创新高", desc: "上海无问芯穹智能科技股份有限公司完成23亿元C轮融资，累计融资额达43亿元，创中国AI原生基础设施赛道最高纪录。公司成立于2023年，由清华大学和上海交通大学孵化，近期已向港交所递交IPO申请，计划募资数亿美元，目标2027年上半年上市。", source: "IT之家", url: "https://www.ithome.com/1/011/849.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "硅谷AI现状：谁有算力谁是爹，马斯克连横A社，VC囤GPU", desc: "马斯克联合A社，硅谷风险投资开始大量囤积GPU。这一动作反映出硅谷AI领域对算力的重视，算力成为AI发展的关键因素。此举可能对AI行业产生深远影响，推动相关技术的发展和应用。", source: "量子位", url: "https://www.qbitai.com/2026/10/502585.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "宇树科技王兴兴：过去十几年我犯的最大错误就是对AI还不够相信", desc: "宇树科技创始人王兴兴在第二十六届中国国际工业博览会上分享，公司团队将GPT-6部署至机器人进行测试，效果良好。他认为具身智能行业临界点可能一两年内到来，未来几年将解决泛化性和效率问题。王兴兴表示，他对AI的信仰与日俱增，认为AI将赋予机器人真正理解世界的能力，推动机器人融入生活。", source: "IT之家", url: "https://www.ithome.com/1/011/850.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "非文本AI模型Jev估值达75亿美元", desc: "Jev的制造商TypeSafe发布非文本AI模型Jev，估值达75亿美元。该模型在推出后仅数周，即因其声称比LLMs快得多且使用更少的token而受到用户和大型企业的热烈欢迎。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/09/the-maker-of-non-text-ai-model-jev-valued-at-7-5b-just-weeks-after-launch/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "微软CEO称AI模型需紧急制动", desc: "微软CEO萨蒂亚·纳德拉在周六晨间发表文章，提出AI模型需要“紧急制动”。他强调，是时候“退一步评估AI的信任架构”了。这一观点对于当前AI技术的发展和应用具有重要的指导意义。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/10/microsofts-satya-nadella-says-ai-models-need-an-emergency-brake/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Anthropic AI模型向警方提供虚假信息", desc: "Anthropic的AI模型向费城警方提供虚假信息，导致一起未解谋杀案线索被忽视。据6abc报道，该AI模型于7月18日通过PhillyUnsolvedMurders.com发送了虚假线索，但调查人员因标记为垃圾邮件而未审查。Anthropic于9月28日得知情况，并于10月7日通知了费城警方。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1009090/anthropic-fake-homicide-information-philadelphia-pd-tip" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "TikTok CEO谈AI短期与长期影响", desc: "TikTok CEO 周受资在新加坡参加星展集团首届亚洲未来前瞻论坛时指出，人工智能的长期发展潜力仍被低估，未来两至三年有望推动物理学、生物科技等领域出现重大突破。他强调，市场对AI短期发展的能力可能有所高估，却低估其长期影响，尤其在科学研究领域，AI有机会加速突破既有技术瓶颈，但同时也需确保AI遵守道德与伦理规范。", source: "IT之家", url: "https://www.ithome.com/1/011/861.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "DeepSeek Bot发布民间版", desc: "DeepSeek公司发布了DeepSeek Bot，这是一款民间版的DSH插件，用户只需安装插件即可使用。该产品旨在替代Grok Bot，但具体的技术规格和覆盖范围尚未公布。相较于之前的预测，DeepSeek Bot的推出或许将带来行业内的重大变化。", source: "量子位", url: "https://www.qbitai.com/2026/10/502544.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "英伟达、谷歌、微软锁定三星芯片产能", desc: "三星电子已通过长期供应协议锁定了明年近 80% 的存储芯片产能，包括高带宽内存 HBM，英伟达、谷歌、微软等全球科技巨头纷纷下单，供应期普遍在五年以上。这一趋势已蔓延至整个 AI 硬件供应链，反映了科技巨头保障供应链稳定的迫切需求。", source: "IT之家", url: "https://www.ithome.com/1/011/877.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "亚马逊开放数据中心信息，与AI代理商合作", desc: "亚马逊宣布将停止在与地方政府谈判数据中心交易时使用保密协议，此举效仿了今年早些时候微软的做法。这一决定是在社区对AI基础设施的保密性产生反感的背景下做出的，从纽约到旧金山，已有数百项提议和实施的禁令。与此同时，许多初创公司正押注消费者将允许AI代理访问他们的信用卡。", source: "TechCrunch", url: "https://techcrunch.com/podcast/amazon-drops-data-center-ndas-and-ai-agents-want-your-credit-card/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "西门子展示工业全栈能力，推动物理AI落地", desc: "西门子将亮相2026工博会，展示其工业全栈能力，以软硬协同推动物理AI加速落地。公司将以更集中、更场景化的方式呈现技术实力。此次亮相预计将对工业领域产生积极影响。", source: "量子位", url: "https://www.qbitai.com/2026/10/502541.html" }
+    ]
+  },
+  {
     date: "2026-10-09",
     weekday: "星期五",
     regioned: true,
