@@ -384,6 +384,26 @@ def risky_tokens(text, bare_numbers=False):
     return toks
 
 
+
+def title_entity_supported(title, material_text):
+    """标题中的关键实体必须能在素材原文找到，拦截阶段A编造的标题。
+    检查两类：拉丁品牌词（OpenAI/YouTube...）与中文机构名（……委/部/局/院/实验室/公司/大学/银行/理事会）。
+    通用缩写词跳过。找不到任一关键实体 → False。
+    """
+    t = (title or "").strip()
+    if not t:
+        return True
+    generic = {"AI", "GPU", "IPO", "API", "CEO", "LLM", "OS", "CPU", "TPU", "GPT", "APP"}
+    for w in re.findall(r"[A-Za-z][A-Za-z0-9\.\-]{1,}", t):
+        if w.upper() in generic:
+            continue
+        if w not in (material_text or ""):
+            return False
+    for mm in re.finditer(r"[\u4e00-\u9fff]{2,12}(?:委员会|发改委|发展改革委|工业和信息化部|部|局|研究院|研究所|实验室|公司|集团|大学|银行|理事会|办公室)", t):
+        if mm.group(0) not in (material_text or ""):
+            return False
+    return True
+
 def ungrounded_numbers(text, material_text):
     """返回文本中【无法在素材里核实】的金额/百分比/倍数 token（空集=全部可核实）。
 
@@ -2279,11 +2299,19 @@ def generate_news(material, today_cn, attempt=0):
             continue
         # 三轮都没救回来 → 才是真正不可用
         if issues:
-            log(f"  丢弃三轮重写仍不合格的条目: {c['title'][:26]}")
-            continue
+            # [2026-10-15] 唯一问题是字数不足且已 ≥55 字 → 容忍收下（淡季保出稿）
+            if set(issues.keys()) <= {"short"} and len(desc) >= 55:
+                log(f"  ⚠ 字数仅 {len(desc)} 字（<80），容忍收下: {c['title'][:22]}")
+            else:
+                log(f"  丢弃三轮重写仍不合格的条目: {c['title'][:26]}")
+                continue
         # 标题侧的数字溯源是最后一道保险（标题由阶段 A 产出，此前只查了长度）
         if ungrounded_numbers(c["title"], material_text):
             log(f"  丢弃标题数字不可核实的条目: {c['title'][:30]}")
+            continue
+        # [2026-10-15] 标题实体必须在素材中出现（拦截阶段A编造标题）
+        if not title_entity_supported(c["title"], material_text):
+            log(f"  丢弃标题实体与素材不符的条目: {c['title'][:26]}")
             continue
         # 分类确定性纠偏（模型常为"四类均衡"而错标）。
         # [2026-09-21] 必须带上地域——"政策发布"在两个板块的判据不同：
