@@ -378,11 +378,23 @@ def gen_day(material, day_str):
                 if not issues:
                     break
                 np.log(f"  正文待修（第{b+1}轮）{np.issues_brief(issues)}: {c['title'][:20]}")
-            if not got_any or issues:
-                np.log(f"  丢弃重写仍不合格的条目: {c['title'][:26]}")
+            if not got_any:
+                np.log(f"  丢弃生成全失败的条目: {c['title'][:26]}")
                 continue
+            if issues:
+                # [2026-10-15] 唯一问题是字数不足且已 ≥55 字 → 容忍收下（淡季保出稿）
+                if set(issues.keys()) <= {"short"} and len(desc) >= 55:
+                    np.log(f"  ⚠ 字数仅 {len(desc)} 字（<80），容忍收下: {c['title'][:22]}")
+                else:
+                    np.log(f"  丢弃重写仍不合格的条目: {c['title'][:26]}")
+                    continue
             if np.ungrounded_numbers(c["title"], material_text):
                 np.log(f"  丢弃标题数字不可核实的条目: {c['title'][:26]}")
+                continue
+            # [2026-10-15] 标题实体必须在素材中出现（拦截阶段A编造标题，
+            # 如"国家发改委发布AI产业指导意见"配的却是上海AI实验室的正文）
+            if not np.title_entity_supported(c["title"], material_text):
+                np.log(f"  丢弃标题实体与素材不符的条目: {c['title'][:26]}")
                 continue
             # 分类确定性纠偏必须带地域：两个板块的"政策发布"判据不同
             fixed = np.normalize_category(c["cat"], c["title"], desc, c.get("region", "cn"))
@@ -396,7 +408,7 @@ def gen_day(material, day_str):
                 "source": c["source"] or m["source"], "url": c["url"],
                 "_rank": c.get("_rank", 999),
             })
-        if len(items) >= 12:
+        if len(items) >= 10:
             np._log_cell_dist(f"{day_str} 阶段B 合格正文", items)
             items.sort(key=lambda x: x.get("_rank", 999))
             for x in items:
@@ -410,10 +422,30 @@ def gen_day(material, day_str):
                 np.log("  摘要提及了未收录内容，改用条目标题兜底摘要")
                 summary = np.clean_for_js(np.fallback_summary(items))
             return summary, items
-        np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条（<12 硬底线），重试")
+        np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条（<10 硬底线），重试")
         time.sleep(2)
     return "", []
 
+
+
+def title_entity_supported(title, material_text):
+    """标题中的关键实体必须能在素材原文找到，拦截阶段A编造的标题。
+    检查两类：拉丁品牌词（OpenAI/YouTube...）与中文机构名（……委/部/局/院/实验室/公司/大学/银行/理事会）。
+    通用缩写词跳过。找不到任一关键实体 → False。
+    """
+    t = (title or "").strip()
+    if not t:
+        return True
+    generic = {"AI", "GPU", "IPO", "API", "CEO", "LLM", "OS", "CPU", "TPU", "GPT", "APP"}
+    for w in re.findall(r"[A-Za-z][A-Za-z0-9\.\-]{1,}", t):
+        if w.upper() in generic:
+            continue
+        if w not in (material_text or ""):
+            return False
+    for mm in re.finditer(r"[\u4e00-\u9fff]{2,12}(?:委员会|发改委|发展改革委|工业和信息化部|部|局|研究院|研究所|实验室|公司|集团|大学|银行|理事会|办公室)", t):
+        if mm.group(0) not in (material_text or ""):
+            return False
+    return True
 
 def js_block(day_str, weekday, summary, items):
     """按现有 HTML 的缩进风格构造条目块"""
@@ -541,8 +573,8 @@ def main():
             np.log(f"  素材不足 6 条（含邻域），放弃 {day}")
             continue
         summary, items = gen_day(material, day)
-        if len(items) < 6:
-            np.log(f"  生成失败（<6 条），跳过 {day}")
+        if len(items) < 4:
+            np.log(f"  生成失败（<4 条），跳过 {day}")
             continue
         if len(items) < 8:
             np.log(f"  ⚠ 仅 {len(items)} 条（<8 目标），仍写入")
