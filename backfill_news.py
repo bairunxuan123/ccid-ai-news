@@ -346,7 +346,7 @@ def gen_day(material, day_str):
 
         # —— 阶段 B：逐条素材单独撰写正文 ——
         np.log(f"  {day_str} 阶段A {len(cands)} 条候选，开始逐条写正文"
-               f"（8 格各满 {np.MIN_PER_CELL_DESC} 条才收工，上限 {np.DESC_TARGET} 条）")
+               f"（国内 8 条四维各 2 / 国外 5+ 条才收工，上限 {np.DESC_TARGET} 条）")
         # 按（地域 × 维度）轮转，保证无论写到哪里停手两个板块都是齐的
         cands = np.interleave_by_cell(cands, prefer=np.MIN_PER_CELL_DESC)
         items = []
@@ -354,7 +354,7 @@ def gen_day(material, day_str):
             if len(items) >= np.DESC_TARGET:
                 np.log(f"  已达上限 {np.DESC_TARGET} 条，其余候选不再调用")
                 break
-            if len(items) >= np.MAX_ITEMS and np._cell_ready(items, np.MIN_PER_CELL_DESC):
+            if len(items) >= np.MIN_TOTAL_ITEMS and np.items_ready(items):
                 np.log(f"  已写满 {len(items)} 条且 8 格齐备，其余候选不再调用")
                 break
             if ci:
@@ -408,7 +408,7 @@ def gen_day(material, day_str):
                 "source": c["source"] or m["source"], "url": c["url"],
                 "_rank": c.get("_rank", 999),
             })
-        if len(items) >= 10:
+        if len(items) >= np.MIN_TOTAL_ITEMS and np.items_ready(items):
             np._log_cell_dist(f"{day_str} 阶段B 合格正文", items)
             items.sort(key=lambda x: x.get("_rank", 999))
             for x in items:
@@ -422,7 +422,7 @@ def gen_day(material, day_str):
                 np.log("  摘要提及了未收录内容，改用条目标题兜底摘要")
                 summary = np.clean_for_js(np.fallback_summary(items))
             return summary, items
-        np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条（<10 硬底线），重试")
+        np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条（<13 或板块结构不齐），重试")
         time.sleep(2)
     return "", []
 
@@ -573,11 +573,11 @@ def main():
             np.log(f"  素材不足 6 条（含邻域），放弃 {day}")
             continue
         summary, items = gen_day(material, day)
-        if len(items) < 4:
-            np.log(f"  生成失败（<4 条），跳过 {day}")
+        if len(items) < np.MIN_TOTAL_ITEMS or not np.items_ready(items):
+            np.log(f"  生成不足（国内8/国外5+未凑齐，仅 {len(items)} 条），跳过 {day}")
             continue
         if len(items) < 8:
-            np.log(f"  ⚠ 仅 {len(items)} 条（<8 目标），仍写入")
+            np.log(f"  ⚠ 仅 {len(items)} 条（<16 目标），仍写入")
         weekday = np.WEEKDAYS[datetime.strptime(day, "%Y-%m-%d").weekday()]
         results.append((day, js_block(day, weekday, summary, items), len(items)))
         np.log(f"  ✓ {day} 生成 {len(items)} 条 | {summary[:40]}")
