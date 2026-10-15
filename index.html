@@ -2627,6 +2627,104 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-15",
+    weekday: "星期四",
+    regioned: true,
+    summary: "Ricursive Intelligence押注AI芯片设计，解决计算危机、麦肯锡引入AI面试，模拟客户进行10分钟对话、全球金融监管机构呼吁加强对AI智能体人工监管",
+    items: [
+      {
+        region: "intl",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "Ricursive Intelligence押注AI芯片设计，解决计算危机",
+        desc: "Ricursive Intelligence公司致力于开发能够设计芯片的人工智能，该技术能够从每次迭代中学习并优化后续设计，旨在自动化并加速芯片设计流程。该初创企业通过AI技术，旨在解决计算危机，其创新方法有望显著提高芯片设计的效率和性能。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/10/14/ricursive-intelligence-is-betting-on-ai-designed-chips-to-help-solve-the-compute-crisis/"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "麦肯锡引入AI面试，模拟客户进行10分钟对话",
+        desc: "麦肯锡公司推出一项面试新举措，要求部分初级候选人与模拟的AI客户进行10分钟对话。该AI模拟旨在反映麦肯锡顾问日常工作中可能遇到的80%的场景，而非模拟失控的客户。面试过程中，人类评委将评估候选人在模拟情境中的表现。该工具目前处于测试阶段。",
+        source: "The Verge",
+        url: "https://www.theverge.com/news/1011654/mckinsey-ai-client-interview"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "全球金融监管机构呼吁加强对AI智能体人工监管",
+        desc: "全球金融稳定理事会发布指引，要求银行及企业加强对AI智能体的人工监督，并将此纳入AI风险管理的最终版指引。指引指出，AI智能体在人工监督有限的情况下可自行规划任务，带来特殊挑战。修订版指引强调，对于风险较高的AI应用，加强人工监督至关重要，并要求企业明确规定AI智能体在何种情况下需先获得人工批准。此外，金融稳定理事会删除了将AI视为“虚拟员工”的建议，转而强调AI智能体与人类思考方式不同，可能产生意想不到的风险。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/013/375.htm"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "YouTube Music推出新标签，应对AI生成音乐泛滥",
+        desc: "YouTube Music发布全新标签，涵盖完全由AI生成或部分由AI参与的曲目，如作曲和演唱。这些标签将出现在播放器页面，标志着AI生成音乐在流媒体平台上的兴起。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/10/14/youtube-music-launches-new-labels-as-ai-generated-music-floods-streaming-platforms/"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "The AI race is back on，AI竞赛再次激烈",
+        desc: "Anthropic和OpenAI发布了更强大的AI模型，Meta Connect开发者大会上，Facebook母公司Meta宣布投入数十亿美元以复兴其AI野心，而谷歌和中国的最新模型似乎仍在追赶。这些进展使得AI竞赛重新激烈起来。",
+        source: "The Verge",
+        url: "https://www.theverge.com/ai-artificial-intelligence/1011311/the-ai-race-is-back-on"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "三星电子强调AI时代人的创造力是产品设计核心竞争力",
+        desc: "三星电子首席设计官毛罗·波尔奇尼在“2026首尔设计周”上强调，三星坚持以人为本的设计理念，将AI与人的情感智能、想象力相结合，认为人的创造力是产品设计的核心竞争力。他指出，AI技术应帮助人们发挥情感智能和想象力，而非取代人。三星将这一理念贯穿于电视、智能手机、家电等产品设计，旨在提升硬件性能的同时，体现用户生活方式和个性，形成差异化。波尔奇尼强调，设计的根本在于理解人的需求，避免产品同质化。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/013/359.htm"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "Apate利用AI进行欺诈情报收集",
+        desc: "Apate.ai推出AI特工潜入诈骗活动收集欺诈情报。这些AI特工被派往网络中，以获取诈骗信息，以帮助公司了解欺诈行为。与以往不同，Apate.ai的AI特工并非用于加速产品运输或工作流程，而是专门用于收集欺诈数据。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/10/14/apate-sends-ai-agents-undercover-to-get-scammed-so-they-can-gather-fraud-intelligence/"
+      },
+      {
+        region: "intl",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "Zenzap筹集4400万美元，旨在用AI聊天应用取代WhatsApp",
+        desc: "Zenzap成功融资4400万美元，推出旨在替代WhatsApp的AI聊天应用。该应用已获得星巴克和塔可钟等组织的采用。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/10/14/zenzap-raises-44m-for-its-ai-chat-app-that-aims-to-replace-whatsapp-in-the-workplace/"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "Android利用AI识别Google Messages中的诈骗者",
+        desc: "Google推出针对诈骗者的新防御功能，旨在帮助用户避免移动欺诈。该功能包括增强Google Messages的保护措施和额外的安全工具。基于Google Messages中的诈骗检测功能，即将推出“增强保护”设置，利用基于云的Gemini AI模型快速评估未识别发送者意图。Google表示，诈骗者常在缓慢发展的对话中隐藏真实动机。",
+        source: "The Verge",
+        url: "https://www.theverge.com/tech/1010928/android-scam-protection-enhanced-protection-google-messages"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "DeepSeek网页/API服务恢复正常，中断近5个小时",
+        desc: "DeepSeek 官方今日发布，网页/ API 服务于10月15日早间出现中断，持续近5小时后已恢复正常。此次问题持续时间为4小时52分钟，为DeepSeek本月最大规模服务中断。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/013/352.htm"
+      }
+    ]
+  },
+  {
     date: "2026-10-14",
     weekday: "星期三",
     regioned: true,
