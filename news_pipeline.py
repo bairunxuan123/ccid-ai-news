@@ -1200,6 +1200,15 @@ def build_desc_prompt(m, attempt=0, fix=None):
                 "当成新闻写进了正文。正文里只允许有这条新闻的内容，"
                 "一个字的说明性文字都不许出现。"
             )
+        stale_fix = tuple(fix.get("stale") or ())
+        if stale_fix:
+            rules.append(
+                "旧闻时间锚：上一版出现了"
+                + "、".join(f"“{s}”" for s in stale_fix)
+                + "这类距今超过 7 天的具体日期。"
+                "请只保留今天或近 7 天内的时间表述，"
+                "素材里如果只有旧日期，宁可模糊写“近日”“近期”，也绝对不要硬塞过去的具体日期——否则会让读者误以为是今日新发生的。"
+            )
         vague = tuple(fix.get("vague") or ())
         if vague:
             rules.append(
@@ -1278,6 +1287,26 @@ def vague_phrases(desc):
     return tuple(w for w in _VAGUE_MARKS if w in (desc or ""))
 
 
+def stale_anchors(desc, today=None):
+    """desc 里出现的具体日期（"2023年10月13日" 等）距今超过 7 天则视为旧闻时间锚。
+    LLM 在写正文时常把"今天是 10-13"硬套到一个素材的原始发表时间上（如把 2023 年的
+    华为麒麟沟通会塞进 2026-10-13 的今日动态）。任何"20XX 年 X 月 X 日"锚点若早于
+    today - 7 天一律记录。返回命中列表（空列表 = 干净）。"""
+    from datetime import datetime, timedelta
+    if today is None:
+        today = datetime.now()
+    out = []
+    for m in re.finditer(r"20\d{2}\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日", desc or ""):
+        s = re.sub(r"\s+", "", m.group(0)).replace("年", "-").replace("月", "-").replace("日", "")
+        try:
+            d = datetime.strptime(s, "%Y-%m-%d")
+        except ValueError:
+            continue
+        if d < today - timedelta(days=7):
+            out.append(m.group(0))
+    return out
+
+
 def desc_issues(desc, material_text):
     """体检一段正文，返回问题字典（空 dict = 合格）。
 
@@ -1298,6 +1327,9 @@ def desc_issues(desc, material_text):
     leak = prompt_leak(desc)
     if leak:
         issues["leak"] = leak
+    stale = stale_anchors(desc)
+    if stale:
+        issues["stale"] = stale
     vague = vague_phrases(desc)
     if vague:
         issues["vague"] = vague
@@ -1319,6 +1351,8 @@ def issues_brief(issues):
         why.append("英文残留")
     if issues.get("leak"):
         why.append("混入指令:" + "、".join(issues["leak"][:2]))
+    if issues.get("stale"):
+        why.append("旧闻时间锚:" + "、".join(issues["stale"][:2]))
     if issues.get("vague"):
         why.append("空泛表述:" + "、".join(issues["vague"][:2]))
     return "｜".join(why)
@@ -2461,14 +2495,14 @@ def main():
 
     # 1. 抓素材
     material = collect_material(hours=72)
-    if len(material) < 12:
-        log("素材不足（<12 条），本次跳过，避免生成低质/编造内容")
+    if len(material) < 8:
+        log("素材不足（<8 条），本次跳过，避免生成低质/编造内容")
         return 0
     # 两个板块各有素材才可能各出 8 条。任一侧为空就说明当天素材严重偏科，
     # 与其写出"国内 16 条 / 国外 0 条"，不如不写。
     _pools = split_material_by_region(material)
-    if min(len(_pools[r]) for r in REGIONS) < 6:
-        log("素材地域偏科（国内/国外任一池 <6 条），本次跳过："
+    if min(len(_pools[r]) for r in REGIONS) < 3:
+        log("素材地域偏科（国内/国外任一池 <3 条），本次跳过："
             + " ".join(f"{REGION_LABELS[r]}{len(_pools[r])}" for r in REGIONS))
         return 0
 
