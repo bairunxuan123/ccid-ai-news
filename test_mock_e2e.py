@@ -424,8 +424,8 @@ def main():
     ok = True
     global ROUNDS
 
-    # 阶段 B 的收工条件是"8 格各满 MIN_PER_CELL_DESC 条"，不是"总共写满 N 条"。
-    expect_first = np.MIN_PER_CELL_DESC * len(np.CAT_LABELS) * len(np.REGIONS)   # 2×4×2 = 16
+    # [2026-10-15 用户新口径] 收工条件是"国内 8（四格各 2）+ 国外 5（四格各 ≥1）"。
+    expect_first = np.MIN_TOTAL_ITEMS   # 13 = 国内 8 + 国外 5
 
     def run(mode, plan_cn=None, plan_intl=None, attempt=0):
         ROUNDS.clear()
@@ -459,8 +459,8 @@ def main():
 
     # A. 阶段 A 两个地域各放行 12 条（坏候选被拦），四类候选都够 3 条 → 各只跑 1 轮
     a_ok = (n_desc_first == expect_first)
-    print(f"  {'✅' if a_ok else '❌'} 阶段 A 拦下 8 条坏候选；阶段 B 写到“8 格各 "
-          f"{np.MIN_PER_CELL_DESC} 条”即收工（实得 {n_desc_first} 次首写 / 应有 {expect_first} 次）")
+    print(f"  {'✅' if a_ok else '❌'} 阶段 A 拦下 8 条坏候选；阶段 B 写到“国内 8 / 国外 5+”"
+          f"即收工（实得 {n_desc_first} 次首写 / 应有 {expect_first} 次）")
     ok &= a_ok
     a2_ok = len(sel_calls) == 2
     print(f"  {'✅' if a2_ok else '❌'} 两地域各选题 1 轮、无多余补选（阶段 A 共 {len(sel_calls)} 次）")
@@ -488,15 +488,17 @@ def main():
         print(f"  8格分布 {cell}")
     cats = ("policy", "tech", "industry", "capital")
     for name, good in [
-        (f"产出 {np.MAX_ITEMS} 条（国内 8 + 国外 8）",
-         len(items1) == np.MAX_ITEMS and n_cn == 8 and n_intl == 8),
+        (f"产出 ≥{np.MIN_TOTAL_ITEMS} 条（国内 8 + 国外 5+，用户新口径）",
+         len(items1) >= np.MIN_TOTAL_ITEMS and n_cn >= 8
+         and n_intl >= np.INTL_MIN_ITEMS and np.items_ready(items1)),
         ("标题均 ≥15 字", bool(tl) and min(tl) >= 15),
         ("正文均 ≥80 字（8月下沿）", bool(dl) and min(dl) >= 80),
         ("正文均 ≤400 字", bool(dl) and max(dl) <= 400),
         ("正文均值 ≥110 字", bool(dl) and sum(dl) / len(dl) >= 110),
         ("每条都带 region 字段", all(i.get("region") in np.REGIONS for i in items1)),
-        ("两板块四类各 2 条（用户硬要求）",
-         all(cell.get((r, c), 0) == 2 for r in np.REGIONS for c in cats)),
+        ("国内四类各 2 条、国外四类各 ≥1 条（用户新口径）",
+         all(cell.get(("cn", c), 0) >= 2 for c in cats)
+         and all(cell.get(("intl", c), 0) >= np.MIN_PER_CELL_INTL for c in cats)),
         ("无编造 URL", all(i["url"] in VALID for i in items1)),
     ]:
         print(f"  {'✅' if good else '❌'} {name}")
@@ -520,7 +522,8 @@ def main():
     i2_ok = sample_fix.count("350亿元") == 1
     print(f"  {'✅' if i2_ok else '❌'} 金额不重复罗列（amt/mag 去重）")
     ok &= i2_ok
-    j_ok = len(items3) == np.MAX_ITEMS and not any("350亿元" in it["desc"] for it in items3)
+    j_ok = (len(items3) >= np.MIN_TOTAL_ITEMS and np.items_ready(items3)
+            and not any("350亿元" in it["desc"] for it in items3))
     print(f"  {'✅' if j_ok else '❌'} {expect_first} 条全部救回、残留错误数字 0 条")
     ok &= j_ok
     _, dl3, _ = _stats(items3)
@@ -540,8 +543,8 @@ def main():
     print(f"  {'✅' if l1_ok else '❌'} 每条被污染的正文都被要求清掉指令文字"
           f"（实得 {len(leak_fix_calls)} 次 / 应有 {expect_first} 次）")
     ok &= l1_ok
-    l2_ok = len(items_leak) == np.MAX_ITEMS and not any(
-        np.prompt_leak(it["desc"]) for it in items_leak)
+    l2_ok = (len(items_leak) >= np.MIN_TOTAL_ITEMS and np.items_ready(items_leak)
+             and not any(np.prompt_leak(it["desc"]) for it in items_leak))
     print(f"  {'✅' if l2_ok else '❌'} 成品里指令残留 0 条（{len(items_leak)} 条）")
     ok &= l2_ok
     l3_ok = bool(leak_fix_calls) and "上一轮" in leak_fix_calls[0]["prompt"]
@@ -559,8 +562,8 @@ def main():
     print(f"  {'✅' if v1_ok else '❌'} 每条写了空泛评价的正文都被要求改掉"
           f"（实得 {len(vague_fix_calls)} 次 / 应有 {expect_first} 次）")
     ok &= v1_ok
-    v2_ok = len(items_vague) == np.MAX_ITEMS and not any(
-        np.vague_phrases(it["desc"]) for it in items_vague)
+    v2_ok = (len(items_vague) >= np.MIN_TOTAL_ITEMS and np.items_ready(items_vague)
+             and not any(np.vague_phrases(it["desc"]) for it in items_vague))
     print(f"  {'✅' if v2_ok else '❌'} 成品里空泛评价残留 0 条（{len(items_vague)} 条）")
     ok &= v2_ok
     v3_ok = bool(vague_fix_calls) and "引起广泛关注" in vague_fix_calls[0]["prompt"]
@@ -582,9 +585,7 @@ def main():
     print(f"  {'✅' if m2_ok else '❌'} 补选轮 prompt 带“四类都要有候选”的纠正提示")
     ok &= m2_ok
     _, _, cell_fill = _stats(items_fill)
-    m3_ok = (len(items_fill) == np.MAX_ITEMS
-             and all(cell_fill.get((r, c), 0) >= 2
-                     for r in np.REGIONS for c in cats))
+    m3_ok = (len(items_fill) >= np.MIN_TOTAL_ITEMS and np.items_ready(items_fill))
     print(f"  {'✅' if m3_ok else '❌'} 补选后 8 格各 ≥2 条：{cell_fill}")
     ok &= m3_ok
 
@@ -604,8 +605,9 @@ def main():
     print(f"  {'✅' if f_ok else '❌'} attempt=1 的选题 prompt 含“上一轮不合格，本次务必修正”")
     ok &= f_ok
     print(f"  attempt=1 → {len(items2b)} 条")
-    g_ok = len(items2b) == np.MAX_ITEMS
-    print(f"  {'✅' if g_ok else '❌'} 重试后恢复到 {np.MAX_ITEMS} 条")
+    # [2026-10-15 用户新口径] 达标线改为：≥13 条（国内 8 + 国外 5）且结构齐备
+    g_ok = len(items2b) >= np.MIN_TOTAL_ITEMS and np.items_ready(items2b)
+    print(f"  {'✅' if g_ok else '❌'} 重试后恢复到 ≥{np.MIN_TOTAL_ITEMS} 条且国内外结构齐备")
     ok &= g_ok
 
     print("\n" + ("🎉 两阶段 mock 演练全部通过" if ok else "⚠ 存在失败项"))
