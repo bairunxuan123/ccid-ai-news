@@ -115,6 +115,11 @@ PER_REGION_ITEMS = 8
 MAX_ITEMS = PER_REGION_ITEMS * len(REGIONS)
 # 每个"地域 × 维度"格子最终至少要有几条（8 格 × 2 = 16 条）
 MIN_PER_CELL = 2
+# [2026-10-15 用户新口径] 国内必须 8 条（四维度各 2）；国外 5 条+
+# （同四维度逻辑、每格 ≥1，不硬凑 8）。总量下限 13、上限 16。
+INTL_MIN_ITEMS = 5
+MIN_PER_CELL_INTL = 1
+MIN_TOTAL_ITEMS = PER_REGION_ITEMS + INTL_MIN_ITEMS
 
 # 要求模型输出的候选条数（**每个地域**）。8 格 × 4 = 32 条，分两次要。
 # [2026-09-21] 由单次 14 条改为"每地域 16 条 × 2 轮地域"。原因见上面的地域说明：
@@ -132,7 +137,7 @@ MIN_CANDS_PER_CELL = 3
 MAX_SELECT_ROUNDS = 3
 # 阶段 B 最多写多少条合格正文就停手（上限；
 # 提前收工条件是"8 格每格够 2 条"，即 16 条）
-DESC_TARGET = 26
+DESC_TARGET = 20
 # 阶段 B 每格至少要有多少条合格正文，8 格都够了才允许提前收工
 MIN_PER_CELL_DESC = 2
 
@@ -177,6 +182,8 @@ BLOCK_CN = [
     # 纯消费品（无 AI 技术内容）
     "相机", "镜头", "电视", "戒指", "键盘", "鼠标", "爆料", "评测",
     "手办", "盲盒", "玩偶",
+    # [2026-10-15] 版本推送/系统更新（消费向产品动态，非 AI 产业内容）
+    "升级版本", "系统更新", "推送更新", "内测版", "公测版",
     # 汽车新品与传闻（无 AI 技术内容）
     "官图", "试驾", "新车", "mpv", "suv", "座舱", "灯效", "rgb", "影音",
     "续航", "渲染图", "内饰",
@@ -1453,7 +1460,8 @@ def clean_for_js(value):
 CAPITAL_HINTS = ["融资", "并购", "收购", "ipo", "上市", "估值", "投资", "注资",
                  "增资", "参股", "领投", "跟投", "募资", "轮"]
 NEGATIVE_HINTS = ["黑客", "攻击", "入侵", "罚款", "起诉", "诉讼", "争议", "泄露",
-                  "宕机", "故障", "被罚", "违规", "反垄断", "泄密",
+                  "宕机", "故障", "中断", "停服", "崩溃", "瘫痪", "事故", "下架",
+                  "被罚", "违规", "反垄断", "泄密",
                   # [2026-09-14] 补：负面事件通用表述，避免"某公司面临网络安全
                   # 问题"被标成技术突破
                   "安全问题", "网络安全问题", "陷入困境"]
@@ -2032,14 +2040,32 @@ def select_balanced(cands, target=MAX_ITEMS, prefer=MIN_PER_CELL):
     for idx, c in enumerate(cands):
         by_cell.setdefault((c.get("region", "cn"), c["cat"]), []).append(idx)
     picked = set()
-    for want in range(1, prefer + 1):
-        for region in REGIONS:
-            for cat in CAT_LABELS:
-                pool = by_cell.get((region, cat), [])
-                if len(picked) >= target:
-                    break
-                if len(pool) >= want:
-                    picked.add(pool[want - 1])
+
+    def _fill_region(region):
+        """[2026-10-15] 给该地域四格各补一条"下一跳"（每格取还没取过的下一条）。"""
+        for cat in CAT_LABELS:
+            if len(picked) >= target:
+                break
+            pool = by_cell.get((region, cat), [])
+            taken = sum(1 for i in pool if i in picked)
+            if taken < len(pool):
+                picked.add(pool[taken])
+
+    # [2026-10-15 用户新口径] 三轮轮转：
+    #   第一轮 8 格各取 1（国内外四维度都出现，共 8 条）
+    #   第二轮国内四格再各 1（国内凑满 8）
+    #   第三轮国外四格再各 1（国外尽量凑满 8；素材不足自然停在 5+）
+    for regions in (REGIONS, ("cn",), ("intl",)):
+        for region in regions:
+            if len(picked) >= target:
+                break
+            _fill_region(region)
+    # 名额仍有富余：先把国外补向 8，再按价值序兜底
+    while len(picked) < target:
+        before = len(picked)
+        _fill_region("intl")
+        if len(picked) == before:
+            break
     for idx in range(len(cands)):          # 剩余名额按价值序补齐
         if len(picked) >= target:
             break
@@ -2140,6 +2166,18 @@ def _cell_ready(items, per_cell):
     return all(d[r].get(k, 0) >= per_cell for r in REGIONS for k in CAT_LABELS)
 
 
+
+def items_ready(items):
+    """[2026-10-15 用户新口径] 阶段 B 收工判据：
+    国内 ≥8 且四格各 ≥2；国外 ≥5 且四格各 ≥1。"""
+    d = _cell_dist(items)
+    cn_ok = (sum(d["cn"].values()) >= PER_REGION_ITEMS
+             and all(d["cn"].get(k, 0) >= MIN_PER_CELL for k in CAT_LABELS))
+    intl_ok = (sum(d["intl"].values()) >= INTL_MIN_ITEMS
+               and all(d["intl"].get(k, 0) >= MIN_PER_CELL_INTL for k in CAT_LABELS))
+    return cn_ok and intl_ok
+
+
 def _cells_lack(items, per_cell, label_fn=None):
     """返回还没达标的格子标签列表，用于日志与补选提示。"""
     d = _cell_dist(items)
@@ -2200,8 +2238,9 @@ def collect_candidates(region_mat, by_url, today_cn, region, attempt=0):
                 c["_rank"] = base + k
             cands.extend(fresh)
         dist = Counter(c["cat"] for c in cands)
+        _need = MIN_CANDS_PER_CELL if region == "cn" else MIN_PER_CELL_INTL + 1
         lack = [CAT_LABELS[k] for k in CAT_LABELS
-                if dist.get(k, 0) < MIN_CANDS_PER_CELL]
+                if dist.get(k, 0) < _need]
         log(f"  阶段 A【{REGION_LABELS[region]}】第{rnd+1}轮：候选 {len(cands)} 条 "
             + " ".join(f"{CAT_LABELS[k]}{dist.get(k, 0)}" for k in CAT_LABELS)
             + (f"｜仍缺 {'/'.join(lack)}" if lack else "｜四类齐备"))
@@ -2253,7 +2292,7 @@ def generate_news(material, today_cn, attempt=0):
     # 直接丢弃等于每天白扔 5-6 条可用新闻。现在把体检结果（desc_issues）
     # 原样回灌进提示词，指名要求改掉那个数字/那句英文。
     log(f"  选题完成：{len(cands)} 条候选，开始逐条撰写正文"
-        f"（8 格各满 {MIN_PER_CELL_DESC} 条才收工，上限 {DESC_TARGET} 条）")
+        f"（国内 8 条四维各 2 / 国外 5+ 条才收工，上限 {DESC_TARGET} 条）")
     # 按 (地域 × 维度) 轮转排序，保证无论写到哪里停手，两个板块四个维度都齐
     # prefer 取 MIN_PER_CELL_DESC：先给每个格子凑满收工所需的条数，
     # 再按原价值序补。这样"提前收工"时刚好写满 16 条，不多烧 4-7 次 API。
@@ -2266,8 +2305,8 @@ def generate_news(material, today_cn, attempt=0):
         # 收工条件不只是"凑够 16 条"，还要 8 格每格都够 2 条供均衡选取。
         # [2026-09-14] 复验时只按条数收工，结果 8 条里缺了"产业动态"——
         # 因为写到 12 条就停手，而 industry 候选恰好都排在后面还没轮到。
-        if len(out) >= MAX_ITEMS and _cell_ready(out, MIN_PER_CELL_DESC):
-            log(f"  已写满 {len(out)} 条且 8 格齐备，其余候选不再调用")
+        if len(out) >= MIN_TOTAL_ITEMS and items_ready(out):
+            log(f"  已写满 {len(out)} 条且国内外结构齐备，其余候选不再调用")
             break
         if ci:
             # 阶段 B 调用密集（每天 16-30 次），主动留出间隔，
@@ -2545,7 +2584,7 @@ def main():
             last_err = e
             log(f"第{attempt+1}次 LLM 生成失败: {e}")
             continue
-        if len(items) >= MAX_ITEMS:
+        if len(items) >= MIN_TOTAL_ITEMS and items_ready(items):
             break
 
     if not items:
@@ -2555,9 +2594,9 @@ def main():
     # 写上去等于把一个残缺的页面推给用户，不如留线上旧版。
     _n_cn = sum(1 for x in items if x.get("region") == "cn")
     _n_intl = len(items) - _n_cn
-    if min(_n_cn, _n_intl) < 6:
-        log(f"两个板块产出失衡（国内 {_n_cn} 条 / 国外 {_n_intl} 条，"
-            "任一板块 <6 条即视为失败），放弃本次写入")
+    if _n_cn < PER_REGION_ITEMS or _n_intl < INTL_MIN_ITEMS:
+        log(f"板块产出不达新口径（国内 {_n_cn}/{PER_REGION_ITEMS}、"
+            f"国外 {_n_intl}/{INTL_MIN_ITEMS}+），放弃本次写入")
         return 1
     if len(items) < MAX_ITEMS:
         log(f"仅生成 {len(items)} 条（<{MAX_ITEMS} 条），仍写入但内容偏少")
