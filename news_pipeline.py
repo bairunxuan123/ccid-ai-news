@@ -52,16 +52,29 @@ ZHIPU_MODEL = "glm-4-flash"   # 免费模型
 #     量子位（中文 AI 垂直，更新到当天）｜AI News（AI 垂直）｜
 #     Ars Technica｜IEEE Spectrum AI
 RSS_SOURCES = [
+    # —— 国内（2026-10-16 扩到 6 个）——
+    # 原先只有 IT之家 + 量子位：IT之家 60 条里 AI 相关且未被消费电子/汽车硬拦的
+    # 实测只剩 13 条，量子位 10 条里剩 6 条；淡季两家合计只有 3 条，国内 8 条凑不出。
+    # 新增 4 源均已实测可用（2026-10-16）：
+    #   雷峰网 20 条 / AI 可用 9；钛媒体 19 条 / 10；极客公园 30 条 / 15；
+    #   InfoQ 中国 20 条 / 11。极客公园 RSS 有约 10 天历史深度，可支撑回填。
     "https://www.ithome.com/rss/",                                  # 中文 IT 综合
-    "https://www.qbitai.com/feed",                                  # 量子位（中文 AI 垂直）★ 新增
+    "https://www.qbitai.com/feed",                                  # 量子位（中文 AI 垂直）
+    "https://www.leiphone.com/feed",                                # 雷峰网（中文 AI/科技深度）★ 10-16 新增
+    "https://www.tmtpost.com/rss.xml",                              # 钛媒体（中文科技/产业）★ 10-16 新增
+    "https://www.geekpark.net/rss",                                 # 极客公园（历史深度约 10 天）★ 10-16 新增
+    "https://www.infoq.cn/feed",                                    # InfoQ 中国（技术/AI 工程）★ 10-16 新增
+    # —— 国外 ——
     "https://techcrunch.com/category/artificial-intelligence/feed/",
     "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",  # Atom
     "https://venturebeat.com/category/ai/feed/",
-    "https://www.artificialintelligence-news.com/feed/",            # AI News ★ 新增
+    "https://www.artificialintelligence-news.com/feed/",            # AI News
     "https://www.technologyreview.com/topic/artificial-intelligence/feed",
-    "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss",  # IEEE Spectrum AI ★ 新增
-    "https://feeds.arstechnica.com/arstechnica/technology-lab",     # Ars Technica ★ 新增
-    "https://openai.com/news/rss.xml",
+    "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss",  # IEEE Spectrum AI
+    "https://feeds.arstechnica.com/arstechnica/technology-lab",     # Ars Technica
+    # [2026-10-16] 移除 openai.com/news/rss.xml：它一次返回 1293 条全量历史文章
+    # （总去重素材 1453 条里占 89%），回填不做 72h 窗口过滤时被它灌满国外池，
+    # 把国内条目挤到只剩个位数。国外高质量源仍有 6 个，不受影响。
 ]
 
 # 源域名 → 媒体简称。8 月定版里 source 字段填的是"IT之家""The Verge"这类简称，
@@ -69,6 +82,10 @@ RSS_SOURCES = [
 SOURCE_NAMES = {
     "ithome.com": "IT之家",
     "qbitai.com": "量子位",
+    "leiphone.com": "雷峰网",
+    "tmtpost.com": "钛媒体",
+    "geekpark.net": "极客公园",
+    "infoq.cn": "InfoQ",
     "techcrunch.com": "TechCrunch",
     "theverge.com": "The Verge",
     "venturebeat.com": "VentureBeat",
@@ -76,7 +93,6 @@ SOURCE_NAMES = {
     "technologyreview.com": "MIT Tech Review",
     "spectrum.ieee.org": "IEEE Spectrum",
     "arstechnica.com": "Ars Technica",
-    "openai.com": "OpenAI",
 }
 
 
