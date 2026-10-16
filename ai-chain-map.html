@@ -2627,6 +2627,131 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-16",
+    weekday: "星期五",
+    regioned: true,
+    summary: "【国内】百度萝卜快跑在香港开启自动驾驶汽车试乘，苹果智能接入阿里千问大模型，人形机器人租赁市场价格雪崩。　【国外】AI产业持续发展，技术突破与政策监管并行，企业并购与产品发布活跃。",
+    items: [
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "百度萝卜快跑香港试乘自动驾驶汽车",
+        desc: "百度旗下自动驾驶出行服务平台“萝卜快跑”将于10月21日至11月3日在香港东涌举行大规模自动驾驶汽车公众试乘活动，预计超过1000名市民参与。试乘路线全长5.1公里，每辆车最多可搭载两名乘客，并配备一名拥有10年驾驶经验的安全员。此次活动旨在展示百度自动驾驶技术的最新成果，并收集实际使用反馈，推动自动驾驶技术在香港普及。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/013/963.htm"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "人形机器人租赁市场日租金跌至几百元",
+        desc: "钛媒体报道，人形机器人租赁市场经历价格雪崩，日租金跌至几百元。杭州西湖景区、合肥文创园等地的机器人提供导航、营业员等服务。不到一年，机器人从象征性存在变为实际劳动力，一天“工资”不到一顿火锅。2025年国庆，机器人以“新劳动力”身份进入公众视野，如武汉站东进站口、北京王府井等地均有应用。",
+        source: "钛媒体",
+        url: "https://www.tmtpost.com/8170280.html"
+      },
+      {
+        region: "cn",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "禾盛新材加码智算，主业难撑AI加速转型",
+        desc: "禾盛新材发布2026年度简易程序向特定对象发行股票预案修订稿，拟募集资金约1.9亿元，其中1.33亿元用于国产智算集群建设项目，5700万元用于补充流动资金。该项目由上海海曦技术有限公司实施，总投资约1.56亿元，预计每年新增收入8583.14万元、净利润1998.89万元，税后静态投资回收期为4.79年。此次定增有助于推进AI布局、缓解资金压力，但尚无法覆盖全部资金需求。",
+        source: "钛媒体",
+        url: "https://www.tmtpost.com/8171133.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "海康威视亮相工博会，加速工业场景数字化",
+        desc: "海康威视在2026中国工博会上发布100余款场景数字化产品，并发布十余款新品，以“物联感知+AI，加速工业场景数字化”为主题，展出大模型产品与解决方案，覆盖可见光、红外、毫米波、X光、声波等感知技术，助力解决工业领域具体问题。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/industrynews/1SliUXA2cNsJLwzk.html"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "阶跃星辰开放Step 5 Preview，竞争延伸至上下文管理与训练系统",
+        desc: "阶跃星辰开放了Step 5 Preview，这是一款长程Agent的上下文管理与训练系统。该系统旨在提升Agent的竞争能力，具体细节未提及。这一举措将推动长程Agent技术的发展和应用。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/EwqsJX6f03ODRac6Kk4c?utm_source=rss&utm_medium=article"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "国产GPU越来越多，为什么反而更难用？",
+        desc: "英伟达发布了新一代GPU产品，尽管国产GPU数量增加，但用户反馈使用体验反而不如预期。新一代GPU在性能、功耗等方面有所提升，但用户普遍反映兼容性和稳定性有待提高。这一现象引发了业界对国产GPU发展的关注，未来如何提升用户体验将成为关键。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/pkyTD9OWfpU7QvIbLX2j?utm_source=rss&utm_medium=article"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "黄仁勋谈中国AI公司：算力缺，但拼命把事情做成",
+        desc: "NVIDIA创始人黄仁勋在谈论中国AI公司时指出，尽管算力资源紧张，但他们正努力推进项目。据InfoQ报道，中国AI公司在算力紧缺的情况下，正积极投入资源，全力推进项目进展。黄仁勋强调，尽管面临诸多挑战，但中国AI公司在算力短缺的情况下，仍能取得显著成果，显示出强大的执行力。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/HC8SAgaZmHc6sfwp9gc9?utm_source=rss&utm_medium=article"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "大模型「土木系」翻身：AI Infra 年薪冲到800万？",
+        desc: "雷峰网报道，大模型独角兽DeepSeek发布了DeepSeek R1，引发AI Infra人才市场薪资狂飙。2024年，深圳Infra候选人年薪从30万涨至100万，部分人才薪资翻倍，期权占大头。这轮涨薪起爆点为DeepSeek R1发布，AI Infra人才被厂商疯抢，年薪高达七八百万。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/industrynews/azREeBbKSJ84PQTK.html"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "谷歌布林：AI正开始“自己造自己”",
+        desc: "谷歌联合创始人谢尔盖·布林表示，Gemini 模型正迈向“自我改进”的关键时刻，AI 已开始参与打造下一代模型，如 Flash 系列模型所示。AI 研发流程的部分环节已实现自动化，AI 智能体现在可承担大部分生产代码编写和漏洞修复工作，但代码变更仍需人工审核。多家机构的研究人员认为，RSI 可能在未来 3 至 12 个月内开始。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/013/957.htm"
+      },
+      {
+        region: "intl",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "量子位智库发布Agent落地报告",
+        desc: "量子位智库发布《Agent落地报告》，深入分析企业智能化六大断点，并附上全链路破局框架。报告详细拆解了Agent如何深入业务毛细血管，为企业智能化提供解决方案。",
+        source: "量子位",
+        url: "https://www.qbitai.com/2026/10/503614.html"
+      },
+      {
+        region: "intl",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "OpenAI入局，全球具身智能变天",
+        desc: "OpenAI发布了GPT-6 Astra模型，其操控机械臂完成任务的成功率高达95%。这一模型在简单任务上的表现优于同期其他模型。OpenAI的成功归因于其在数据、算力和时间上的优势，使得通用基座模型直接包揽了机器人的规划与粗抓取。随着2026年具身智能的“上市大年”的到来，机器人相关企业纷纷登陆港股，如梅卡曼德、优地机器人等，预示着行业竞争将更加激烈。",
+        source: "钛媒体",
+        url: "https://www.tmtpost.com/8170706.html"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "亚马逊云科技推出CloudWatch Omni",
+        desc: "亚马逊云科技发布了CloudWatch Omni，这是一款不仅监控系统，还能评估AI可靠性的工具。该工具旨在帮助用户更全面地监控和管理云资源，同时确保AI系统的稳定性和准确性。CloudWatch Omni的推出，为用户提供了更强大的监控和评估能力，有助于提升云服务的质量和效率。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/5GOXqmJaGKbukSIWU4Uf?utm_source=rss&utm_medium=article"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "Ricursive Intelligence押注AI设计芯片",
+        desc: "Ricursive Intelligence公司推出AI芯片设计技术，该技术能够设计芯片，并通过每次迭代学习，改进后续设计，旨在自动化和加速芯片设计过程。该技术有望解决计算危机，提高芯片设计效率。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/10/14/ricursive-intelligence-is-betting-on-ai-designed-chips-to-help-solve-the-compute-crisis/"
+      }
+    ]
+  },
+  {
     date: "2026-10-15",
     weekday: "星期四",
     regioned: true,
@@ -2755,106 +2880,124 @@ var NEWS_DATA = [
     date: "2026-10-14",
     weekday: "星期三",
     regioned: true,
-    summary: "【国内】今日AI产业动态涵盖技术突破、产业合作、政策发布及资本运作，展现我国AI领域的活跃态势。　【国外】AI领域技术突破、产业动态活跃，政策监管与投融资持续进行。",
+    summary: "【国内】苹果智能接入阿里大模型，国产GPU挑战与AI应用创新齐头并进。　【国外】AI领域技术突破、产业动态、政策发布及投融资活动活跃。",
     items: [
       {
         region: "cn",
         cat: "industry",
         catLabel: "产业动态",
-        title: "字节跳动洽谈采购联发科AI芯片",
-        desc: "字节跳动即将采购联发科数据中心芯片，数量待定，用于数据中心运行。这笔交易可能使字节跳动成为联发科ASIC业务第二大客户，仅次于谷歌。字节跳动正大举增加硬件投入，押注人工智能作为下一增长引擎，但无法采购英伟达等厂商最顶尖的AI芯片。此次合作有助于联发科摆脱对手机业务的依赖，在数据中心赛道和高通、博通竞争。",
-        source: "IT之家",
-        url: "https://www.ithome.com/1/013/279.htm"
-      },
-      {
-        region: "cn",
-        cat: "tech",
-        catLabel: "技术突破",
-        title: "国内最年轻AI教授创业，推动世界模型全模态发展",
-        desc: "国内最年轻AI教授曹原带领团队创业，致力于让世界模型走向全身全模态。该团队通过给Ego补上缺失的交互信息，为AI领域带来新的突破。这一创新举措有望推动AI技术的发展和应用，为未来智能时代的到来奠定坚实基础。",
+        title: "苹果智能接入阿里千问大模型，10月底中国测试",
+        desc: "苹果公司宣布将智能接入阿里千问大模型，预计10月底在中国发布测试版本。此次接入不包括Siri AI，标志着苹果在人工智能领域的进一步拓展。",
         source: "量子位",
-        url: "https://www.qbitai.com/2026/10/503172.html"
+        url: "https://www.qbitai.com/2026/10/503640.html"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "人形机器人面临挑战：长腿却难干活",
+        desc: "源策未来发布了以“全身智能”（WBI）为核心技术路线的新模型和演示，该模型自采人类全身交互数据，研发出能够适配不同本体的人形基础模型系统。在演示中，机器人能完成精细按压和搬踏台登高等动作，展现出人形机器人的实用潜力，相较于此前只能跳舞表演的尴尬局面，这一进展有望撕掉“表演道具”的标签。",
+        source: "极客公园",
+        url: "http://www.geekpark.net/news/372420"
       },
       {
         region: "cn",
         cat: "industry",
         catLabel: "产业动态",
-        title: "瑞典节目制作文件被AI智能体删除，引发行业关注",
-        desc: "瑞典真人竞技节目《The Challenge Sverige》制作团队遭遇意外，即将播出的整季节目被AI智能体删除，导致数百名工作人员需从头剪辑。据悉，Mastiff公司允许AI智能体接入服务器，导致整季节目文件无法恢复。新一季节目原定11月22日播出，现因“技术故障”推迟至明年首播。",
-        source: "IT之家",
-        url: "https://www.ithome.com/1/013/288.htm"
+        title: "海康威视AI超声检测获奖，加速工业场景数字化",
+        desc: "海康威视发布了AI超声检测技术，并在2026中国国际工业博览会上荣获“工业自动化奖”。该技术通过AI建模、定量分析与分类识别，将超声检测的门槛降低，提高了产业价值。海康威视创新对超声原始信号进行AI建模，实现了对零部件缺陷的精确识别，解决了传统检测的难题。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/industrynews/ZKD7Fqh34I9b4ujG.html"
       },
       {
-        region: "intl",
-        cat: "industry",
-        catLabel: "产业动态",
-        title: "金融稳定理事会呼吁加强AI智能体监管",
-        desc: "金融稳定理事会发布指引，要求银行及其他企业加强对AI智能体的人工监督，并将此纳入AI风险管理的最终版指引。指引强调，AI智能体在人工监督有限的情况下可能自行规划、执行任务，带来特殊挑战。根据修订后的指引，对于风险较高的AI应用，加强人工监督至关重要，企业需明确规定AI智能体在何种情况下需人工批准。此修订版指引旨在防范AI带来的风险，包括网络攻击威胁。",
-        source: "IT之家",
-        url: "https://www.ithome.com/1/013/375.htm"
-      },
-      {
-        region: "intl",
+        region: "cn",
         cat: "tech",
         catLabel: "技术突破",
-        title: "Ricursive Intelligence开发AI芯片设计技术",
-        desc: "Ricursive Intelligence公司推出AI芯片设计技术，该技术能设计芯片、从迭代中学习并优化后续设计，旨在自动化和加速芯片设计流程。该技术旨在解决计算危机，通过AI自动化设计过程，提高芯片设计的效率和质量。",
-        source: "TechCrunch",
-        url: "https://techcrunch.com/2026/10/14/ricursive-intelligence-is-betting-on-ai-designed-chips-to-help-solve-the-compute-crisis/"
+        title: "国产GPU挑战：越难用却越来越多",
+        desc: "国产GPU市场日益繁荣，但用户反馈称使用体验却不如预期。据InfoQ报道，尽管国产GPU数量增加，但用户普遍反映其性能和兼容性有待提高。这一现象引发了业界对国产GPU发展方向的关注和讨论。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/pkyTD9OWfpU7QvIbLX2j?utm_source=rss&utm_medium=article"
       },
       {
-        region: "intl",
+        region: "cn",
         cat: "industry",
         catLabel: "产业动态",
-        title: "YouTube Music推出新标签，AI生成音乐涌入流媒体平台",
-        desc: "YouTube Music发布了新的音乐标签，其中包括完全由AI生成或部分由AI参与的曲目，如作曲和演唱部分由AI完成。这些标签将出现在播放器页面上。随着AI生成音乐在流媒体平台上的涌现，这一举措标志着音乐产业在技术应用上的新进展。",
-        source: "TechCrunch",
-        url: "https://techcrunch.com/2026/10/14/youtube-music-launches-new-labels-as-ai-generated-music-floods-streaming-platforms/"
+        title: "腾讯上线绿泡泡短剧，对标字节红果",
+        desc: "腾讯低调上线绿泡泡短剧，主打“免费好剧，一点就看”，界面分为“免费剧场”“刷一刷”和“我的”，特斯拉Roadster跑车明日发布，豆包工作支持一键导入GPT、Claude对话。155款应用拒绝豆包助手AI自动化操作，腾讯、阿里、美团、快手旗下多款产品均在名单内，标志着移动端AI入口权博弈正式开启，行业认为这只是智能体时代生态确权的起点。",
+        source: "极客公园",
+        url: "http://www.geekpark.net/news/372366"
       },
       {
-        region: "intl",
+        region: "cn",
         cat: "industry",
         catLabel: "产业动态",
-        title: "OpenAI声称前员工将产品计划泄露给苹果",
-        desc: "OpenAI声称一名前员工在加入苹果公司前窃取了超过100份与其产品计划相关的文件。这些文件中至少包含了一款未发布设备的图片。OpenAI指控该员工将信息发送至个人账户，并向苹果公司领导层，包括亚洲运营副总裁展示。这一指控与苹果和OpenAI之间的商业机密纠纷有关。",
-        source: "The Verge",
-        url: "https://www.theverge.com/ai-artificial-intelligence/1011276/openai-employee-unreleased-product-plans"
+        title: "大模型工程师年薪高达800万，AI Infra翻身",
+        desc: "科锐国际华南区AI业务资深专家卢炳宁指出，AI Infra人才薪资近年来大幅上涨，2024年深圳一位候选人年薪从30万涨至50万，今年跳槽后直接达到100万。这轮涨薪起始于DeepSeek R1的发布，2025年初R1爆火，使得AI Infra人才被模型厂商疯抢，薪资翻倍现象频发。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/industrynews/azREeBbKSJ84PQTK.html"
       },
       {
-        region: "intl",
-        cat: "industry",
-        catLabel: "产业动态",
-        title: "Flox Intelligence开发AI技术，防止野生动物进入铁路、机场和道路",
-        desc: "Flox Intelligence推出AI技术，旨在通过边缘设备识别动物并使用特定物种的声音将它们驱离关键基础设施，如铁路、机场和道路。该技术能够有效保护关键基础设施，避免野生动物带来的潜在风险。",
-        source: "TechCrunch",
-        url: "https://techcrunch.com/2026/10/13/flox-intelligence-is-building-ai-to-keep-wildlife-away-from-trains-airports-and-roads/"
-      },
-      {
-        region: "intl",
-        cat: "industry",
-        catLabel: "产业动态",
-        title: "八州起诉OpenAI，称ChatGPT对儿童不安全",
-        desc: "OpenAI发布了ChatGPT，却面临八州起诉。这些州指控OpenAI在开发ChatGPT时将利润置于安全之上，未向客户警告ChatGPT的危险，违反了当地消费者保护法。起诉指出，OpenAI未能警告客户，导致青少年和成年人的家庭成员提起多起诉讼。",
-        source: "The Verge",
-        url: "https://www.theverge.com/ai-artificial-intelligence/1011500/openai-state-lawsuits-chatgpt-safety"
-      },
-      {
-        region: "intl",
+        region: "cn",
         cat: "tech",
         catLabel: "技术突破",
-        title: "DeepSeek网页/API服务恢复正常，中断近5个小时",
-        desc: "DeepSeek 官方于 2026 年 10 月 15 日早间发布，网页 / API 服务中断近 5 个小时，问题持续时间为 4 小时 52 分钟，这是 DeepSeek 本月以来遇到的最大规模服务问题。目前服务已恢复正常。",
-        source: "IT之家",
-        url: "https://www.ithome.com/1/013/352.htm"
+        title: "阶跃星辰发布Step 5 Preview，长程Agent竞争升级",
+        desc: "阶跃星辰公司发布了Step 5 Preview，这是一款针对长程Agent的上下文管理与训练系统。该系统旨在提升Agent在复杂环境中的决策能力，其技术规格和覆盖范围均有所提升。相较于之前的版本，Step 5 Preview在性能上有了显著提升，预计将推动长程Agent技术的发展。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/EwqsJX6f03ODRac6Kk4c?utm_source=rss&utm_medium=article"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "黄仁勋谈中国AI公司：算力紧缺，但拼命做成事",
+        desc: "英伟达CEO黄仁勋在谈论中国AI公司时指出，尽管算力资源紧张，但中国AI公司在努力推进项目。据InfoQ报道，这些公司在积极克服困难，致力于实现技术突破。黄仁勋强调，中国AI公司在算力短缺的情况下，正全力以赴推进项目，展现出强大的执行力。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/HC8SAgaZmHc6sfwp9gc9?utm_source=rss&utm_medium=article"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "OpenAI发布ChatGPT浏览器插件，可查看Chrome标签页",
+        desc: "OpenAI推出ChatGPT Chrome扩展，可查看用户已打开的浏览器标签页。扩展安装后，用户在ChatGPT的网页或桌面应用程序中标记Chrome时，ChatGPT可查看标签页，如演示视频中展示的对比功能。今日为Chrome用户提供重大升级，将计算机使用能力带给所有Chrome用户。",
+        source: "The Verge",
+        url: "https://www.theverge.com/ai-artificial-intelligence/1012510/openai-chatgpt-google-chrome-tabs"
       },
       {
         region: "intl",
         cat: "industry",
         catLabel: "产业动态",
         title: "Anthropic警告小型AI模型可能通过物联网设备自我复制",
-        desc: "AI公司Anthropic发布警告称，小型AI模型的发展可能导致新的自我复制恶意软件时代，该恶意软件可感染智能冰箱、吸尘器等物联网设备，并具有更强的抵抗清除能力。据称，到明年，更小的AI模型可能能够在各种物联网设备上自主复制。该公司近期的一项实验表明，这种能力最终可能使计算机蠕虫得以传播，无需人类交互即可感染不熟悉的物联网设备。",
+        desc: "AI公司Anthropic发布警告，指出小型AI模型可能通过物联网设备实现自我复制。据称，明年起，这些模型可能自主地在各种物联网设备上自我复制，最终可能导致无需人类交互的计算机蠕虫传播，感染未知物联网设备。",
         source: "Ars Technica",
         url: "https://arstechnica.com/security/2026/10/anthropic-warns-small-ai-models-could-self-replicate-through-iot-devices/"
+      },
+      {
+        region: "intl",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "上海AI实验室“书生-S2”大模型助力三维Ghys猜想证明",
+        desc: "上海人工智能实验室依托书生科学多模态大模型S2（书生-S2），通过人机协同完成了三维Ghys猜想证明，北京大学董彬教授、刘若川院士团队利用其开发的SHEAF框架完成形式化验证。相关论文已在预印本平台发布，形式化代码在Github平台公开。这标志着中国科学家首次用中国大模型攻克世界级数学难题。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/academic/ChIK9FvwSwlHmfFc.html"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "亚马逊设备负责人潘诺斯·帕纳伊展望AI设备替代应用的未来",
+        desc: "亚马逊设备负责人潘诺斯·帕纳伊在TechCrunch Disrupt活动中展望了未来，称环境AI设备将在后台工作，预测用户需求而非等待指令。他描述了一个未来，其中AI设备将取代使用应用程序的需要。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/10/15/amazon-devices-chief-panos-panay-sees-a-future-where-ai-devices-replace-the-need-to-use-apps/"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "Ricursive Intelligence投资AI设计芯片以解决计算危机",
+        desc: "Ricursive Intelligence发布AI芯片设计技术，该技术能设计芯片、学习迭代并优化设计，旨在自动化和加速芯片设计流程。该技术有望解决计算危机，自动化和加速芯片设计过程。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/10/14/ricursive-intelligence-is-betting-on-ai-designed-chips-to-help-solve-the-compute-crisis/"
       }
     ]
   },
