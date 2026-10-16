@@ -414,9 +414,23 @@
   .biz-container h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; color: #1a1a2e; }
   .biz-container .section-line { width: 48px; height: 3px; background: var(--coral-accent); border-radius: 2px; margin-bottom: 24px; }
   .biz-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
     margin-bottom: 32px;
   }
+  .biz-origin {
+    background: #faf7f4; border-left: 3px solid var(--coral-accent);
+    padding: 14px 18px; margin-bottom: 18px; border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .biz-origin-row { display: flex; gap: 12px; font-size: 13px; line-height: 1.85; }
+  .biz-origin-row + .biz-origin-row { margin-top: 4px; }
+  .biz-origin-label { flex: 0 0 62px; color: var(--coral-dark); font-weight: 600; }
+  .biz-origin-text { flex: 1; color: var(--text2); }
+  .biz-origin-note { margin-top: 8px; font-size: 11.5px; color: var(--text3); }
+  @media (max-width: 768px) {
+    .biz-origin-row { flex-direction: column; gap: 2px; }
+    .biz-origin-label { flex: none; }
+  }
+
   .biz-mobile-panel { display: none; }
   .biz-card {
     background: var(--white); border: 1px solid #eceade; border-radius: var(--radius);
@@ -1030,277 +1044,170 @@
 
     <div class="page-footer">人工智能产业链图谱 · 2026 · 版权所有 © 赛迪顾问人工智能与大数据研究中心</div>
   </div><!-- ==================== PAGE 2: 业务介绍 ==================== -->
-  <div class="page page-2">
-    <div class="biz-container">
-      <h2>业务介绍</h2>
-      <div class="section-line"></div>
-      <p style="font-size:14px;color:var(--text2);margin-bottom:24px;">以价值落地为最终导向，打破单一环节咨询局限，整合产业研究、市场战略、园区服务三大纬度能力，提供从宏观研判、商业设计到物理落地的一体化解决方案。</p>
-
-      <!-- ===== 服务数据统计 ===== -->
-      <div class="biz-stats">
-        <div class="biz-stat-item"><span class="biz-stat-num">14+</span><span class="biz-stat-label">国家部委</span></div>
-        <div class="biz-stat-item"><span class="biz-stat-num">31</span><span class="biz-stat-label">省市</span></div>
-        <div class="biz-stat-item"><span class="biz-stat-num">200+</span><span class="biz-stat-label">城市</span></div>
-        <div class="biz-stat-item"><span class="biz-stat-num">1000+</span><span class="biz-stat-label">企业</span></div>
-        <div class="biz-stat-item"><span class="biz-stat-num">500+</span><span class="biz-stat-label">园区</span></div>
-      </div>
-
-      <div class="biz-grid">
-        <div class="biz-card biz-tab-btn active" data-biz="1" onclick="switchBizTab('1')">
-          <div class="biz-num">01</div>
-          <h3>产业研究</h3>
-          <div class="biz-desc">立足宏观视野与技术前沿，梳理AI产业演进规律，理清技术落地路径，规避盲目布局风险，精准把握战略先机。</div>
-          <div class="biz-sub">
-            <span>宏观市场分析</span><span>行业竞争分析</span><span>技术趋势研判</span><span>产业智能咨询</span><span>政策研究</span>
+      <div class="page page-2">
+      <div class="biz-container">
+        <h2>业务介绍</h2>
+        <div class="section-line"></div>
+        <p style="font-size:14px;color:var(--text2);margin-bottom:24px;">对接赛迪顾问区域战略、园区咨询、产业规划、行研可研、企业战略、投融资咨询、数字转型七类咨询业务体系，将全业务能力聚焦到人工智能方向，为政府、园区、企业与投资机构提供从顶层谋划、产业研究到项目落地的一体化服务。</p>
+        <div class="biz-stats">
+          <div class="biz-stat-item"><span class="biz-stat-num">14+</span><span class="biz-stat-label">国家部委</span></div>
+          <div class="biz-stat-item"><span class="biz-stat-num">31</span><span class="biz-stat-label">省市</span></div>
+          <div class="biz-stat-item"><span class="biz-stat-num">200+</span><span class="biz-stat-label">城市</span></div>
+          <div class="biz-stat-item"><span class="biz-stat-num">1000+</span><span class="biz-stat-label">企业</span></div>
+          <div class="biz-stat-item"><span class="biz-stat-num">500+</span><span class="biz-stat-label">园区</span></div>
+        </div>
+        <div class="biz-grid">
+          <div class="biz-card biz-tab-btn active" data-biz="1" onclick="switchBizTab('1')">
+            <div class="biz-num">01</div>
+            <h3>区域战略</h3>
+            <div class="biz-desc">把人工智能纳入区域发展的顶层设计，从产业诊断、五年规划到智算布局与“人工智能+”行动，形成可落地、可考核的区域方案。</div>
+            <div class="biz-sub">
+              <span>区域AI产业诊断</span>              <span>人工智能专项规划</span>              <span>智算中心布局</span>              <span>“人工智能+”行动计划</span>              <span>区域AI招商策略</span>              <span>规划评估</span>
+            </div>
           </div>
-        </div>
-        <div class="biz-mobile-panel" id="bizMobile1"></div>
-        <div class="biz-card biz-tab-btn" data-biz="2" onclick="switchBizTab('2')">
-          <div class="biz-num">02</div>
-          <h3>市场战略</h3>
-          <div class="biz-desc">打通"技术可能性"到"商业可行性"的转化路径，让AI创新精准切入市场、建立壁垒并持续产生收入。</div>
-          <div class="biz-sub">
-            <span>战略布局</span><span>产品选型分析</span><span>投融资策略</span><span>尽职调查</span><span>智能招商</span><span>智慧金融</span>
+          <div class="biz-mobile-panel" id="bizMobile1"></div>
+          <div class="biz-card biz-tab-btn" data-biz="2" onclick="switchBizTab('2')">
+            <div class="biz-num">02</div>
+            <h3>园区咨询</h3>
+            <div class="biz-desc">面向各类园区与开发运营商，以人工智能特色化定位为核心，提供从战略谋划、升级申报到企业服务体系搭建的园区综合咨询。</div>
+            <div class="biz-sub">
+              <span>AI特色园区战略</span>              <span>园中园专项规划</span>              <span>先导区申报</span>              <span>企业全生命周期服务</span>              <span>五年陪伴</span>              <span>高质量发展诊断</span>
+            </div>
           </div>
-        </div>
-        <div class="biz-mobile-panel" id="bizMobile2"></div>
-        <div class="biz-card biz-tab-btn" data-biz="3" onclick="switchBizTab('3')">
-          <div class="biz-num">03</div>
-          <h3>园区服务</h3>
-          <div class="biz-desc">面向园区、传统企业与AI企业三类主体，以智能化升级与产业生态培育双轮驱动，提供从诊断规划到招商运营的全链条赋能。</div>
-          <div class="biz-sub">
-            <span>产业定位设计</span><span>智能化升级规划</span><span>产业生态构建</span><span>运营模式设计</span><span>五年陪伴</span><span>企业赋能</span>
+          <div class="biz-mobile-panel" id="bizMobile2"></div>
+          <div class="biz-card biz-tab-btn" data-biz="3" onclick="switchBizTab('3')">
+            <div class="biz-num">03</div>
+            <h3>产业规划</h3>
+            <div class="biz-desc">为行业主管部门与产业载体明确人工智能赛道选择、空间布局与招商路径，形成可执行的产业图谱与行动计划。</div>
+            <div class="biz-sub">
+              <span>产业对标诊断</span>              <span>AI产业专项规划</span>              <span>产业链招商图谱</span>              <span>应用场景开放</span>              <span>产业生态策划</span>              <span>产业IP策划</span>
+            </div>
           </div>
+          <div class="biz-mobile-panel" id="bizMobile3"></div>
+          <div class="biz-card biz-tab-btn" data-biz="4" onclick="switchBizTab('4')">
+            <div class="biz-num">04</div>
+            <h3>行研可研</h3>
+            <div class="biz-desc">把行业研究与可行性研究落到人工智能细分赛道，为政府、园区、企业与投资机构提供可核验的市场判断与投资决策依据。</div>
+            <div class="biz-sub">
+              <span>行业研究报告</span>              <span>可行性研究</span>              <span>产业链图谱</span>              <span>竞争格局分析</span>              <span>市场进入策略</span>              <span>企业业务战略</span>
+            </div>
+          </div>
+          <div class="biz-mobile-panel" id="bizMobile4"></div>
+          <div class="biz-card biz-tab-btn" data-biz="5" onclick="switchBizTab('5')">
+            <div class="biz-num">05</div>
+            <h3>企业战略</h3>
+            <div class="biz-desc">面向大模型企业、AI应用企业与准备引入AI的传统企业，打通从价值锚定、产品选型到组织变革的战略落地路径。</div>
+            <div class="biz-sub">
+              <span>总体战略</span>              <span>AI业务战略</span>              <span>产品选型矩阵</span>              <span>投资战略</span>              <span>营销与商业化</span>              <span>组织变革</span>
+            </div>
+          </div>
+          <div class="biz-mobile-panel" id="bizMobile5"></div>
+          <div class="biz-card biz-tab-btn" data-biz="6" onclick="switchBizTab('6')">
+            <div class="biz-num">06</div>
+            <h3>投融资咨询</h3>
+            <div class="biz-desc">围绕AI企业融资并购、募投设计与园区产业基金运作，提供财务顾问、尽职调查与招商投资一体化的投融资服务。</div>
+            <div class="biz-sub">
+              <span>财务顾问</span>              <span>募投项目设计</span>              <span>尽职调查</span>              <span>价值评估</span>              <span>产业基金</span>              <span>招商投资策略</span>
+            </div>
+          </div>
+          <div class="biz-mobile-panel" id="bizMobile6"></div>
+          <div class="biz-card biz-tab-btn" data-biz="7" onclick="switchBizTab('7')">
+            <div class="biz-num">07</div>
+            <h3>数字转型</h3>
+            <div class="biz-desc">为政府、园区与企业的数字化转型项目提供从能力诊断、规划编制到工程全过程管理的智能化落地服务。</div>
+            <div class="biz-sub">
+              <span>数字化能力诊断</span>              <span>AI赋能政务</span>              <span>智算工程咨询</span>              <span>初设与概预算</span>              <span>绩效评价</span>              <span>全过程管理</span>
+            </div>
+          </div>
+          <div class="biz-mobile-panel" id="bizMobile7"></div>
         </div>
-        <div class="biz-mobile-panel" id="bizMobile3"></div>
-      </div>
-
-      <!-- ===== 业务详情区（Tab切换） ===== -->
-
-      <!-- ===== Tab 1: 产业研究 ===== -->
-
-      <!-- ===== Tab 1: 产业研究 ===== -->
-      <div class="biz-detail" id="bizDetail1" style="display:block;">
-        <h3 class="biz-detail-title">产业研究：洞察市场，把握趋势</h3>
-
-        <div class="biz-tags-row">
-          <span class="biz-tag-chip">生成式AI</span>
-          <span class="biz-tag-chip">大模型</span>
-          <span class="biz-tag-chip">计算机视觉</span>
-          <span class="biz-tag-chip">智能语音</span>
-          <span class="biz-tag-chip">NLP</span>
-          <span class="biz-tag-chip">智算中心</span>
-          <span class="biz-tag-chip">AI行业应用</span>
-          <span class="biz-tag-chip">云计算</span>
-          <span class="biz-tag-chip">大数据</span>
-          <span class="biz-tag-chip">数据要素</span>
+        <div class="biz-detail" id="bizDetail1" style="display:block;">
+          <h3 class="biz-detail-title">区域战略：把人工智能写进区域发展的顶层设计</h3>
+          <p class="biz-detail-sub">面向国家部委与各级城市，以区域资源禀赋和产业基础为起点，回答一个地方“人工智能该怎么布局、先做什么、靠什么承载”的问题。</p>
+        <div class="biz-origin">
+          <div class="biz-origin-row"><span class="biz-origin-label">服务对象</span><span class="biz-origin-text">国家部委、城市、城区、县域、城市新区等</span></div>
+          <div class="biz-origin-row"><span class="biz-origin-label">咨询内容</span><span class="biz-origin-text">为各级政府提供区域经济诊断分析、区域发展战略、国民经济和社会发展五年规划、现代化产业体系综合规划、产业专项规划、行动计划、规划评估、招商引资战略研究、活动策划等区域综合咨询服务。</span></div>
+          <div class="biz-origin-note">以上为赛迪顾问官网业务口径；以下为本中心在人工智能方向的落地细化。</div>
         </div>
-
+        <div class="biz-sub-title" style="margin-top:20px;">人工智能方向的落地重点</div>
         <div class="biz-method-grid">
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">01</span> 宏观市场分析</div>
-            <div class="method-tag">核心方法：PESTEL分析</div>
-            <div class="method-desc">围绕政治、经济、社会、技术、环境及法律六大维度展开深度扫描，全面评估AI产业所处的外部宏观环境，精准识别推动产业变革的关键驱动力。</div>
-            <div class="method-value-title">核心价值</div>
-            <div class="method-value">前瞻性洞察——帮助企业提前捕捉政策红利与技术风口，规避战略盲区。</div>
+            <div class="method-header"><span class="method-num">01</span> 区域人工智能产业诊断</div>
+            <div class="method-desc">在区域经济诊断分析框架下叠加人工智能专项维度，摸清一个地区发展AI的真实基础与约束条件。</div>
+            <div class="method-value-title">诊断维度</div>
+            <div class="method-value">算力条件（在建/在用智算规模与上架率）、数据要素（公共数据开放与行业数据积累）、产业基础（软件信息服务与电子信息规模）、人才供给（高校AI专业与从业人数）、场景存量（政务与主导行业的数字化水平）。</div>
             <div class="method-extra">
-              <div class="method-value-title">分析维度</div>
-              <div class="method-value">政治维度关注国家AI战略布局与监管走向；经济维度评估算力成本与市场体量；社会维度洞察AI接受度与伦理关切；技术维度跟踪大模型迭代节奏；环境维度考量绿色算力需求；法律维度研判数据合规与AI立法进程。</div>
+              <div class="method-value-title">成果形式</div>
+              <div class="method-value">区域人工智能产业基础评估报告，含与同类城市的对标位次、可优先切入的赛道清单与不宜追高的方向提示。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
-
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">02</span> 行业竞争分析</div>
-            <div class="method-tag">核心方法：波特五力模型</div>
-            <div class="method-desc">深入解构行业竞争全景，从供应商议价能力、购买者议价能力、潜在新进入者威胁、替代品压力及现有玩家竞争烈度五大维度量化评估。</div>
-            <div class="method-value-title">核心价值</div>
-            <div class="method-value">客观决策依据——打破主观认知偏差，提供真实可信的竞争态势判断。</div>
+            <div class="method-header"><span class="method-num">02</span> 区域人工智能产业专项规划</div>
+            <div class="method-desc">承接国民经济和社会发展五年规划与现代化产业体系综合规划，编制人工智能专项规划与三年行动方案。</div>
+            <div class="method-value-title">规划内容</div>
+            <div class="method-value">发展基础与形势研判、总体思路与目标指标体系、重点赛道选择（基础层/技术层/应用层）、空间布局与载体设计、重大项目与重大平台谋划、要素保障与组织实施。</div>
             <div class="method-extra">
-              <div class="method-value-title">AI领域应用</div>
-              <div class="method-value">评估算力供应商（GPU/ASIC）议价能力、云厂商对下游的议价能力、开源模型对新进入者的门槛影响、传统软件替代AI方案的压力、以及大厂之间的模型军备竞赛烈度。</div>
+              <div class="method-value-title">目标设计</div>
+              <div class="method-value">核心产业规模、智算供给规模、大模型与智能体产品数、AI应用渗透率、AI企业数量与规上企业占比等可考核指标。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
-
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">03</span> 技术趋势研判</div>
-            <div class="method-tag">核心方法：技术成熟度曲线</div>
-            <div class="method-desc">精准定位各项AI细分技术的演进阶段，针对大模型、智能Agent、具身智能等前沿方向进行周期判断，识别泡沫期与成熟期。</div>
-            <div class="method-value-title">核心价值</div>
-            <div class="method-value">系统化路径设计——为研发投入、技术选型及商业化节奏提供决策框架。</div>
+            <div class="method-header"><span class="method-num">03</span> 智算中心与算力基础设施布局</div>
+            <div class="method-desc">统筹智算中心的建设规模、技术路线与运营模式，避免重复建设与建成即闲置。</div>
+            <div class="method-value-title">核心判断</div>
+            <div class="method-value">依据本地训练与推理需求结构确定规模，按国产芯片适配要求确定技术路线，按财政承受能力确定投建运模式，并设计跨域算力调度与接入机制。</div>
             <div class="method-extra">
-              <div class="method-value-title">当前重点研判方向</div>
-              <div class="method-value">通用大模型能力边界、多模态融合进展、Agent自主决策成熟度、端侧模型部署可行性、具身智能商业化时间窗口、AI安全与对齐技术演进。</div>
+              <div class="method-value-title">风险提示</div>
+              <div class="method-value">重点评估上架率、单位算力能耗、国产化率与投资回收期四类指标，对超出需求预期的扩建方案给出调整建议。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">04</span> “人工智能+”行动计划与场景清单</div>
+            <div class="method-desc">把“人工智能+”落到具体行业与具体环节，形成可发布、可申报、可考核的场景机会清单。</div>
+            <div class="method-value-title">编制方法</div>
+            <div class="method-value">按主导行业逐一拆解业务流程，筛选高频、高价值、数据可得的环节，形成“一景一策”建设指南与场景机会清单。</div>
+            <div class="method-extra">
+              <div class="method-value-title">重点方向</div>
+              <div class="method-value">智能制造、智能网联汽车、智慧医疗、智慧金融、智慧政务、智慧教育等本地具备产业基础的领域。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">05</span> 区域人工智能招商引资战略</div>
+            <div class="method-desc">在招商引资战略研究基础上嵌入人工智能产业链图谱，明确招什么、去哪招、靠什么引。</div>
+            <div class="method-value-title">策略构成</div>
+            <div class="method-value">目标企业名录（按产业链环节与融资轮次筛选）、招商路径设计（产业链招商、资本招商、以商招商）、政策工具包与落地服务流程。</div>
+            <div class="method-extra">
+              <div class="method-value-title">配套研究</div>
+              <div class="method-value">区域招商竞争力对标、落地成本测算、政策兑现效率评估。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">06</span> 规划评估与滚动修编</div>
+            <div class="method-desc">对已实施的AI相关规划开展中期与期末评估，支撑规划修编与考核问责。</div>
+            <div class="method-value-title">评估内容</div>
+            <div class="method-value">目标指标完成度、重大项目落地率、资金使用效率、政策条款兑现情况、与上位规划的衔接一致性。</div>
+            <div class="method-extra">
+              <div class="method-value-title">成果形式</div>
+              <div class="method-value">规划实施评估报告、指标调整建议、下一周期重点任务清单。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
         </div>
-
-        <div class="biz-sub-title" style="margin-top:20px;">数字化研究工具</div>
-        <div class="biz-method-grid">
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">04</span> 产业智能咨询平台</div>
-            <div class="tool-badge">AI赋能产业决策</div>
-            <div class="method-desc">基于产业知识大模型应用系统，以行业知识库为核心，面向工业和信息化领域提供AI驱动的产业分析与决策支持。</div>
-            <div class="method-extra">
-              <div class="method-value-title">核心功能</div>
-              <div class="method-value"><b>智能问答</b>——产业知识精准问答；<b>AI诊断</b>——诊断产业发展趋势现状，辅助预测决策；<b>智能研报</b>——结合赛迪研究逻辑，AI辅助研报撰写；<b>AI数据挖掘</b>——挖掘多要素数据关联性，研判海量数据趋势；<b>知识库</b>——编辑上传个人知识库，智能训练专属模型。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">05</span> 政策研究与标准制定</div>
-            <div class="method-desc">深度跟踪解读国家及地方AI产业政策，涵盖十五五部署、专项债、超长期国债等政策工具，为政府和企业提供政策适配与项目谋划支持。</div>
-            <div class="method-extra">
-              <div class="method-value-title">政策研究覆盖</div>
-              <div class="method-value">国家层面：十五五部署AI相关方向、新质生产力政策、算力基础设施布局、数据要素市场化配置。地方层面：各省市AI产业发展行动计划、智算中心建设指南、AI专项产业基金设立。标准层面：参与AI伦理、安全、评测等领域标准研究与制定。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">06</span> 产业数据库与指数体系</div>
-            <div class="method-desc">构建覆盖AI全产业链的多维数据库，持续追踪企业动态、技术进展、投融资事件与市场指标，定期发布行业指数与白皮书。</div>
-            <div class="method-extra">
-              <div class="method-value-title">数据产品</div>
-              <div class="method-value">已发布《中国大模型市场研究报告》《中国智能体市场研究报告》等年度权威报告，建立AI企业竞争力评估模型，为大模型、智算中心、AI应用等细分赛道提供持续追踪与量化分析。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
         </div>
-      </div>
-
-      <!-- ===== Tab 2: 市场战略 ===== -->
-      <div class="biz-detail" id="bizDetail2" style="display:none;">
-        <h3 class="biz-detail-title">市场战略：确保战略可执行，技术可落地</h3>
-
-        <div class="biz-sub-title">战略布局 · Rewired框架</div>
-        <div class="biz-method-grid">
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">01</span> 价值锚定</div>
-            <div class="method-desc">明确AI驱动的核心价值主张，判断技术落地后是直接实现降本增效、优化客户体验，还是开拓全新业务场景与收入来源。</div>
-            <div class="method-extra">
-              <div class="method-value-title">落地方法</div>
-              <div class="method-value">通过业务流程拆解识别高价值AI应用场景，建立"技术可行性×商业价值"二维评估矩阵，优先筛选投入产出比最高的场景切入。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">02</span> 敏捷交付</div>
-            <div class="method-desc">设计适配AI的敏捷交付模式，通过跨职能小组以MVP快速验证价值假设，持续迭代，降低大规模落地前的不确定性。</div>
-            <div class="method-extra">
-              <div class="method-value-title">交付节奏</div>
-              <div class="method-value">4-6周完成首个MVP版本，建立模型效果评估指标体系，每迭代周期输出可量化的业务改善数据，确保技术进展与商业目标同频。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">03</span> 组织变革</div>
-            <div class="method-desc">技术落地的核心障碍往往在人。需配套调整业务流程、考核机制，通过分层培训减少抵触，构建全员支持的数字化文化。</div>
-            <div class="method-extra">
-              <div class="method-value-title">变革路径</div>
-              <div class="method-value">高管层建立AI战略共识，中层管理者重塑KPI体系纳入AI效能指标，基层员工开展场景化AI工具培训，设立内部AI创新激励机制。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
+        <div class="biz-detail" id="bizDetail2" style="display:none;">
+          <h3 class="biz-detail-title">园区咨询：让园区成为人工智能落地的承载空间</h3>
+          <p class="biz-detail-sub">面向高新区、经开区等各类园区，以AI特色化定位与全生命周期企业服务为主线，提供从战略谋划到申报创建、运营提升的综合咨询。</p>
+        <div class="biz-origin">
+          <div class="biz-origin-row"><span class="biz-origin-label">服务对象</span><span class="biz-origin-text">高新区、经开区、国家自主创新示范区、综合保税区、工业园区、园中园等</span></div>
+          <div class="biz-origin-row"><span class="biz-origin-label">咨询内容</span><span class="biz-origin-text">为园区管委会和园区开发运营商提供中长期发展战略，产业专项规划，高质量发展诊断对标与跃升发展，重点难点问题专题研究，各类园区创建、升级、试点示范申报，全生命周期企业服务体系构建等园区综合咨询服务。</span></div>
+          <div class="biz-origin-note">以上为赛迪顾问官网业务口径；以下为本中心在人工智能方向的落地细化。</div>
         </div>
-
-        <div class="biz-sub-title" style="margin-top:20px;">产品选型矩阵分析</div>
-        <div class="biz-method-grid">
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">04</span> 技术可行性评估</div>
-            <div class="method-desc">评估模型成熟度、部署难度与运维复杂度，确保技术可用、易用、易维护。</div>
-            <div class="method-extra">
-              <div class="method-value-title">评估维度</div>
-              <div class="method-value">模型能力（精度/泛化/推理速度）、部署方式（云端/边缘/端侧）、数据依赖（训练数据量与质量）、运维成本（模型更新频率与资源消耗）、生态成熟度（框架与工具链支持）。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">05</span> 商业可持续性分析</div>
-            <div class="method-desc">测算技术应用后的投入产出比，判断能否形成可持续的商业模式闭环。</div>
-            <div class="method-extra">
-              <div class="method-value-title">分析框架</div>
-              <div class="method-value">构建3年财务模型，覆盖算力成本、数据标注、模型迭代、人力投入等全成本项，对标行业标杆量化效率提升与收入增长，测算投资回收期与净现值。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">06</span> 综合成本与效益</div>
-            <div class="method-desc">横向对比同类方案的采购、集成与迭代成本，筛选高性价比选项。</div>
-            <div class="method-extra">
-              <div class="method-value-title">对比维度</div>
-              <div class="method-value">开源 vs 商业模型、自建 vs 调用API、通用 vs 行业专属模型，从TCO（总拥有成本）视角综合评估采购成本、集成成本、运维成本与迁移成本。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-        </div>
-
-        <div class="biz-sub-title" style="margin-top:20px;">投融资策略与尽职调查</div>
-        <div class="biz-method-grid">
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">01</span> 投融资策略分析</div>
-            <div class="method-desc">面向企业：量身设计阶梯式融资路径与股权架构，精准对接匹配投资者。面向投资机构：应用"AI价值创造矩阵"方法论，全方位扫描与潜力评级。</div>
-            <div class="method-extra">
-              <div class="method-value-title">服务内容</div>
-              <div class="method-value">企业端：融资节奏设计、估值模型搭建、BP优化、投资人匹配。机构端：赛道全景扫描、标的筛选清单、技术壁垒评估、商业化路径验证。已累计对接企业1000+家，协助落地项目80+个。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">02</span> 尽职调查</div>
-            <div class="method-desc">包含核心技术尽调、核心数据尽调、AI专项项目尽调、商业化落地尽调四大维度。</div>
-            <div class="method-extra">
-              <div class="method-value-title">尽调框架</div>
-              <div class="method-value"><b>技术尽调</b>——模型创新性与壁垒验证、算法专利分析；<b>数据尽调</b>——数据来源合规性、标注质量与数据飞轮效应评估；<b>项目尽调</b>——市场适配能力与伦理合规审查；<b>商业化尽调</b>——场景真实需求验证与商业模式可行性论证。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-        </div>
-
-        <div class="biz-sub-title" style="margin-top:20px;">数字化赋能工具</div>
-        <div class="biz-method-grid">
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">07</span> 智能招商</div>
-            <div class="tool-badge">数字化智能招商服务</div>
-            <div class="method-desc">为政府与园区提供AI驱动的产业监测与精准招商服务，覆盖全国产业布局研判、目标企业锁定、项目流程跟踪全链路。</div>
-            <div class="method-extra">
-              <div class="method-value-title">核心功能</div>
-              <div class="method-value"><b>产业监测</b>——全国产业布局与区域产业研判；<b>精准招商</b>——产业链招商、地图招商、资本招商、以商招商多模式并行；<b>项目管理</b>——项目线索录入、流程跟踪、招商活动管理一站式解决。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">08</span> 智慧金融赋能</div>
-            <div class="tool-badge">精准企业融资服务</div>
-            <div class="method-desc">为企业提供全生命周期融资赋能，涵盖成长追踪、上市培育、供应链金融与政策资金对接。</div>
-            <div class="method-extra">
-              <div class="method-value-title">服务体系</div>
-              <div class="method-value"><b>企业成长追踪仪</b>——实现梯度培育可视化；<b>上市培育加速器</b>——为"千里马"全程护航；<b>产业链金融导航仪</b>——一链一策强生态；<b>普惠金融灌溉网</b>——钱随产业精准达；<b>政策落地直通车</b>——亿元红利不跑偏。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">09</span> 数字化转型咨询</div>
-            <div class="method-desc">提供从数字化顶层设计到深化设计、全过程管理咨询的一站式数字化转型服务，帮助企业构建AI驱动的数字化能力体系。</div>
-            <div class="method-extra">
-              <div class="method-value-title">服务范围</div>
-              <div class="method-value">数字化战略设计、技术架构设计、数据治理体系搭建、AI中台建设咨询、数字化组织变革、数字人才体系设计。已服务1000+家企业，覆盖制造、金融、零售、政务等核心行业。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ===== Tab 3: 园区服务 ===== -->
-      <div class="biz-detail" id="bizDetail3" style="display:none;">
-        <h3 class="biz-detail-title">园区服务：研究 · 咨询 · 科创 · 数字化 · 投融资一站式解决方案</h3>
-        <p class="biz-detail-sub">以五年陪伴式服务为节奏，面向产业园区、传统企业、AI企业三类主体的差异化需求，提供五大类别、十七项专业服务，从产业诊断到资本闭环全链路覆盖。</p>
-
-        <!-- ===== 三类服务对象 ===== -->
-        <div class="biz-value-grid" style="margin-bottom:24px;">
+        <div class="biz-value-grid" style="margin-bottom:20px;">
           <div class="value-card" style="border-left:3px solid #0F6E56;">
             <h4 style="font-size:14px;">政府与园区</h4>
             <div class="value-item">产业定位与智能化升级规划，精准招商与资金申报，打造智慧、低碳、高效运营的现代化产业载体</div>
@@ -1314,8 +1221,76 @@
             <div class="value-item">园区落地方案对接，场景创新与市场拓展，投融资与政策申报，人才引育全方位支撑</div>
           </div>
         </div>
-
-        <div class="biz-sub-title">五年陪伴式服务体系</div>
+        <div class="biz-sub-title" style="margin-top:20px;">人工智能方向的落地重点</div>
+        <div class="biz-method-grid">
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">01</span> 人工智能特色园区中长期发展战略</div>
+            <div class="method-desc">为园区管委会与开发运营商明确人工智能在园区产业体系中的位置、节奏与组织方式。</div>
+            <div class="method-value-title">战略内容</div>
+            <div class="method-value">产业定位与赛道选择、发展阶段与阶段性目标、开发运营模式设计、投入产出与资金平衡测算、组织保障与考核机制。</div>
+            <div class="method-extra">
+              <div class="method-value-title">典型命题</div>
+              <div class="method-value">传统制造园区如何导入AI改造存量产业，新建园区如何在大模型、具身智能、AI芯片等环节中选定主攻方向。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">02</span> 人工智能园中园专项规划</div>
+            <div class="method-desc">针对园中园编制专项规划，明确细分赛道、空间载体与配套政策。</div>
+            <div class="method-value-title">规划要点</div>
+            <div class="method-value">细分赛道选择（大模型应用、数据标注、智能终端、具身智能零部件等）、空间布局与楼宇适配、公共技术平台配置、入驻标准与退出机制。</div>
+            <div class="method-extra">
+              <div class="method-value-title">配套设计</div>
+              <div class="method-value">概念策划、开发模式谋划、智能化基础设施设计与首期启动区方案。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">03</span> 高质量发展诊断对标与跃升发展</div>
+            <div class="method-desc">对园区开展高质量发展诊断，对标同类标杆园区，形成跃升发展路径。</div>
+            <div class="method-value-title">诊断框架</div>
+            <div class="method-value">产业能级、创新浓度、产出效率、绿色低碳、数字化水平五个维度的量化对标。</div>
+            <div class="method-extra">
+              <div class="method-value-title">跃升路径</div>
+              <div class="method-value">诊断评估—对标分析—跃升方案编制—申报材料编制—关键节点陪跑的全周期服务。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">04</span> 各类园区创建、升级与试点示范申报</div>
+            <div class="method-desc">支撑园区创建与升级，以及人工智能相关试点示范的申报工作。</div>
+            <div class="method-value-title">申报类型</div>
+            <div class="method-value">国家人工智能创新应用先导区、国家新一代人工智能创新发展试验区、高标准数字园区、各类高新区与经开区升级创建。</div>
+            <div class="method-extra">
+              <div class="method-value-title">服务内容</div>
+              <div class="method-value">申报条件比对、短板补齐方案、申报材料编制、汇报答辩支撑与审批节点跟踪。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">05</span> 全生命周期人工智能企业服务体系</div>
+            <div class="method-desc">为园区构建覆盖AI企业从注册到上市各阶段的服务体系。</div>
+            <div class="method-value-title">服务链条</div>
+            <div class="method-value">注册落地与政策兑现—场景对接与首台套应用—融资对接与股权设计—规模扩张与空间保障—上市培育与梯度申报。</div>
+            <div class="method-extra">
+              <div class="method-value-title">要素配置</div>
+              <div class="method-value">算力券、数据券、模型券等工具设计，公共技术平台与概念验证中心配置，产业导师与人才实训机制。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">06</span> 高标准数字园区与智慧运营</div>
+            <div class="method-desc">对标高标准数字园区建设要求，设计数字底座与智慧运营体系。</div>
+            <div class="method-value-title">建设内容</div>
+            <div class="method-value">数字底座（园区网络、算力接入、数据安全）、绿色低碳（碳台账、零碳园区对标、AI能效优化）、智慧运营（运营管理系统、态势“一屏”监管）。</div>
+            <div class="method-extra">
+              <div class="method-value-title">运营指标</div>
+              <div class="method-value">企业入驻办理时效、能耗强度、空间利用率、企业服务响应时长。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+        </div>
+        <div class="biz-sub-title" style="margin-top:20px;">五年陪伴式服务体系</div>
         <div class="biz-timeline">
           <div class="biz-timeline-item">
             <div class="biz-timeline-dot">1</div>
@@ -1348,245 +1323,428 @@
             <div class="biz-timeline-desc">高端平台创建，产业生态闭环，区域能级跃升</div>
           </div>
         </div>
-
-        <!-- ===== 一、研究服务 ===== -->
-        <div class="biz-sub-title"><span class="cat-badge" style="background:#EEEDFE;color:#534AB7;">研究</span> 研究服务</div>
-        <div class="biz-method-grid">
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">01</span> 定制化研究（含标准化产品）</div>
-            <div class="method-desc">聚焦前沿产业趋势与政策动向，提供标准化研究成果订阅与定制化深度研究服务，为园区和企业决策提供准确情报支撑。</div>
-            <div class="method-value-title">标准化研究</div>
-            <div class="method-value">赛迪满天星会员账号，定期发送系列产业研究——大模型产业洞察、具身智能前沿、AI芯片演进、独角兽洞察、新型工业化期刊、赛迪前瞻等。</div>
-            <div class="method-extra">
-              <div class="method-value-title">定制化研究</div>
-              <div class="method-value"><b>政策研判</b>——各级产业政策、科技创新政策解读与时序研判；<b>产业深度</b>——前沿技术预测预见、垂直赛道深度研究（大模型/具身智能/AI芯片等）、产业链图谱绘制与动态更新；<b>竞争对标</b>——全国产业集聚区竞争力解码、区域差异化定位分析。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
         </div>
-
-        <!-- ===== 二、咨询服务 ===== -->
-        <div class="biz-sub-title" style="margin-top:20px;"><span class="cat-badge" style="background:#E1F5EE;color:#0F6E56;">咨询</span> 咨询服务</div>
+        <div class="biz-detail" id="bizDetail3" style="display:none;">
+          <h3 class="biz-detail-title">产业规划：把人工智能赛道落到空间与项目</h3>
+          <p class="biz-detail-sub">为省市区行业主管部门及产业载体提供人工智能与关联产业的对标诊断、专项规划、招商图谱与生态策划，形成可执行方案。</p>
+        <div class="biz-origin">
+          <div class="biz-origin-row"><span class="biz-origin-label">服务对象</span><span class="biz-origin-text">省市区行业主管部门及相关产业载体</span></div>
+          <div class="biz-origin-row"><span class="biz-origin-label">咨询内容</span><span class="biz-origin-text">围绕高端装备、智能网联汽车、智能制造、电子信息、软件和信息服务、集成电路、医药健康、数字经济、双碳经济、人工智能、大数据、物联网、新材料等重点产业方向，为各行业主管部门及产业载体提供产业对标诊断、产业专项规划、产业行动计划、产业招商图谱、产业生态策划、产业IP策划等咨询服务。</span></div>
+          <div class="biz-origin-note">以上为赛迪顾问官网业务口径；以下为本中心在人工智能方向的落地细化。</div>
+        </div>
+        <div class="biz-sub-title" style="margin-top:20px;">人工智能方向的落地重点</div>
         <div class="biz-method-grid">
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">02</span> 摸底诊断与标杆研学</div>
-            <div class="method-desc">深度评估区域产业发展基础与智能化升级需求，解码全国标杆园区与产业集聚区成功经验，为园区和企业找准定位提供依据。</div>
-            <div class="method-value-title">摸底诊断</div>
-            <div class="method-value">区域产业资源禀赋摸底、基础设施现状评估、人才储备分析、周边区域竞争形势研判。</div>
+            <div class="method-header"><span class="method-num">01</span> 人工智能产业对标诊断</div>
+            <div class="method-desc">在产业对标诊断框架下，评估本地人工智能产业在全国的位次与结构短板。</div>
+            <div class="method-value-title">对标维度</div>
+            <div class="method-value">企业数量与规模结构、注册资本分布、专精特新与独角兽数量、产业链完整度、创新平台数量、人才密度。</div>
             <div class="method-extra">
-              <div class="method-value-title">标杆研学</div>
-              <div class="method-value">全国标杆园区与产业集聚区竞争力解码，涵盖北京中关村、上海张江、深圳湾等核心区域，提供实地访学考察与深度对标报告。</div>
+              <div class="method-value-title">交付成果</div>
+              <div class="method-value">对标诊断报告，明确优势环节、缺失环节与可补齐环节。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
-
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">03</span> 产业园区发展规划设计</div>
-            <div class="method-desc">立足区域资源禀赋与产业基础，锚定智能制造、数字经济、新能源等核心赛道，制定3-5年产业发展蓝图与智能化升级路径。</div>
-            <div class="method-value-title">设计体系</div>
-            <div class="method-value"><b>成熟园区</b>——五年发展纲要、产业体系优化升级、高质量发展行动计划；<b>特色/专业园区</b>——前期概念策划、产业定位设计、开发模式谋划、空间布局与智能化基础设施设计。</div>
+            <div class="method-header"><span class="method-num">02</span> AI产业链图谱与招商图谱</div>
+            <div class="method-desc">绘制人工智能产业链图谱，并转化为可直接用于招商的企业名录。</div>
+            <div class="method-value-title">图谱层级</div>
+            <div class="method-value">基础层（AI芯片、智算中心、数据服务）、技术层（大模型、算法框架、开发平台）、应用层（数字级AI应用、物理级AI应用）。</div>
             <div class="method-extra">
-              <div class="method-value-title">专项方案</div>
-              <div class="method-value">细分赛道专项方案编制——产业创新融合方案、招商图谱、智能化平台空间布局设计等。</div>
+              <div class="method-value-title">应用方式</div>
+              <div class="method-value">按缺失环节锁定目标企业，按融资轮次与技术方向筛选，形成招商名录与对接优先级。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
-
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">03</span> 产业行动计划与空间布局</div>
+            <div class="method-desc">编制人工智能产业行动计划，并落到具体载体与地块。</div>
+            <div class="method-value-title">计划要素</div>
+            <div class="method-value">重点任务清单、重大项目清单、重大平台清单、政策工具清单，配套年度分解与责任分工。</div>
+            <div class="method-extra">
+              <div class="method-value-title">空间设计</div>
+              <div class="method-value">产业集聚区选址、楼宇与厂房适配、公共服务平台布局、智算与数据设施配套。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
           <div class="method-card expandable" onclick="toggleMethod(this)">
             <div class="method-header"><span class="method-num">04</span> 应用场景培育与开放</div>
-            <div class="method-desc">围绕智能化技术落地，策划场景创新清单，建设场景图谱，为园区和企业打造可展示、可体验、可复制的应用生态。</div>
-            <div class="method-value-title">场景策划</div>
-            <div class="method-value">"一景一策"场景建设指南编制——智能网联、具身智能、智能制造、智慧医疗、智慧金融等标杆场景创新策划。</div>
+            <div class="method-desc">策划场景创新清单，建设场景图谱，形成可展示、可体验、可复制的应用生态。</div>
+            <div class="method-value-title">“双图双录”体系</div>
+            <div class="method-value"><b>双图</b>——场景创新图谱（全景展示可落地的场景矩阵）、场景空间图谱（场景与物理空间对应）；<b>双录</b>——场景技术目录（所需技术栈与成熟度）、场景数据目录（数据需求与获取路径）。</div>
             <div class="method-extra">
-              <div class="method-value-title">"双图双录"体系</div>
-              <div class="method-value"><b>双图</b>——场景创新图谱（全景展示可落地的场景矩阵）、场景空间图谱（场景与物理空间对应）；<b>双录</b>——场景技术目录（所需技术栈与成熟度）、场景数据目录（数据需求与获取路径）。同步编制场景机会清单与场景能力清单。</div>
+              <div class="method-value-title">机会清单</div>
+              <div class="method-value">同步编制场景机会清单与场景能力清单，支撑供需撮合与揭榜挂帅。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
-
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">05</span> 智能化基础设施设计</div>
-            <div class="tool-badge">高标准数字园区</div>
-            <div class="method-desc">对标《高标准数字园区建设指南》，评估数字底座水平，设计布局智算中心、算力调度平台、数据标注基地等核心设施，并覆盖零碳园区建设需求。</div>
-            <div class="method-value-title">建设内容</div>
-            <div class="method-value"><b>数字底座</b>——智算中心机房设计、算力调度平台设计、高速网络与数据安全体系；<b>绿色低碳</b>——基础碳台账编制、零碳园区评价对标、AI驱动能效优化方案；<b>智慧运营</b>——智慧园区运营管理系统部署、园区运营态势"一屏"监管。</div>
+            <div class="method-header"><span class="method-num">05</span> 产业生态策划与产业IP策划</div>
+            <div class="method-desc">围绕人工智能主题设计产业生态与品牌IP，提升区域辨识度与资源吸附力。</div>
+            <div class="method-value-title">生态策划</div>
+            <div class="method-value">创新联合体、产业联盟、开源社区与开发者生态的组织方式设计与运营方案。</div>
             <div class="method-extra">
-              <div class="method-value-title">跃升服务</div>
-              <div class="method-value">数字园区建设水平评估→对标分析→建设方案编制→跃升申报材料编制→关键节点陪跑，全周期护航园区数字化升级。</div>
+              <div class="method-value-title">IP策划</div>
+              <div class="method-value">主题论坛、创新大赛、企业路演、产业展会等IP活动矩阵设计与年度排期。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
-        </div>
-
-        <!-- ===== 三、科创服务 ===== -->
-        <div class="biz-sub-title" style="margin-top:20px;"><span class="cat-badge" style="background:#FAECE7;color:#993C1D;">科创</span> 科创服务</div>
-        <div class="biz-method-grid">
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">06</span> 产业链精准招商</div>
-            <div class="method-desc">编制企业招商名录，导入招商数据库，组织主题招商活动，为园区精准锁定目标企业提供全流程支撑。</div>
-            <div class="method-value-title">招商名录</div>
-            <div class="method-value">针对性企业招商名录编制，覆盖智能制造、数字经济、新能源、AI等全产业链，按融资轮次、技术方向、团队规模等50+维度标签筛选匹配。</div>
+            <div class="method-header"><span class="method-num">06</span> 重大项目谋划与资金申报</div>
+            <div class="method-desc">为人工智能重大项目提供谋划与政策资金申报支撑。</div>
+            <div class="method-value-title">资金渠道</div>
+            <div class="method-value">超长期特别国债、中央预算内投资专项、地方政府专项债、新型政策性金融工具等渠道的适配性判断与统筹。</div>
             <div class="method-extra">
-              <div class="method-value-title">招商活动</div>
-              <div class="method-value">企业对接会、闭门洽谈会、创新应用挑战赛、揭榜挂帅、赛迪科创之星大赛等系列资源导入活动，以赛促招、以会促引。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">07</span> 技术成果转化</div>
-            <div class="method-desc">梳理高校与科研院所实验室技术成果，开展专利导航与技术成熟度评估，搭建从实验室到产业化的"死亡谷"桥梁。</div>
-            <div class="method-value-title">成果转化路径</div>
-            <div class="method-value">科研院所与高校技术成果梳理→专利导航分析→技术成熟度评估→转化路径设计。配套概念验证中心（PoC）、中试基地等创新载体设计及建设方案编制。</div>
-            <div class="method-extra">
-              <div class="method-value-title">产学研对接</div>
-              <div class="method-value">技术对接会、院士/专家企业行、创新载体开放日等系列活动，打通学术界与产业界的信息鸿沟。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">08</span> 创新企业孵化培育</div>
-            <div class="method-desc">为园区设计和运营孵化器/加速器，搭建涵盖技术平台、数据、资本、导师的全要素孵化服务体系。</div>
-            <div class="method-value-title">孵化体系</div>
-            <div class="method-value">孵化器/加速器运营方案设计→孵化服务体系搭建→入孵企业筛选与常态化跟踪。链接技术资源、数据资源、创投资本与产业导师，降低创新企业冷启动成本。</div>
-            <div class="method-extra">
-              <div class="method-value-title">梯度培育</div>
-              <div class="method-value"><b>专项培训</b>——面向园区管委会提供产业政策宣贯、招商实战课堂；面向园区企业提供专精特新特训营、高管研修班、融资跃升班。<b>品牌赋能</b>——园区品牌IP策划、主题论坛、创新大赛、企业路演等IP活动矩阵。</div>
+              <div class="method-value-title">服务流程</div>
+              <div class="method-value">政策解读—项目谋划—优先级筛选—财务测算—申报书编制—流程沟通与汇报。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
         </div>
-
-        <!-- ===== 四、数字化服务 ===== -->
-        <div class="biz-sub-title" style="margin-top:20px;"><span class="cat-badge" style="background:#E8E6FF;color:#7F77DD;">平台</span> 数字化服务</div>
-        <p style="font-size:13px;color:var(--text3);margin-bottom:16px;">以AI驱动园区运营全链路智能化，覆盖招商、金融、人才、场景、决策、管理与运营七大方向。</p>
+        </div>
+        <div class="biz-detail" id="bizDetail4" style="display:none;">
+          <h3 class="biz-detail-title">行研可研：用可核验的数据支撑人工智能决策</h3>
+          <p class="biz-detail-sub">面向政府、园区、企业与投资机构，提供人工智能细分赛道的行业研究、可行性研究与产业链图谱研究。</p>
+        <div class="biz-origin">
+          <div class="biz-origin-row"><span class="biz-origin-label">服务对象</span><span class="biz-origin-text">各级政府、园区、企业、投资机构</span></div>
+          <div class="biz-origin-row"><span class="biz-origin-label">咨询内容</span><span class="biz-origin-text">整合行业/市场现状研究、行业/市场发展趋势判断、产业链/供应链梳理、市场竞争格局分析、市场进入策略、企业业务战略等重点内容，为政府、企业、投资机构提供行业研究报告、可行性研究报告、产业链图谱研究、企业发展战略及企业管控策略研究等咨询产品。</span></div>
+          <div class="biz-origin-note">以上为赛迪顾问官网业务口径；以下为本中心在人工智能方向的落地细化。</div>
+        </div>
+        <div class="biz-sub-title" style="margin-top:20px;">人工智能方向的落地重点</div>
         <div class="biz-method-grid">
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">09</span> 智能招商</div>
-            <div class="method-desc">基于AI产业知识图谱，实现目标企业智能匹配、招商线索精准推送、项目全流程跟踪管理的智能招商服务。</div>
+            <div class="method-header"><span class="method-num">01</span> 人工智能行业研究</div>
+            <div class="method-desc">围绕人工智能细分赛道开展现状研究、趋势判断与竞争格局分析。</div>
+            <div class="method-value-title">覆盖赛道</div>
+            <div class="method-value">大模型、智能体（Agent）、具身智能、AI芯片、AI Infra平台、智算云、MaaS、AI一体机、AI行业应用等。</div>
             <div class="method-extra">
-              <div class="method-value-title">核心能力</div>
-              <div class="method-value">AI企业全息画像——覆盖融资轮次、技术方向、团队规模、专利布局等50+标签；AI产业链匹配算法——按园区定位自动推荐高匹配度目标企业；招商漏斗管理——从线索发掘到签约落地全流程可视化跟踪。</div>
+              <div class="method-value-title">已发布研究</div>
+              <div class="method-value">《中国大模型市场研究报告》《中国智能体市场研究报告》《中国AI Infra平台市场研究报告（2026）》《中国AI云市场研究报告（2026）》《中国智算云市场研究报告（2026）》《中国MaaS市场发展研究报告（2026）》等年度研究。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
-
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">10</span> 智慧金融赋能</div>
-            <div class="method-desc">面向企业融资需求，智能匹配银行贷款、基金投资、政策补贴等多元资金渠道，助力园区企业加速成长。</div>
+            <div class="method-header"><span class="method-num">02</span> 智算中心与AI项目可行性研究</div>
+            <div class="method-desc">为智算中心、人工智能公共服务平台等项目编制可行性研究报告。</div>
+            <div class="method-value-title">论证要点</div>
+            <div class="method-value">需求侧测算（本地训练与推理需求规模）、技术方案比选（芯片路线与组网方式）、投资估算与资金筹措、财务评价与风险分析、社会效益与能耗评估。</div>
             <div class="method-extra">
-              <div class="method-value-title">服务场景</div>
-              <div class="method-value">企业融资需求智能诊断→资金渠道智能匹配→融资方案推演→投资机构精准对接。覆盖银行信贷、政府引导基金、产业资本、上市辅导等全周期金融服务。</div>
+              <div class="method-value-title">关键指标</div>
+              <div class="method-value">上架率、单位算力投资强度、PUE、投资回收期、盈亏平衡点。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
-
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">11</span> 智能人才服务</div>
-            <div class="method-desc">以产定需，精准匹配产业人才需求，构建"引才、育才、用才、留才"全链路人才服务体系。</div>
+            <div class="method-header"><span class="method-num">03</span> 产业链与供应链梳理</div>
+            <div class="method-desc">梳理人工智能产业链与供应链，识别关键环节与卡点。</div>
+            <div class="method-value-title">梳理方法</div>
+            <div class="method-value">按基础层、技术层、应用层逐级拆解，标注每个环节的国内外主要供给方、国产化水平与替代难度。</div>
             <div class="method-extra">
-              <div class="method-value-title">四大模块</div>
-              <div class="method-value"><b>人才引进智慧眼</b>——以产定需精准引才，AI人才画像与智能匹配；<b>创新创业资源通</b>——用才兴业要素赋能；<b>人才成长育苗圃</b>——产教融合全链培育，联动高校AI实训基地；<b>人才服务护航舰</b>——以业留才服务无忧。</div>
+              <div class="method-value-title">成果形式</div>
+              <div class="method-value">产业链图谱与供应链风险清单，明确断供风险点与备选方案。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
-
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">12</span> 场景创新服务</div>
-            <div class="method-desc">AI场景创新公共服务平台，支撑"一景一策"编制、场景清单发布、场景供需对接，加速AI技术落地应用。</div>
+            <div class="method-header"><span class="method-num">04</span> 市场竞争格局分析</div>
+            <div class="method-tag">核心方法：波特五力模型</div>
+            <div class="method-desc">深入解构行业竞争全景，量化评估各方的竞争地位。</div>
+            <div class="method-value-title">AI领域应用</div>
+            <div class="method-value">评估算力供应商（GPU/ASIC）议价能力、云厂商对下游的议价能力、开源模型对新进入者的门槛影响、传统软件被AI方案替代的压力、以及头部厂商之间的模型竞争烈度。</div>
             <div class="method-extra">
-              <div class="method-value-title">平台功能</div>
-              <div class="method-value">场景机会清单在线发布与匹配、场景能力清单展示、场景创新图谱可视化、场景供需智能撮合、场景落地效果跟踪评估。</div>
+              <div class="method-value-title">核心价值</div>
+              <div class="method-value">打破主观认知偏差，提供真实可信的竞争态势判断。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
-
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">13</span> 产业智能咨询</div>
-            <div class="method-desc">面向政府与园区的产业咨询与智能问答服务，提供产业政策解读、技术趋势研判、市场数据查询等知识服务。</div>
+            <div class="method-header"><span class="method-num">05</span> 技术成熟度与趋势研判</div>
+            <div class="method-tag">核心方法：技术成熟度曲线</div>
+            <div class="method-desc">定位各项人工智能技术的演进阶段，识别泡沫期与成熟期。</div>
+            <div class="method-value-title">重点研判方向</div>
+            <div class="method-value">通用大模型能力边界、多模态融合进展、Agent自主决策成熟度、端侧模型部署可行性、具身智能商业化时间窗口、AI安全与对齐技术演进。</div>
             <div class="method-extra">
-              <div class="method-value-title">应用场景</div>
-              <div class="method-value">产业政策快速检索与解读、技术路线对比分析、企业情报查询、产业数据看板、招商政策智能问答。</div>
+              <div class="method-value-title">成果形式</div>
+              <div class="method-value">技术成熟度曲线与研发投入、技术选型、商业化节奏的决策框架。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
-
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">14</span> 智慧园区运营</div>
-            <div class="method-desc">覆盖园区"设计-建设-运营"全周期的数字化转型服务，打造智能化驱动的智慧园区运营体系。</div>
+            <div class="method-header"><span class="method-num">06</span> 市场进入策略与企业业务战略</div>
+            <div class="method-desc">为拟进入人工智能领域的企业与投资机构提供进入路径与业务战略研究。</div>
+            <div class="method-value-title">研究内容</div>
+            <div class="method-value">赛道吸引力评估、进入壁垒与所需能力、切入环节选择、合作或并购路径、分阶段目标与资源配置。</div>
             <div class="method-extra">
-              <div class="method-value-title">核心功能</div>
-              <div class="method-value">园区基础设施IoT监控、能源智能调度、安防AI巡检、物业智慧服务、企业入驻线上办理、园区公告智能推送，实现园区管理降本增效。</div>
-            </div>
-            <span class="method-toggle">展开详情</span>
-          </div>
-
-          <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">15</span> 园区运营态势监管</div>
-            <div class="method-desc">园区运营态势"一屏"可视化监管，实时洞察企业画像、产业监测、空间利用率、经济贡献等核心指标。</div>
-            <div class="method-extra">
-              <div class="method-value-title">监管维度</div>
-              <div class="method-value"><b>企业画像</b>——入园企业经营健康度、技术实力、成长潜力动态评估；<b>产业监测</b>——AI产业链完整性、产值分布、就业带动效应；<b>协同管理</b>——跨部门数据打通、政策兑现跟踪、重大项目进度管控。</div>
+              <div class="method-value-title">交付成果</div>
+              <div class="method-value">市场进入策略报告、企业业务战略研究报告与企业管控策略建议。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
         </div>
-
-        <!-- ===== 五、投融资服务 ===== -->
-        <div class="biz-sub-title" style="margin-top:20px;"><span class="cat-badge" style="background:#FFF3E0;color:#D85A30;">资本</span> 投融资服务</div>
+        <div class="biz-sub-title" style="margin-top:20px;">数字化研究工具</div>
         <div class="biz-method-grid">
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">16</span> 重大项目资金争取</div>
-            <div class="method-desc">为园区重大项目建设提供全流程资金争取服务，统筹运用超长期特别国债、中央预算内投资、地方政府专项债等政策资金渠道。</div>
-            <div class="method-value-title">服务流程</div>
-            <div class="method-value"><b>前期论证</b>——政策解读、项目谋划、优先级筛选、资金渠道统筹、申报方向谋划、合规性把控；<b>资金申报</b>——财务测算、方案及资金申报书编制、流程沟通与汇报。已服务多个国家级及省级产业园区申报超长期国债、专项债等。</div>
-            <div class="method-extra">
-              <div class="method-value-title">资金渠道</div>
-              <div class="method-value">超长期特别国债、中央预算内投资专项、地方政府专项债、新型政策性金融工具、EOD/TOD项目融资等多种渠道协同。</div>
-            </div>
+            <div class="method-header"><span class="method-num">07</span> 产业智能咨询平台</div>
+            <div class="method-tag">AI赋能产业决策</div>
+            <div class="method-desc">基于产业知识大模型应用系统，以行业知识库为核心，面向工业和信息化领域提供AI驱动的产业分析与决策支持。</div>
+            <div class="method-value-title">核心功能</div>
+            <div class="method-value"><b>智能问答</b>——产业知识精准问答；<b>AI诊断</b>——诊断产业发展趋势现状，辅助预测决策；<b>智能研报</b>——结合赛迪研究逻辑，AI辅助研报撰写；<b>AI数据挖掘</b>——挖掘多要素数据关联性，研判海量数据趋势；<b>知识库</b>——编辑上传个人知识库，智能训练专属模型。</div>
             <span class="method-toggle">展开详情</span>
           </div>
-
+        </div>
+        </div>
+        <div class="biz-detail" id="bizDetail5" style="display:none;">
+          <h3 class="biz-detail-title">企业战略：让人工智能投入产生可衡量的回报</h3>
+          <p class="biz-detail-sub">面向大模型企业、AI应用企业与准备引入AI的传统企业，打通从价值锚定、产品选型到组织变革的战略落地路径。</p>
+        <div class="biz-origin">
+          <div class="biz-origin-row"><span class="biz-origin-label">服务对象</span><span class="biz-origin-text">各类企业、各地中小企业主管部门</span></div>
+          <div class="biz-origin-row"><span class="biz-origin-label">咨询内容</span><span class="biz-origin-text">为企业提供总体战略、业务战略、投资战略、营销战略等企业战略咨询服务，为各地中小企业主管部门提供项目申报、资质申报、投资融资、政策咨询、企业培训等咨询服务。</span></div>
+          <div class="biz-origin-note">以上为赛迪顾问官网业务口径；以下为本中心在人工智能方向的落地细化。</div>
+        </div>
+        <div class="biz-sub-title" style="margin-top:20px;">人工智能方向的落地重点</div>
+        <div class="biz-method-grid">
           <div class="method-card expandable" onclick="toggleMethod(this)">
-            <div class="method-header"><span class="method-num">17</span> 市场化融资与产业基金</div>
-            <div class="method-desc">为园区及园内企业提供市场化融资方案设计、资金渠道对接与产业基金运作服务。</div>
+            <div class="method-header"><span class="method-num">01</span> 价值锚定</div>
+            <div class="method-tag">Rewired框架</div>
+            <div class="method-desc">明确AI驱动的核心价值主张，判断技术落地后是直接降本增效、优化客户体验，还是开拓新的业务场景与收入来源。</div>
+            <div class="method-value-title">落地方法</div>
+            <div class="method-value">通过业务流程拆解识别高价值AI应用场景，建立“技术可行性×商业价值”二维评估矩阵，优先筛选投入产出比最高的场景切入。</div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">02</span> 敏捷交付</div>
+            <div class="method-tag">Rewired框架</div>
+            <div class="method-desc">设计适配AI的敏捷交付模式，以MVP快速验证价值假设，持续迭代，降低大规模落地前的不确定性。</div>
+            <div class="method-value-title">交付节奏</div>
+            <div class="method-value">4—6周完成首个MVP版本，建立模型效果评估指标体系，每迭代周期输出可量化的业务改善数据，确保技术进展与商业目标同频。</div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">03</span> 组织变革</div>
+            <div class="method-tag">Rewired框架</div>
+            <div class="method-desc">技术落地的核心障碍往往在人，需配套调整业务流程与考核机制，构建全员支持的数字化文化。</div>
+            <div class="method-value-title">变革路径</div>
+            <div class="method-value">高管层建立AI战略共识，中层管理者重塑KPI体系并纳入AI效能指标，基层员工开展场景化AI工具培训，设立内部AI创新激励机制。</div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">04</span> 技术可行性评估</div>
+            <div class="method-tag">产品选型矩阵分析</div>
+            <div class="method-desc">评估模型成熟度、部署难度与运维复杂度，确保技术可用、易用、易维护。</div>
+            <div class="method-value-title">评估维度</div>
+            <div class="method-value">模型能力（精度/泛化/推理速度）、部署方式（云端/边缘/端侧）、数据依赖（训练数据量与质量）、运维成本（模型更新频率与资源消耗）、生态成熟度（框架与工具链支持）。</div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">05</span> 商业可持续性分析</div>
+            <div class="method-tag">产品选型矩阵分析</div>
+            <div class="method-desc">测算技术应用后的投入产出比，判断能否形成可持续的商业模式闭环。</div>
+            <div class="method-value-title">分析框架</div>
+            <div class="method-value">构建三年财务模型，覆盖算力成本、数据标注、模型迭代、人力投入等成本项，对标行业标杆量化效率提升与收入增长，测算投资回收期与净现值。</div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">06</span> 综合成本与效益</div>
+            <div class="method-tag">产品选型矩阵分析</div>
+            <div class="method-desc">横向对比同类方案的采购、集成与迭代成本，筛选高性价比选项。</div>
+            <div class="method-value-title">对比维度</div>
+            <div class="method-value">开源与商业模型、自建与调用API、通用与行业专属模型，从总拥有成本视角综合评估采购、集成、运维与迁移成本。</div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">07</span> 面向中小企业主管部门的服务</div>
+            <div class="method-desc">为各地中小企业主管部门提供人工智能相关的项目与资质申报、投融资对接、政策咨询与培训服务。</div>
             <div class="method-value-title">服务内容</div>
-            <div class="method-value"><b>渠道谋划</b>——银行贷款、基金投资、社会资本引入、存量资产盘活等多元渠道设计与财务测算；<b>资金对接</b>——银行、财务投资人、大型央国企、专业化运营单位等多方资源精准匹配。</div>
+            <div class="method-value">AI项目申报与专精特新资质申报辅导、融资对接与政策咨询、面向企业管理者的AI能力培训课程设计。</div>
+            <div class="method-extra">
+              <div class="method-value-title">培训体系</div>
+              <div class="method-value">产业政策宣贯、AI转型实战课堂、专精特新特训营、高管研修班、融资跃升班。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+        </div>
+        </div>
+        <div class="biz-detail" id="bizDetail6" style="display:none;">
+          <h3 class="biz-detail-title">投融资咨询：给人工智能资产一个站得住的价格</h3>
+          <p class="biz-detail-sub">围绕AI企业融资并购、募投项目设计与园区产业基金运作，提供财务顾问、尽职调查与招商投资一体化服务。</p>
+        <div class="biz-origin">
+          <div class="biz-origin-row"><span class="biz-origin-label">服务对象</span><span class="biz-origin-text">企业、政府、园区</span></div>
+          <div class="biz-origin-row"><span class="biz-origin-label">咨询内容</span><span class="biz-origin-text">为企业提供财务顾问咨询服务，具体涵盖募投项目设计与可行性分析、企业所处行业研究及相关财务测算，对拟收购标的的尽职调查、价值评估及可行性分析服务等咨询服务；为政府及园区提供招商投资策略制定、投资机会研究、投资项目实施促进、招商项目可行性分析、地方平台融资咨询、区域开发投融资咨询等服务。</span></div>
+          <div class="biz-origin-note">以上为赛迪顾问官网业务口径；以下为本中心在人工智能方向的落地细化。</div>
+        </div>
+        <div class="biz-sub-title" style="margin-top:20px;">人工智能方向的落地重点</div>
+        <div class="biz-method-grid">
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">01</span> 投融资策略分析</div>
+            <div class="method-desc">面向企业设计与投资者匹配，面向投资机构做赛道扫描与潜力评级。</div>
+            <div class="method-value-title">服务内容</div>
+            <div class="method-value"><b>企业端</b>：融资节奏设计、估值模型搭建、BP优化、投资人匹配。<b>机构端</b>：赛道全景扫描、标的筛选清单、技术壁垒评估、商业化路径验证。</div>
+            <div class="method-extra">
+              <div class="method-value-title">方法工具</div>
+              <div class="method-value">应用“AI价值创造矩阵”，从技术壁垒与商业化确定性两个维度对标的做潜力评级。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">02</span> 人工智能专项尽职调查</div>
+            <div class="method-desc">在传统财务与法务尽调之外，增加人工智能特有的技术与数据核查维度。</div>
+            <div class="method-value-title">尽调框架</div>
+            <div class="method-value"><b>技术尽调</b>——模型创新性与壁垒验证、算法专利分析；<b>数据尽调</b>——数据来源合规性、标注质量与数据飞轮效应评估；<b>项目尽调</b>——市场适配能力与伦理合规审查；<b>商业化尽调</b>——场景真实需求验证与商业模式可行性论证。</div>
+            <div class="method-extra">
+              <div class="method-value-title">关注要点</div>
+              <div class="method-value">模型性能的可复现性、训练数据的权属链条、算力成本的长期可承受能力、客户集中度与续约率。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">03</span> 募投项目设计与可行性分析</div>
+            <div class="method-desc">为人工智能企业设计募投项目并开展可行性分析。</div>
+            <div class="method-value-title">设计要点</div>
+            <div class="method-value">募投方向与主业协同性论证、投资规模与产能匹配、研发费用资本化处理、效益测算的审慎性。</div>
+            <div class="method-extra">
+              <div class="method-value-title">常见问题</div>
+              <div class="method-value">避免募投项目与现有技术能力脱节、效益预测显著高于行业基准、研发中心建设缺少具体研发内容支撑。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">04</span> 价值评估与财务测算</div>
+            <div class="method-desc">对拟收购标的开展行业研究、价值评估与可行性分析。</div>
+            <div class="method-value-title">估值方法</div>
+            <div class="method-value">结合可比交易、可比公司与现金流折现，并对大模型企业额外考量算力投入强度、Token成本曲线与用户留存指标。</div>
+            <div class="method-extra">
+              <div class="method-value-title">交付成果</div>
+              <div class="method-value">估值报告、交易结构建议与风险提示清单。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">05</span> 政府与园区招商投资策略</div>
+            <div class="method-desc">为政府及园区制定人工智能方向的招商投资策略与项目落地促进方案。</div>
+            <div class="method-value-title">服务内容</div>
+            <div class="method-value">招商投资策略制定、投资机会研究、投资项目实施促进、招商项目可行性分析、地方平台融资咨询、区域开发投融资咨询。</div>
+            <div class="method-extra">
+              <div class="method-value-title">配套工具</div>
+              <div class="method-value">产业链招商图谱、目标企业名录、项目落地成本与收益测算、政策工具包设计。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">06</span> 产业基金与市场化融资</div>
+            <div class="method-desc">为园区及园内企业提供产业基金运作与市场化融资方案设计。</div>
+            <div class="method-value-title">服务内容</div>
+            <div class="method-value"><b>渠道谋划</b>——银行贷款、基金投资、社会资本引入、存量资产盘活等多元渠道设计与财务测算；<b>资金对接</b>——银行、财务投资人、大型央国企、专业化运营单位资源匹配。</div>
             <div class="method-extra">
               <div class="method-value-title">上市辅导</div>
-              <div class="method-value">为园内高成长企业提供融资前置准备与方案设计，上市IPO辅导——可行性评估、上市路径设计（科创板/北交所/港股等）、券商与律所资源对接。</div>
+              <div class="method-value">为高成长企业提供上市路径设计（科创板/北交所/港股等）与券商、律所资源对接。</div>
             </div>
             <span class="method-toggle">展开详情</span>
           </div>
         </div>
-      </div>
-
-      <div class="biz-value-title">为客户创造的核心价值</div>
-      <div class="biz-value-grid">
-        <div class="value-card">
-          <h4>面向政府与园区</h4>
-          <div class="value-item"><b>科学决策</b> 基于全域产业数据的精准设计，杜绝资源错配</div>
-          <div class="value-item"><b>智能化升级</b> 推动传统园区向智慧、低碳、高效运营转型</div>
-          <div class="value-item"><b>生态集聚</b> 链接上下游创新主体形成产业生态圈</div>
         </div>
-        <div class="value-card">
-          <h4>面向传统企业</h4>
-          <div class="value-item"><b>找准场景</b> 诊断业务痛点，筛选高价值的AI/智能化应用切入点</div>
-          <div class="value-item"><b>匹配合伙</b> 遴选靠谱的技术合作伙伴与投资标的</div>
-          <div class="value-item"><b>量化成效</b> 建立科学评估体系，衡量智能化转型的真实回报</div>
+        <div class="biz-detail" id="bizDetail7" style="display:none;">
+          <h3 class="biz-detail-title">数字转型：以人工智能驱动转型项目落地</h3>
+          <p class="biz-detail-sub">为政府、园区与企业的数字化转型项目提供从能力诊断、规划编制到工程全过程管理的服务。</p>
+        <div class="biz-origin">
+          <div class="biz-origin-row"><span class="biz-origin-label">服务对象</span><span class="biz-origin-text">政府、园区、企业数字转型相关项目</span></div>
+          <div class="biz-origin-row"><span class="biz-origin-label">咨询内容</span><span class="biz-origin-text">为政府提供数字化能力诊断评估、数字化发展规划、数字化行动计划、数字品牌活动、数字转型竞争力研究、数字化/信息化规划等咨询服务；为数字转型项目提供可行性研究、初步设计与概预算编制、系统深化设计、工程造价评估、工程绩效评价、工程建设全过程与运维/运营管理咨询服务。</span></div>
+          <div class="biz-origin-note">以上为赛迪顾问官网业务口径；以下为本中心在人工智能方向的落地细化。</div>
         </div>
-        <div class="value-card">
-          <h4>面向AI企业</h4>
-          <div class="value-item"><b>锚定方向</b> 梳理技术优势，连接真实的产业落地场景</div>
-          <div class="value-item"><b>加速落地</b> 园区选址、政策申报、投融资全链路支撑</div>
-          <div class="value-item"><b>生态赋能</b> 链接产业资源与资本市场，协助优化商业化路径</div>
+        <div class="biz-sub-title" style="margin-top:20px;">人工智能方向的落地重点</div>
+        <div class="biz-method-grid">
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">01</span> 数字化与智能化能力诊断评估</div>
+            <div class="method-desc">对政府、园区与企业的数字化能力开展诊断评估，明确智能化升级的起点与优先级。</div>
+            <div class="method-value-title">评估维度</div>
+            <div class="method-value">数据治理水平、系统集成程度、算力与模型资源、数字化人才结构、业务流程在线化率、安全合规状况。</div>
+            <div class="method-extra">
+              <div class="method-value-title">成果形式</div>
+              <div class="method-value">能力诊断报告与成熟度评级，配套分阶段提升路线图。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">02</span> 数字化发展规划与行动计划</div>
+            <div class="method-desc">编制数字化（智能化）发展规划与行动计划，明确建设任务与时序。</div>
+            <div class="method-value-title">规划内容</div>
+            <div class="method-value">总体架构设计、数据治理体系、AI中台与技术平台、重点应用清单、投资估算与建设计划、保障机制。</div>
+            <div class="method-extra">
+              <div class="method-value-title">衔接要求</div>
+              <div class="method-value">与上位规划、行业政策及现有信息化资产衔接，避免重复建设与系统割裂。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">03</span> AI赋能政务与城市大模型应用</div>
+            <div class="method-desc">设计人工智能在政务服务与城市治理中的应用方案。</div>
+            <div class="method-value-title">应用场景</div>
+            <div class="method-value">智能问答与办事引导、政策文件智能检索与解读、政务文书辅助生成、城市运行态势感知与事件处置调度、营商环境监测。</div>
+            <div class="method-extra">
+              <div class="method-value-title">实施要点</div>
+              <div class="method-value">明确数据来源与更新机制、模型选型与私有化部署要求、人机协同的责任边界与审核流程。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">04</span> 智算中心工程咨询</div>
+            <div class="method-desc">为智算中心等数字转型项目提供工程全过程咨询服务。</div>
+            <div class="method-value-title">服务链条</div>
+            <div class="method-value">可行性研究、初步设计与概预算编制、系统深化设计、工程造价评估、工程绩效评价、工程建设全过程与运维/运营管理咨询。</div>
+            <div class="method-extra">
+              <div class="method-value-title">技术要点</div>
+              <div class="method-value">机房与机电设计、组网与存储方案、算力调度平台设计、国产芯片适配与迁移方案、能耗与PUE控制。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">05</span> 工程绩效评价与全过程管理</div>
+            <div class="method-desc">对数字转型项目开展绩效评价，并承担工程建设全过程管理。</div>
+            <div class="method-value-title">评价维度</div>
+            <div class="method-value">建设进度与投资控制、系统功能达成度、性能指标（算力利用率、响应时延、可用性）、应用成效与用户满意度。</div>
+            <div class="method-extra">
+              <div class="method-value-title">管理内容</div>
+              <div class="method-value">招标采购支持、合同与变更管理、里程碑验收、运维交接与运营指标跟踪。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
+          <div class="method-card expandable" onclick="toggleMethod(this)">
+            <div class="method-header"><span class="method-num">06</span> 数字品牌活动与竞争力研究</div>
+            <div class="method-desc">策划数字主题品牌活动，并开展数字转型竞争力研究。</div>
+            <div class="method-value-title">活动内容</div>
+            <div class="method-value">数字化转型论坛、典型案例征集与发布、创新应用挑战赛、成果展与现场会。</div>
+            <div class="method-extra">
+              <div class="method-value-title">研究成果</div>
+              <div class="method-value">区域或行业数字转型竞争力评价体系与年度排名，形成可对外发布的指数成果。</div>
+            </div>
+            <span class="method-toggle">展开详情</span>
+          </div>
         </div>
+        </div>
+        <div class="biz-sub-title" style="margin-top:28px;">为客户创造的核心价值</div>
+        <div class="biz-value-grid">
+          <div class="value-card" style="border-left:3px solid #0F6E56;">
+            <h4 style="font-size:14px;">面向政府与园区</h4>
+            <div class="value-item">科学决策——基于全域产业数据的精准设计，杜绝资源错配</div>
+            <div class="value-item">智能化升级——推动传统园区向智慧、低碳、高效运营转型</div>
+            <div class="value-item">生态集聚——链接上下游创新主体形成产业生态圈</div>
+          </div>
+          <div class="value-card" style="border-left:3px solid #534AB7;">
+            <h4 style="font-size:14px;">面向传统企业</h4>
+            <div class="value-item">找准场景——诊断业务痛点，筛选高价值的AI/智能化应用切入点</div>
+            <div class="value-item">匹配合伙——遴选可靠的技术合作伙伴与投资标的</div>
+            <div class="value-item">量化成效——建立科学评估体系，衡量智能化转型的真实回报</div>
+          </div>
+          <div class="value-card" style="border-left:3px solid #D85A30;">
+            <h4 style="font-size:14px;">面向AI企业</h4>
+            <div class="value-item">锚定方向——梳理技术优势，连接真实的产业落地场景</div>
+            <div class="value-item">加速落地——园区选址、政策申报、投融资全链路支撑</div>
+            <div class="value-item">生态赋能——链接产业资源与资本市场，协助优化商业化路径</div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:24px;">版权所有 © 赛迪顾问人工智能与大数据研究中心</p>
       </div>
-      </div>
-    <div class="page-footer">版权所有 © 赛迪顾问人工智能与大数据研究中心</div>
-  </div><!-- ==================== PAGE 3: 部门介绍 ==================== -->
-  <div class="page page-3">
+    </div>
+      <div class="page page-3">
     <div class="dept-section">
       <h2>部门介绍</h2>
       <div class="section-line"></div>
@@ -2318,7 +2476,7 @@ function switchBizTab(num) {
   });
   if (!isMobile) {
     // PC: toggle detail panels below
-    for (var i = 1; i <= 3; i++) {
+    for (var i = 1; i <= 7; i++) {
       document.getElementById('bizDetail' + i).style.display = (i == num) ? 'block' : 'none';
     }
   } else {
@@ -2326,7 +2484,7 @@ function switchBizTab(num) {
     document.querySelectorAll('.biz-tab-btn').forEach(function(btn) {
       btn.closest('.biz-card').classList.remove('expanded');
     });
-    for (var i = 1; i <= 3; i++) {
+    for (var i = 1; i <= 7; i++) {
       var panel = document.getElementById('bizMobile' + i);
       if (i == num) {
         var card = document.querySelector('.biz-tab-btn[data-biz="' + num + '"]').closest('.biz-card');
@@ -2350,7 +2508,7 @@ function switchBizTab(num) {
   var mq = window.matchMedia('(max-width: 768px)');
   function initMobile() {
     if (mq.matches) {
-      for (var i = 1; i <= 3; i++) {
+      for (var i = 1; i <= 7; i++) {
         var src = document.getElementById('bizDetail' + i);
         var dest = document.getElementById('bizMobile' + i);
         if (src && dest && !dest.innerHTML) {
