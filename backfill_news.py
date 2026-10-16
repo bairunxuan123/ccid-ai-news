@@ -282,6 +282,7 @@ def gen_day(material, day_str):
     np.log(f"  {day_str} 素材地域拆分：" + " ".join(
         f"{np.REGION_LABELS[r]}池 {len(pools[r])} 条" for r in np.REGIONS))
 
+    best_items = []          # [2026-10-16] 次优兜底：三次都未达标时用它降级收下
     for attempt in range(3):
         # —— 阶段 A：按地域各选题一次 ——
         cands, seen, summaries = [], set(), {}
@@ -360,12 +361,22 @@ def gen_day(material, day_str):
         # —— 阶段 B：逐条素材单独撰写正文 ——
         np.log(f"  {day_str} 阶段A {len(cands)} 条候选，开始逐条写正文"
                f"（国内 8 条四维各 2 / 国外 5+ 条才收工，上限 {np.DESC_TARGET} 条）")
-        # 按（地域 × 维度）轮转，保证无论写到哪里停手两个板块都是齐的
-        cands = np.interleave_by_cell(cands, prefer=np.MIN_PER_CELL_DESC)
+        # [2026-10-16] 两段式轮转：与 news_pipeline.py 主流程保持一致。
+        cn_cands = [c for c in cands if c.get("region", "cn") == "cn"]
+        intl_cands = [c for c in cands if c.get("region", "cn") == "intl"]
+        cn_first = np.interleave_by_cell(cn_cands, prefer=4)
+        intl_after = np.interleave_by_cell(intl_cands, prefer=2)
+        cands = (cn_first[:np.PER_REGION_ITEMS] + intl_after
+                 + cn_first[np.PER_REGION_ITEMS:])
         items = []
         for ci, c in enumerate(cands):
-            if len(items) >= np.DESC_TARGET:
-                np.log(f"  已达上限 {np.DESC_TARGET} 条，其余候选不再调用")
+            # [2026-10-16] 与 news_pipeline 同步：国内没满 8 条不许因"到 20 条"停手
+            cn_out = sum(1 for x in items if x.get("region", "cn") == "cn")
+            if len(items) >= np.DESC_TARGET and cn_out >= np.PER_REGION_ITEMS:
+                np.log(f"  已达上限 {np.DESC_TARGET} 条且国内已满 {cn_out} 条，其余候选不再调用")
+                break
+            if len(items) >= np.DESC_TARGET + 6:
+                np.log(f"  已达硬上限 {np.DESC_TARGET + 6} 条（国内 {cn_out} 条），其余候选不再调用")
                 break
             if len(items) >= np.MIN_TOTAL_ITEMS and np.items_ready(items):
                 np.log(f"  已写满 {len(items)} 条且 8 格齐备，其余候选不再调用")
@@ -436,7 +447,22 @@ def gen_day(material, day_str):
                 summary = np.clean_for_js(np.fallback_summary(items))
             return summary, items
         np.log(f"  {day_str} 第{attempt+1}次仅 {len(items)} 条（<13 或板块结构不齐），重试")
+        # [2026-10-16] 记下本轮结果，attempt 耗尽时作为次优兜底
+        if len(items) > len(best_items):
+            best_items = items[:]
         time.sleep(2)
+    # 兜底：三次都没凑齐，但历史最好的一轮"总 ≥13 且国内 ≥6" → 降级接受。
+    # 宁可国内少 2 条，也不要整天没有内容（用户反复反馈"很久没更新"）。
+    if len(best_items) >= np.MIN_TOTAL_ITEMS:
+        cn_n = sum(1 for x in best_items if x.get("region", "cn") == "cn")
+        if cn_n >= 6:
+            np.log(f"  ⚠ {day_str} 未达国内 8 条，降级接受（国内 {cn_n} 条 / 共 {len(best_items)} 条）")
+            best_items.sort(key=lambda x: x.get("_rank", 999))
+            for x in best_items:
+                x.pop("_rank", None)
+            best_items = np.dedupe_similar(best_items)
+            best_items = np.select_balanced(best_items)
+            return np.clean_for_js(np.fallback_summary(best_items))[:160], best_items
     return "", []
 
 
