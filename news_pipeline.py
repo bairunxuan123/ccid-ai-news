@@ -2341,14 +2341,28 @@ def generate_news(material, today_cn, attempt=0):
     # 原样回灌进提示词，指名要求改掉那个数字/那句英文。
     log(f"  选题完成：{len(cands)} 条候选，开始逐条撰写正文"
         f"（国内 8 条四维各 2 / 国外 5+ 条才收工，上限 {DESC_TARGET} 条）")
-    # 按 (地域 × 维度) 轮转排序，保证无论写到哪里停手，两个板块四个维度都齐
-    # prefer 取 MIN_PER_CELL_DESC：先给每个格子凑满收工所需的条数，
-    # 再按原价值序补。这样"提前收工"时刚好写满 16 条，不多烧 4-7 次 API。
-    cands = interleave_by_cell(cands, prefer=MIN_PER_CELL_DESC)
+    # [2026-10-16] 两段式轮转：国内先写满 8 条、国外再写满 5 条。
+    # 旧逻辑"8 格一锅轮转 + prefer=2"在国内 4 类不齐时（如政策/投融资当日无货）
+    # 容易把国外候选补进前 8 条，导致国内正文合格 <8 时整轮失败。
+    # 现按 region 拆组，国内 prefer=4（4 圈共 16 条让国内先出齐），
+    # 国外 prefer=2，最后拼接 cn 在前。
+    cn_cands = [c for c in cands if c.get("region", "cn") == "cn"]
+    intl_cands = [c for c in cands if c.get("region", "cn") == "intl"]
+    cn_first = interleave_by_cell(cn_cands, prefer=4)
+    intl_after = interleave_by_cell(intl_cands, prefer=2)
+    # 前 8 条固定给国内（四格各 2），接着写国外凑 5 条，国内剩余候选放最后兜底。
+    # 这样理想情况写 13 次（8+5）就能收工，不会白白多写国内。
+    cands = cn_first[:PER_REGION_ITEMS] + intl_after + cn_first[PER_REGION_ITEMS:]
     out = []
     for ci, c in enumerate(cands):
-        if len(out) >= DESC_TARGET:
-            log(f"  已达上限 {DESC_TARGET} 条，其余候选不再调用")
+        # [2026-10-16] 国内没满 8 条时不能因为"到 20 条"就停手：
+        # 10-15 回填就是写到 20 条 break，而国内只有 4-5 条 → 整轮作废。
+        cn_out = sum(1 for x in out if x.get("region", "cn") == "cn")
+        if len(out) >= DESC_TARGET and cn_out >= PER_REGION_ITEMS:
+            log(f"  已达上限 {DESC_TARGET} 条且国内已满 {cn_out} 条，其余候选不再调用")
+            break
+        if len(out) >= DESC_TARGET + 6:
+            log(f"  已达硬上限 {DESC_TARGET + 6} 条（国内 {cn_out} 条），其余候选不再调用")
             break
         # 收工条件不只是"凑够 16 条"，还要 8 格每格都够 2 条供均衡选取。
         # [2026-09-14] 复验时只按条数收工，结果 8 条里缺了"产业动态"——
