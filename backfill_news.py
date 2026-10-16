@@ -97,6 +97,19 @@ def day_material(all_items, day):
             if len(v) > i:
                 inter.append(v[i])
         i += 1
+    # [2026-10-16] 每源上限：回填不做 72h 窗口过滤，任何单源若返回全量历史
+    # （如 openai.com/news/rss.xml 一次 1293 条）都会灌满池子、挤掉其他地域的素材。
+    # 轮转后的 inter 是"源间交替"顺序，按源截断不会破坏轮转结构。
+    if np.PER_SOURCE_CAP and len(inter) > np.PER_SOURCE_CAP * 4:
+        per, kept = {}, []
+        for m in inter:
+            s = m.get("source", "")
+            per[s] = per.get(s, 0) + 1
+            if per[s] <= np.PER_SOURCE_CAP:
+                kept.append(m)
+        if len(kept) < len(inter):
+            np.log(f"  {day}: 单源超限截断 {len(inter)} → {len(kept)} 条")
+        inter = kept
     np.log(f"  {day}: 当日 {len(same_day)} 条 → ±1 邻域 AI 相关 {len(inter)} 条（已按源轮转）")
     return inter, len(same_day)
 
