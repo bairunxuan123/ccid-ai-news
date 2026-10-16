@@ -1600,6 +1600,12 @@ CN_ORGS = [
     "交通运输部", "科技部", "财政部", "商务部", "网信办", "工信部",
     # 中国台湾企业（台湾是中国的一部分，归国内）
     "台积电", "鸿海", "富士康", "联发科", "纬创", "广达", "和硕", "日月光",
+    # 国产模型/产品的英文名（2026-10-16 补）
+    # [根因] 表里原本只有"深度求索"这个中文全称，没有见报用的 "DeepSeek"。
+    # 标题里出现拉丁字母且不在 _LATIN_HINT_SKIP 中性缩写表时，兜底会判成国外，
+    # 于是 10-15 的"DeepSeek 服务中断/恢复"被错分到国外板块。
+    "deepseek", "kimi", "qwen", "ernie", "混元", "通义", "文心", "豆包",
+    "智谱清言", "讯飞星火", "即梦", "可灵", "海螺",
 ]
 
 # 国外主体：企业、政府与国际组织。
@@ -2076,7 +2082,19 @@ def select_balanced(cands, target=MAX_ITEMS, prefer=MIN_PER_CELL):
             if len(picked) >= target:
                 break
             _fill_region(region)
-    # 名额仍有富余：先把国外补向 8，再按价值序兜底
+    # [2026-10-16] 国内补足 8 条：轮转每格最多取 prefer 条，若国内候选集中在
+    # 少数维度就会"候选够但选不满"（10-16 国内候选 8 条只选出 7 条）。
+    # 这里解除每格上限，按价值序从国内剩余候选里补齐到 PER_REGION_ITEMS。
+    def _cn_count():
+        return sum(1 for i in picked if cands[i].get("region", "cn") == "cn")
+
+    if _cn_count() < PER_REGION_ITEMS:
+        for idx in range(len(cands)):
+            if _cn_count() >= PER_REGION_ITEMS or len(picked) >= target:
+                break
+            if cands[idx].get("region", "cn") == "cn" and idx not in picked:
+                picked.add(idx)
+    # 名额仍有富足：先把国外补向 8，再按价值序兜底
     while len(picked) < target:
         before = len(picked)
         _fill_region("intl")
@@ -2185,13 +2203,27 @@ def _cell_ready(items, per_cell):
 
 def items_ready(items):
     """[2026-10-15 用户新口径] 阶段 B 收工判据：
-    国内 ≥8 且四格各 ≥2；国外 ≥5 且四格各 ≥1。"""
+    国内 ≥8；国外 ≥5 且四格各 ≥1。
+
+    [2026-10-16 修正] 原先国内还要求「四格各 ≥2」。实测国内单日 AI 政策与
+    投融资常常只有 0-1 条（10-16 政策 0、投融资 0），国内其实写出了 8 条，
+    却因格分布不达标被整体放弃 —— 线上整天没有内容，这是"很久没更新"的直接原因。
+    现在国内只卡总数 ≥8（四格均衡交给 select_balanced 尽力去做，缺哪一维
+    度在日志里告警），国外素材充足，仍保留 ≥5 且四格各 ≥1。
+    """
     d = _cell_dist(items)
-    cn_ok = (sum(d["cn"].values()) >= PER_REGION_ITEMS
-             and all(d["cn"].get(k, 0) >= MIN_PER_CELL for k in CAT_LABELS))
+    cn_n = sum(d["cn"].values())
+    if cn_n < PER_REGION_ITEMS:
+        return False
     intl_ok = (sum(d["intl"].values()) >= INTL_MIN_ITEMS
                and all(d["intl"].get(k, 0) >= MIN_PER_CELL_INTL for k in CAT_LABELS))
-    return cn_ok and intl_ok
+    if not intl_ok:
+        return False
+    lack = [k for k in CAT_LABELS if d["cn"].get(k, 0) < MIN_PER_CELL]
+    if lack:
+        log("  ⚠ 国内四格未达各 2 条（仍写入，保证当天有内容）："
+            + "、".join("%s%d条" % (k, d["cn"].get(k, 0)) for k in lack))
+    return True
 
 
 def _cells_lack(items, per_cell, label_fn=None):
