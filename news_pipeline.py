@@ -2212,17 +2212,21 @@ def items_ready(items):
     度在日志里告警），国外素材充足，仍保留 ≥5 且四格各 ≥1。
     """
     d = _cell_dist(items)
+    # 硬门槛只剩"国内 ≥8 / 国外 ≥5"两条；四格均衡一律降级为告警。
+    # [2026-10-16 二次修正] 国外原本还卡"四格各 ≥1"，而国外政策同样不是天天有
+    # （10-15 国外政策 0 条），结果 16 条成品仍被判不合格、整天跳过。
     cn_n = sum(d["cn"].values())
+    intl_n = sum(d["intl"].values())
     if cn_n < PER_REGION_ITEMS:
         return False
-    intl_ok = (sum(d["intl"].values()) >= INTL_MIN_ITEMS
-               and all(d["intl"].get(k, 0) >= MIN_PER_CELL_INTL for k in CAT_LABELS))
-    if not intl_ok:
+    if intl_n < INTL_MIN_ITEMS:
         return False
-    lack = [k for k in CAT_LABELS if d["cn"].get(k, 0) < MIN_PER_CELL]
-    if lack:
-        log("  ⚠ 国内四格未达各 2 条（仍写入，保证当天有内容）："
-            + "、".join("%s%d条" % (k, d["cn"].get(k, 0)) for k in lack))
+    for r, want in (("cn", MIN_PER_CELL), ("intl", MIN_PER_CELL_INTL)):
+        lack = [k for k in CAT_LABELS if d[r].get(k, 0) < want]
+        if lack:
+            log("  ⚠ %s四格未达各 %d 条（仍写入，保证当天有内容）："
+                % (REGION_LABELS.get(r, r), want)
+                + "、".join("%s%d条" % (k, d[r].get(k, 0)) for k in lack))
     return True
 
 
