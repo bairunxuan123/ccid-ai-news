@@ -2785,6 +2785,28 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-17",
+    weekday: "星期六",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，涵盖政策、技术突破、产业动态和投融资等多个方面。　【国外】AI产业动态活跃，技术突破与政策发布并进，投融资动作频繁。",
+    items: [
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "中科院院士鄂维南：民科成科研主力，AI推动科研平权化", desc: "中国科学院院士鄂维南在光华思想力论坛上表示，未来民科将成为科研主力，AI时代每个有想法有能力的团队和个人均可参与科技创新。他预测，通过开放实验室和云服务，每个团队和个人都能参与其中。鄂维南指出，高端工业软件、高端机床数控系统目前受制于人，但有望在一年内实现自主可控，甚至超越西门子。他强调，颠覆性创新很大程度上靠自由探索实现，而非任务驱动。", source: "IT之家", url: "https://www.ithome.com/1/014/371.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "优必选Thinker-WM多模态统一表征，单模型实现六大能力", desc: "优必选公司发布了Thinker-WM模型，该模型在三大基准评测中均获得第一名，实现了多模态统一表征和六大能力。这一成果展示了优必选在具身世界模型领域的领先地位。", source: "量子位", url: "https://www.qbitai.com/2026/10/503843.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "中控技术接入千问办公，打造流程工业AI Native标杆企业", desc: "中控技术股份有限公司正式接入千问办公，将Agent落地营销全链路，未来将优化采购、供应链、财务、人力、研发等场景工作流，共建流程工业领域AI Native标杆企业。中控技术成立于1999年，业务覆盖全球50多个国家和地区，服务海内外4万多家客户。在营销领域，中控技术与千问办公联合打造AI营销项目，覆盖从搜集市场线索到回款结算的营销全链路，效率提升约5倍。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/8IM46Vzpf7IFumo7.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "腾讯上线绿泡泡短剧，主打免费好看；特斯拉Roadster跑车明日发布", desc: "腾讯上线绿泡泡短剧，主打免费好剧一点就看；豆包助手AI自动化操作被155款应用拒绝，包括腾讯、阿里等头部厂商；特斯拉Roadster跑车明日发布。此举标志着移动端AI入口权博弈正式开启，后续权限细化、责任划分、利益分配仍需多方持续磨合。", source: "极客公园", url: "http://www.geekpark.net/news/372366" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "库克：苹果智能接入阿里千问大模型，10月底在中国发布测试版本", desc: "苹果董事会执行主席蒂姆·库克宣布，苹果智能接入阿里千问大模型，将于10月底在中国发布测试版本。该版本将包含实时翻译、书写工具、照片清除工具等首批苹果智能功能，但Siri AI不包括在内。这是苹果智能功能的重要进展，标志着苹果与阿里在人工智能领域的深入合作。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/P1btLjli3z8XoQkz.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "中国机器人羽毛球连打1452拍！拿下吉尼斯，波士顿动力大佬被硬控", desc: "波士顿动力研发的机器人羽毛球连打1452拍，成功打破吉尼斯世界纪录。该机器人背后搭载了一套通用物理运动平台，实现了高难度的羽毛球连续击打。这一突破性进展展示了波士顿动力在机器人运动控制领域的强大实力，为未来机器人技术的发展奠定了坚实基础。", source: "量子位", url: "https://www.qbitai.com/2026/10/503756.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "AI的下一个前沿在哪里？数百位创业者在上海给出了这些答案", desc: "靖亚资本与市北高新联合举办2026 AI Cloud 100 China CEO大会，发布AI Cloud 100 China榜单，其中超过一半为首次入围的新面孔，Physical AI公司最多，约35家。大会关注AI下一个前沿，上海市政协副主席寿子琪建议企业聚焦核心算法、底层架构，提高算力能效比，加强上下游合作，嵌入安全理念。靖亚资本创始管理合伙人郑靖伟分享机构转型史，2022年9月第一届大会时ChatGPT还未发布。", source: "钛媒体", url: "https://www.tmtpost.com/8171952.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "我国首个全自主可控气象 AI 集合预报系统“风清”正式投入业务运行", desc: "国家气象中心牵头研发的“风清”人工智能全球短中期集合天气预报系统V1.0正式投入全国气象业务运行，该系统依托国家超级计算天津中心十万卡AI4S超算集群完成全流程训练与迭代，全球有效预报时效可达11天，较欧洲中期天气预报中心（ECMWF）最新的人工智能集合预报系统在预报指标、精度及离散度误差控制能力上均有提升。", source: "IT之家", url: "https://www.ithome.com/1/014/289.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI纳维-斯托克斯方程证明引发争议", desc: "OpenAI 发布了长达 166 页的纳维-斯托克斯方程相关证明，称其内部 AI 系统在约 88 小时内完成了对这一千禧年难题的求解。然而，数学界对其证明方法、与已有研究的关系以及 AI 智能体贡献提出质疑，专家指出 OpenAI 的证明可能并未遵循“西班牙路线”，且其模型的具体作用尚不明确。", source: "IT之家", url: "https://www.ithome.com/1/014/370.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic估值暴跌，IPO计划受影响", desc: "Anthropic投资者日部分投资者将其IPO估值预期从2万亿美元降至1.5万亿美元，减少5000亿美元。第三季度营收168亿美元，环比增速从第二季度的140%以上降至45%。尽管增长惊人，但华尔街期望更高，此前估值已达到9650亿美元。", source: "钛媒体", url: "https://www.tmtpost.com/8171993.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "奇瑞JAECOO与Momenta完成巴黎凯旋门智驾挑战", desc: "奇瑞JAECOO联合Momenta成功完成巴黎“最难魔鬼环岛”无接管智驾挑战，测试车搭载Momenta R7世界模型，全程11.38公里，覆盖复杂场景。奇瑞JAECOO品牌今年4月进入法国市场，9月新车注册量达2589辆，市场份额升至1.6%，JAECOO 7登顶英国全市场车型销量榜首。", source: "IT之家", url: "https://www.ithome.com/1/014/343.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "清华特奖得主AI创业GeoPT，物理世界模型新进展", desc: "清华大学特等奖得主AI创业项目GeoPT正式入局物理世界模型领域，该项目从搭载物理建模能力的世界模型切入，旨在为物理世界提供更精准的模拟和预测。GeoPT作为一作，展现了在物理世界模型领域的创新实力，为行业带来新的发展机遇。", source: "量子位", url: "https://www.qbitai.com/2026/10/503880.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "谷歌发布面向办公的Gemini Agent，AI上下文争夺战升级", desc: "谷歌发布了面向企业办公的 Gemini Agent，驱动这款智能体的既有谷歌自家的 Gemini，也有对家 Anthropic 的 Claude。企业微信与 WorkBuddy 宣布深度联合，WorkBuddy 以可对话机器人的身份进入企业微信联系人列表，双方打通账号体系，并在企业授权范围内开放多项底层能力。过去一个月，微软、OpenAI、Anthropic 等公司同样围绕“上下文”密集落子，相继推出 Agent 身份、协作空间、外部连接器和组织记忆等能力。", source: "钛媒体", url: "https://www.tmtpost.com/8171629.html" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Elorian推出首个人工智能模型Glimpse，图像推理能力提升", desc: "Elorian发布了首个AI模型Glimpse，该模型在科学图表推理和短视频字幕生成方面表现优于GPT-6 Astra，在其他视觉推理任务上也取得了具有竞争力的成果。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/16/elorians-first-ai-model-wants-to-reason-with-images-not-just-about-them/" }
+    ]
+  },
+  {
     date: "2026-10-16",
     weekday: "星期五",
     regioned: true,
