@@ -14,6 +14,12 @@ on:
         required: false
         default: "false"
 
+# 与 daily-news / auto-heal 共用同一把锁，避免手动回填与定时任务同时写文件
+# 导致 non-fast-forward（2026-10-16 发生过）。
+concurrency:
+  group: ccid-news-write
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
