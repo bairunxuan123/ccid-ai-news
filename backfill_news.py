@@ -420,6 +420,10 @@ def gen_day(material, day_str):
             if not np.title_entity_supported(c["title"], material_text):
                 np.log(f"  丢弃标题实体与素材不符的条目: {c['title'][:26]}")
                 continue
+            # [2026-10-19] 标题与正文必须说同一件事（标题机构名须见于正文）
+            if not np.title_desc_coherent(c["title"], desc):
+                np.log(f"  丢弃标题与正文错配的条目: {c['title'][:26]}")
+                continue
             # 分类确定性纠偏必须带地域：两个板块的"政策发布"判据不同
             fixed = np.normalize_category(c["cat"], c["title"], desc, c.get("region", "cn"))
             if fixed != c["cat"]:
