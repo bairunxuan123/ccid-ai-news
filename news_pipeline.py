@@ -1845,6 +1845,80 @@ def has_ai_topic(text):
     return any(k in t for k in AI_POLICY_TOPICS)
 
 
+
+
+# ---------------------------------------------------------------------------
+# [2026-10-19] 政策类 AI 强主题词表。
+# 原先政策类沿用 has_ai_topic()（机器人/数据/算法都算 AI 相关），
+# 实测后果：三部门"孝老爱老购物季"通知（仅蹭一句"智能护理机器人"）
+# 被判成 AI 政策上页面。政策发布必须与 AI 有实质关联，
+# 只认强主题词；"机器人""数据""算法"这类宽泛词不再单独撑起政策条目。
+POLICY_AI_STRONG = [
+    "人工智能", "大模型", "算力", "智能体", "生成式", "AGI",
+    "软件业", "软件产业", "软件和信息", "数据要素", "数字经济",
+    "智能制造", "智能网联",
+]
+
+
+def policy_ai_strong(text):
+    """政策类目专用的 AI 强主题判定（比 has_ai_topic 严格）。"""
+    t = (text or "").lower()
+    if re.search(r"(?<![a-z])ai(?![a-z])", t):
+        return True
+    return any(k.lower() in t for k in POLICY_AI_STRONG)
+
+
+_ORG_SUFFIX_RE = re.compile(
+    r"[\u4e00-\u9fff]{2,12}(?:委员会|发改委|发展改革委|工业和信息化部|部|局|"
+    r"研究院|研究所|实验室|公司|集团|大学|银行|理事会|办公室)")
+
+
+def title_desc_coherent(title, desc):
+    """标题里的机构名必须在正文出现（至少一个），拦截标题与正文错配的条目。
+
+    实测依据（2026-10-19）：阶段 A 给出的标题是"工信部印发《人工智能+软件
+    专项行动实施方案》"（9-2 旧闻、素材池里根本没有这条），阶段 B 却按
+    统计局 GDP 素材写了正文——正文通篇没有一个机构名。标题与正文
+    各说各话，说明选题与写稿用的不是同一事实，直接丢弃。
+    """
+    orgs = {m.group(0) for m in _ORG_SUFFIX_RE.finditer(title or "")}
+    if not orgs:
+        return True
+    d = desc or ""
+    return any(_org_matches(o, d) for o in orgs)
+
+
+def _org_matches(org, text):
+    """机构名出现在 text 中即命中；另查常见简称↔全称（"工信部"↔"工业和信息化部"，
+    注意全称里"工信"两字并不连续，前缀正则会漏）。"""
+    t = text or ""
+    if org in t:
+        return True
+    full = _ABBR_MAP.get(org)
+    if full and full in t:
+        return True
+    if len(org) <= 6 and org.endswith(("部", "局", "委", "院", "办")):
+        stem = org[:-1]
+        # stem 的每个字都见于 text（顺序不限）→ 视为同机构的不同写法
+        if stem and all(ch in t for ch in stem):
+            return True
+    # 企业类简称："腾讯公司" → 正文写"腾讯"也算同一主体
+    for suf in ("公司", "集团"):
+        if org.endswith(suf) and org[: -len(suf)] in t:
+            return True
+    return False
+
+
+_ABBR_MAP = {
+    "工信部": "工业和信息化部",
+    "发改委": "发展和改革委员会",
+    "国家发改委": "国家发展和改革委员会",
+    "网信办": "互联网信息办公室",
+    "市场监管总局": "市场监督管理总局",
+    "中科院": "中国科学院",
+    "社科院": "社会科学院",
+}
+
 def is_cn_official_policy(title, desc=""):
     """是否为中国官方发布的、与 AI 相关的政策文件（政策发布的准入条件）。
 
@@ -1858,7 +1932,9 @@ def is_cn_official_policy(title, desc=""):
         return False
     if not any(k in text for k in POLICY_ACTIONS):
         return False
-    return has_ai_topic(t)
+    # [2026-10-19] 政策必须与 AI 有实质关联（强主题词），防"购物季通知"
+    # 这类仅蹭"智能护理机器人"的泛化条目混入
+    return policy_ai_strong(t)
 
 
 def _capital_signal(text):
@@ -1892,7 +1968,7 @@ def is_intl_official_policy(title, desc=""):
             r"(?<![a-z])(?:rule|rules|regulation|regulations|act|ban|order|"
             r"mandate|directive|guideline|framework|bill)(?![a-z])", text.lower()):
         return False
-    return has_ai_topic(text)
+    return policy_ai_strong(text)
 
 
 def normalize_category(cat, title, desc, region="cn"):
@@ -2446,6 +2522,10 @@ def generate_news(material, today_cn, attempt=0):
         # [2026-10-15] 标题实体必须在素材中出现（拦截阶段A编造标题）
         if not title_entity_supported(c["title"], material_text):
             log(f"  丢弃标题实体与素材不符的条目: {c['title'][:26]}")
+            continue
+        # [2026-10-19] 标题与正文必须说同一件事（标题机构名须见于正文）
+        if not title_desc_coherent(c["title"], desc):
+            log(f"  丢弃标题与正文错配的条目: {c['title'][:26]}")
             continue
         # 分类确定性纠偏（模型常为"四类均衡"而错标）。
         # [2026-09-21] 必须带上地域——"政策发布"在两个板块的判据不同：
