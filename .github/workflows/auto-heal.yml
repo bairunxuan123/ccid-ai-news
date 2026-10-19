@@ -1,0 +1,95 @@
+name: Auto Heal Missing Days
+
+# [2026-10-19 新增] 自愈回填：每天扫一遍最近 7 天，把线上缺失（或条数明显
+# 不足）的日期自动补上。
+#
+# 为什么需要它：GitHub Actions 的 schedule 会被整体推迟 4~5 小时才启动、
+# 个别时段甚至不触发；而 news_pipeline 在"LLM 输出 JSON 截断解析失败"或
+# "板块产出不达标"时会 return 1，整天不落盘。两者叠加就出现线上整天空白
+# （10-17 就是 JSON 解析失败两次、当天没内容）。
+#
+# auto_heal.py 有前置扫描：没洞就直接退出（20 秒内，不抓素材不调模型），
+# 所以日常运行成本近似为零。
+
+on:
+  schedule:
+    - cron: "0 13 * * *"   # 北京 21:00（考虑 GitHub 的延迟，实际落在夜间）
+    - cron: "0 16 * * *"   # 补一趟，防止前一趟被延迟跳过
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "回溯天数"
+        required: false
+        default: "7"
+
+# 与 daily-news 共用同一把锁：两个 job 同时写两个 HTML 会互相 non-fast-forward
+# 把对方挤掉（2026-10-16 就发生过），排队执行即可。
+concurrency:
+  group: ccid-news-write
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  auto-heal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node（NEWS_DATA 的 JS 语法校验）
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run auto heal（扫描缺失日期并回填）
+        id: heal
+        continue-on-error: true
+        env:
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+        run: python auto_heal.py --days ${{ github.event.inputs.days || '7' }}
+
+      - name: Sync index.html（完整版默认入口，海报短链）
+        if: steps.heal.outcome == 'success'
+        run: cp -f ai-chain-map.html index.html
+
+      - name: Commit & push
+        id: commit
+        if: steps.heal.outcome == 'success'
+        run: |
+          git config user.name "daily-news-bot"
+          git config user.email "daily-news-bot@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "无变更，跳过提交"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "chore: 自愈补齐缺失日期 $(date +%F)"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Notify WeChat via Server酱
+        if: always() && steps.heal.outcome != 'success'
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TITLE="赛迪AI动态 自愈任务未成功"
+          DESP=$(printf '自愈回填执行未成功，可能存在缺失日期。\n\n[查看运行日志](%s)' "$RUN_URL")
+          if [ -n "${SERVERCHAN_SENDKEY}" ]; then
+            curl -s -X POST "https://sctapi.ftqq.com/${SERVERCHAN_SENDKEY}.send" --data-urlencode "title=${TITLE}" --data-urlencode "desp=${DESP}"
+          fi
+
+      - name: Fail if heal failed
+        if: steps.heal.outcome != 'success'
+        run: |
+          echo "自愈未成功（outcome=${{ steps.heal.outcome }}）"
+          exit 1
