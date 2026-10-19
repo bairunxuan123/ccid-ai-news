@@ -2785,6 +2785,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-19",
+    weekday: "星期一",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，涵盖政策发布、技术突破、产业动态和投融资等多个方面。　【国外】OpenAI神秘模型曝光，Meta与苹果合作推出开源模型，Anthropic设立公共利益基金。",
+    items: [
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "工信部印发《“人工智能+软件”专项行动实施方案》", desc: "国家统计局发布了今年前三季度经济数据，显示国内生产总值同比增长4.6%，其中工业机器人产量同比增长29.1%，3D打印设备、锂离子电池产量同比分别增长62.5%、39.5%。这些数据反映出我国国民经济顶住压力保持平稳运行，动能向新、结构向优，为后续发展奠定了坚实基础。", source: "IT之家", url: "https://www.ithome.com/1/014/685.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "华为电驱+L4同源智驾，Ray7能成为埃安年轻化的答卷吗？", desc: "广汽埃安推出了全新轿跑Ray7，预售价12.88万起，搭载宁德时代电池和广汽自研弹匣电池2.0技术，续航可达702公里。新车采用华为DriveONE电驱和芯片级驱制融合架构，百公里制动32.8米，并配备27颗车规级传感器，采用L4级Robotaxi同源大模型。Ray7是埃安年轻化战略的关键产品，旨在与20万级市场的小鹏P7、极氪007等车型竞争。", source: "雷峰网", url: "https://www.leiphone.com/category/transportation/F3nQwjeqDO0BtrQ0.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "中信证券：看好国产大模型持续崛起", desc: "中信证券发布报告，看好国产大模型持续崛起，DeepSeek Harness有望成为DeepSeek生态关键一环，通过插件化、场景预设与跨Agent协作拓展用户和任务覆盖。报告指出，DeepSeek借助Harness完善生态与商业化闭环，其长期价值在于生态扩张积累需求，配置与流程沉淀增强产品黏性，可回溯能力支撑安全治理，共同为持续使用与企业部署创造条件。", source: "IT之家", url: "https://www.ithome.com/1/014/646.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "中控技术接入千问办公，打造流程工业领域AI Native标杆企业", desc: "中控技术股份有限公司正式接入千问办公，将Agent落地营销全链路，后续将优化中控技术的采购、供应链、财务、人力、研发等场景工作流，共建流程工业领域AI Native标杆企业。中控技术成立于1999年，业务覆盖全球50多个国家和地区，服务海内外4万多家客户。在营销领域，中控技术正与千问办公联合打造AI营销项目，覆盖从搜集市场线索到回款结算的营销全链路，如一线销售场景下，解决方案产出时间可缩短至1天，效率提升约5倍。中控技术还将在采购、供应链、财务、人力、研发、合规等场景深度融入千问办公，并基于千问办公的skill能力，把多年经验打造为AI营销技能库。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/8IM46Vzpf7IFumo7.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "烧钱已成过去式，AI竞赛方向有变化？", desc: "微软削减了Anthropic技术（主要是Claude Code）的使用预算，砍掉了三分之一以上，并要求员工更多使用自研AI工具；Meta维持千亿美元基建盘子，同时裁员约8000人“对冲AI相关支出压力”。阿里、腾讯、百度资本开支同比大增，但资本市场更关注收回情况。AI竞赛转向“算着账烧”，竞争方向未变，评价体系和行为模式转变。", source: "钛媒体", url: "https://www.tmtpost.com/8172463.html" },
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "三部门组织开展 2026 年“孝老爱老购物季”活动", desc: "工业和信息化部、民政部、市场监管总局联合发布《关于组织开展 2026 年“孝老爱老购物季”活动的通知》，活动时间为 2026 年 10 月 18 日至 11 月 17 日，旨在提升适老产品供需适配水平，引导适老产品生产企业开发新产品，并推动智能护理机器人等迭代升级。活动期间，将建设适老产品体验空间，鼓励电商平台搭建线上适老产品虚拟展厅，推广“线下体验、线上下单、上门服务”新模式。", source: "IT之家", url: "https://www.ithome.com/1/014/659.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "DeepSeek成立产品部，探索变现模式", desc: "DeepSeek成立产品部，整合Harness团队及Web、App、Platform团队，崔添翼任负责人。月活跃用户达1.3亿，年化营收超10亿美元，主要来自API调用。产品部将负责商业模式，探索变现路径。", source: "钛媒体", url: "https://www.tmtpost.com/8172203.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "清华开源智能体操作系统，降低任务成本83%", desc: "清华大学发布了智能体操作系统，该系统原生支持MCP，使任务成本降低83%，AI记忆可查可改。这一创新技术将显著提升AI应用的效率和灵活性。", source: "量子位", url: "https://www.qbitai.com/2026/10/503935.html" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "OpenAI曝光三个神秘模型，以Aurora命名", desc: "OpenAI曝光三个神秘模型Aurora（极光）红、绿、蓝，疑似GPT-6 Astra后续版本内部检查点；DeepSeek开放搜索与网页抓取API；智界获独立造车资格，计划上市。Anthropic与法律专家探讨AI Agent谈判规则，未来可替用户砍价、处理纠纷。", source: "极客公园", url: "http://www.geekpark.net/news/372514" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Meta联手苹果推出全美最强开源模型，编码基测输给智谱、Kimi", desc: "Meta公司与苹果联合推出了全美最强的开源模型，该模型在编码基准测试中输给了智谱和Kimi。这一模型在性能上表现出色，其技术规格和覆盖范围均达到了行业领先水平。与之前相比，该模型的性能有了显著提升，显示出Meta和苹果在人工智能领域的强大实力。", source: "InfoQ", url: "https://www.infoq.cn/article/EuYOPRUBAeBgBGBu5ktk?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Anthropic承诺将5%股份用于公共利益基金", desc: "Anthropic发布声明，将把5%的股份投入到“公共利益基金”。该基金旨在支持公共事业和慈善事业。这一举措显示出Anthropic对社会责任的重视，同时也为公司的未来发展提供了更多可能性。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/18/anthropic-says-its-committing-5-of-its-shares-to-a-public-benefit-fund/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "迪士尼将雇佣Character.AI大部分员工", desc: "Character.AI 申请破产重组后，迪士尼同意雇佣其60多名员工，前三年总计可获1.8亿美元薪酬，约合12.07亿元人民币。Character.AI是一个由大语言模型驱动的虚拟角色互动与聊天机器人平台，拥有数百万AI角色。迪士尼还将获得Character.AI的核心技术许可。", source: "IT之家", url: "https://www.ithome.com/1/014/634.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "海外AI基建融资溢价飙升，Anthropic借款买芯片利息超10%", desc: "美国人工智能企业Anthropic正在以超过10%的收益率吸引黑石集团为其芯片交易提供融资，总额达600亿美元，其中420亿美元优先级债务由博通担保，180亿美元次级债由黑石旗下基金投资90亿美元，预计总回报率更高。此次融资借贷成本上升，反映出投资者对AI基础建设融资要求更高风险溢价，也凸显了科技公司短期内巨额资金需求带来的压力。", source: "IT之家", url: "https://www.ithome.com/1/014/628.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "JAECOO × Momenta完成首个无接管凯旋门智驾挑战", desc: "JAECOO与Momenta在巴黎车展期间共同完成首个无接管凯旋门智驾挑战，奇瑞欧洲研发中心总经理侯小红、CTO Peter Matkin与Momenta首席架构师饶庆乘坐搭载Momenta R7模型的JAECOO 7测试车，挑战全程约11.38公里的复杂路线，涵盖无标线道路、12个环岛出口等，展现双方共同打造的欧洲智驾体验。此次挑战成功，标志着JAECOO 7在智能出行体验上的拓展。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/LDt2TEiUf3wgi2Os.html" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "AI系统RFdiffusion3能从原子层面设计蛋白质，可在实验中实现预期功能", desc: "美国华盛顿大学、英国牛津大学和英伟达等机构近日发布了AI系统RFdiffusion3，该系统能从原子层面设计蛋白质，并在实验中实现预期功能。该系统可对单个原子进行建模，用于设计蛋白质与核酸，已开源。基于人工智能的蛋白质研究已从预测已有蛋白质的三维结构，进一步发展为设计具备目标结构与功能的全新蛋白质。", source: "IT之家", url: "https://www.ithome.com/1/014/625.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "迪士尼收购Character.AI部分员工", desc: "迪士尼同意雇佣Character.AI的大部分员工，其中“绝大多数”被提供工作的员工接受了迪士尼的邀请。然而，这只是一次试探性出价，另一家公司可能会提出更高的报价。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/18/disney-agrees-to-hire-the-majority-of-character-ais-workforce/" }
+    ]
+  },
+  {
     date: "2026-10-18",
     weekday: "星期日",
     regioned: true,
