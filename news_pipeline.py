@@ -136,6 +136,10 @@ MIN_PER_CELL = 2
 INTL_MIN_ITEMS = 5
 MIN_PER_CELL_INTL = 1
 MIN_TOTAL_ITEMS = PER_REGION_ITEMS + INTL_MIN_ITEMS
+# [2026-10-19] 降级写入的"残废线"：低于此才真的放弃，介于残废线与目标口径之间
+# 一律写盘（保证页面每天有内容），缺口由 auto_heal.py 隔天补。
+FALLBACK_MIN_CN = 5
+FALLBACK_MIN_INTL = 3
 
 # 要求模型输出的候选条数（**每个地域**）。8 格 × 4 = 32 条，分两次要。
 # [2026-09-21] 由单次 14 条改为"每地域 16 条 × 2 轮地域"。原因见上面的地域说明：
@@ -908,7 +912,10 @@ def call_glm(prompt, temperature=0.4):
         "model": ZHIPU_MODEL,
         "messages": [{"role": "user", "content": prompt}],
         "temperature": temperature,
-        "max_tokens": 4096,
+        # [2026-10-19] 由 4096 提到 8192。10-17 整天失败的直接原因就是阶段 A
+        # 的候选 JSON 被 max_tokens 截断、解析抢救不出来，两轮都失败 → return 1，
+        # 线上整天空白。给足上限后截断概率大幅下降。
+        "max_tokens": 8192,
     }).encode("utf-8")
     last = None
     for i in range(4):
@@ -1438,9 +1445,25 @@ def parse_llm_json(content):
                 if depth == 0:
                     close = j
                     break
-        if close == -1:          # 这一层没闭合（截断点），跳过
-            continue
-        frag = text[m.start():close + 1]
+        frag = None
+        if close == -1:
+            # [2026-10-19] 原来遇到未闭合就直接 continue，而"模型吐出单个残缺
+            # item 片段"（连外层 summary/items 包裹都没有）时，唯一的那个 `{`
+            # 就是不闭合的，结果一条也救不出来、整天失败。现在尝试补齐：
+            # 砍掉最后一个不完整的 key/value，再补 `}` 拼成合法对象。
+            tail = text[m.start():]
+            cut = max(tail.rfind('",'), tail.rfind('"}'), tail.rfind("',"))
+            if cut > 0:
+                cand = tail[:cut + 1].rstrip().rstrip(",") + "}"
+                try:
+                    json.loads(cand)
+                    frag = cand
+                except Exception:
+                    frag = None
+            if frag is None:
+                continue
+        else:
+            frag = text[m.start():close + 1]
         if '"title"' not in frag or '"cat"' not in frag:
             continue
         try:
@@ -2666,10 +2689,18 @@ def main():
     # 写上去等于把一个残缺的页面推给用户，不如留线上旧版。
     _n_cn = sum(1 for x in items if x.get("region") == "cn")
     _n_intl = len(items) - _n_cn
-    if _n_cn < PER_REGION_ITEMS or _n_intl < INTL_MIN_ITEMS:
-        log(f"板块产出不达新口径（国内 {_n_cn}/{PER_REGION_ITEMS}、"
-            f"国外 {_n_intl}/{INTL_MIN_ITEMS}+），放弃本次写入")
+    # [2026-10-19] 分两级：低于"残废线"才放弃；只是没凑齐目标口径则降级写入。
+    # 原来的单级门槛（国内 8 / 国外 5）让"写出了 6+4 条"也整天不落盘，
+    # 线上直接空白——这正是用户反复反馈"很久没更新"的直接成因。
+    # 先保证页面每天有东西，条数不够由 auto_heal.py 隔天补。
+    if _n_cn < FALLBACK_MIN_CN or _n_intl < FALLBACK_MIN_INTL:
+        log(f"板块产出过少（国内 {_n_cn}/{FALLBACK_MIN_CN}、"
+            f"国外 {_n_intl}/{FALLBACK_MIN_INTL}），放弃本次写入")
         return 1
+    if _n_cn < PER_REGION_ITEMS or _n_intl < INTL_MIN_ITEMS:
+        log(f"⚠ 未达目标口径（国内 {_n_cn}/{PER_REGION_ITEMS}、"
+            f"国外 {_n_intl}/{INTL_MIN_ITEMS}+），降级写入以保证当天有内容；"
+            "缺口交给 auto_heal 后续补齐")
     if len(items) < MAX_ITEMS:
         log(f"仅生成 {len(items)} 条（<{MAX_ITEMS} 条），仍写入但内容偏少")
     _log_cell_dist("最终写入", items)
