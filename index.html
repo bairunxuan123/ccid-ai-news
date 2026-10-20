@@ -2785,6 +2785,28 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-20",
+    weekday: "星期二",
+    regioned: true,
+    summary: "【国内】今日AI产业聚焦RISC-V技术、机器人应用、DeepSeek模型升级、Robotaxi工程样车下线等热点。　【国外】AI产业政策加强，技术突破与投资活跃。",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "中科通量亮相RISC-V中国峰会，展示全栈RISC-V智能解决方案", desc: "中科通量亮相2026 RISC-V中国峰会，推出SmarCo AI工作站、SmarCo智能视频编码一体机、SmarCo智算加速卡等产品，展示国产RISC-V在视频与智算领域的全栈能力。峰会现场吸引多批专业观众、开发者与行业客户咨询，产品演示和生态交流成焦点。RISC-V已占据全球处理器市场25%份额，中科通量核心技术团队拥有20+年视频智能技术积淀，研发人员占比超过50%，致力于重新定义视频智能的算力范式。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/2KBJmyhuJeiRQ7Op.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "吉利汽车与曹操出行联合打造中国首款原生开发Robotaxi工程样车", desc: "曹操出行与吉利汽车等合作伙伴联合打造的中国首款原生开发Robotaxi，近日正式下线工程样车，标志着项目进入量产级方案实车验证阶段。该车型从开发之初即围绕Robotaxi无人化运营需求进行整车设计和工程开发，预计2027年量产。吉利控股集团安聪慧曾表示，曹操出行将全面采用换电模式，Robotaxi车型也将采用换电模式，产品即将落地。今年4月，首款原生开发Robotaxi原型车吉利“Eva Cab”已亮相，量产后将推进全球范围内的大规模商业化运营。", source: "IT之家", url: "https://www.ithome.com/1/015/225.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "DeepSeek新模型升级，梁文锋为具身智能铺路", desc: "DeepSeek发布DeepSeek-V4.1-Flash-1017版本，升级幅度大，降低AI编程门槛。该版本对现有模型能力迭代，性能提升，成本降低。DeepSeek近期投资多笔具身智能领域，战略版图扩大。", source: "钛媒体", url: "https://www.tmtpost.com/8173675.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "DeepSeek新模型上线，价格更低能力更强", desc: "DeepSeek发布新模型V4.1 Flash，性能提升，任务运行时间缩短，成本降低；马斯克开发议价机器人Hagglebot，目标为企业节省成本；天文学家发现第一颗绿色恒星。", source: "极客公园", url: "http://www.geekpark.net/news/372512" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "新石器完成近4亿美元E轮融资，国家人工智能产业投资基金领投", desc: "新石器完成近4亿美元E轮融资，由博裕投资与国家人工智能产业投资基金联合领投，累计融资额突破百亿元人民币，创国内自动驾驶领域最大单笔融资纪录。公司计划将资金用于深耕精细化运营网络和加大端到端大模型数据训练闭环投入，以提升无人驾驶安全等级和降低运维成本。", source: "IT之家", url: "https://www.ithome.com/1/015/217.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "阿里云探索AI原生研发组织实践，发布7个样板间", desc: "阿里云推出了7个样板间，探索AI原生研发组织的实践，旨在深入研究和应用人工智能技术。这些样板间涵盖了云计算、大数据、物联网等多个领域，通过实际案例展示了AI技术在企业中的应用潜力。此举将有助于推动AI技术的研发和应用，为各行各业带来创新解决方案。", source: "InfoQ", url: "https://www.infoq.cn/article/2uG3W14THqtLhb5Vou51?utm_source=rss&utm_medium=article" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "AI开始挑战最复杂的系统：生命，哲源科技发布WHIRLPO计算医学平台", desc: "哲源科技于10月17日发布WHIRLPO计算医学平台，该平台致力于挑战生命这一最复杂的系统。该平台具有先进的技术规格，覆盖广泛的医学领域，并与多家合作方共同推进。这一发布标志着哲源科技在计算医学领域的重要进展，有望为医学研究和临床应用带来深远影响。", source: "量子位", url: "https://www.qbitai.com/2026/10/504242.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "12.88万起、华为电驱+L4同源智驾，Ray7能成为埃安年轻化的答卷吗？", desc: "广汽埃安推出了全新轿跑Ray7，预售价12.88万起，搭载宁德时代电池和广汽自研弹匣电池2.0技术，续航可达702公里。Ray7采用华为DriveONE电驱和芯片级驱制融合架构，百公里制动32.8米，搭载27颗车规级传感器和L4级Robotaxi同源大模型。自2025年广汽推进“番禺行动”以来，埃安产品迭代加快，Ray7作为埃安年轻化序列的关键车型，旨在20万级市场占位。", source: "雷峰网", url: "https://www.leiphone.com/category/transportation/F3nQwjeqDO0BtrQ0.html" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Meta收购Character AI", desc: "迪士尼同意雇佣Character.AI的大部分员工。据报道，“绝大多数”在迪士尼提供工作机会的Character.AI员工接受了邀请。然而，这只是一个试探性报价，另一家公司可能会提出更高的报价。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/18/disney-agrees-to-hire-the-majority-of-character-ais-workforce/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "亚马逊推出AI开发工具TorchNeuron", desc: "亚马逊发布了新的开发工具TorchNeuron，旨在打破Nvidia对PyTorch的垄断，鼓励更多开发者使用其替代芯片。此举旨在让更多AI应用在亚马逊的芯片上运行。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/19/amazon-is-taking-its-biggest-shot-at-nvidia-yet-with-new-torchneuron-dev-tool/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "奇瑞发布物理AI模型CheryMind", desc: "奇瑞在2026奇瑞全球创新大会上发布了CheryMind垂域基础大模型，宣称该模型专为物理AI而生。CheryMind覆盖700TB企业知识、200PB工程数据，打通400+企业系统，已应用于6万+员工和200+业务场景。此举旨在重塑企业运转方式。", source: "IT之家", url: "https://www.ithome.com/1/015/219.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "OpenAI开发人形机器人项目", desc: "OpenAI曝光三个神秘模型Aurora（极光）红、绿、蓝，可能为GPT-6 Astra后续版本检查点；DeepSeek开放搜索与网页抓取API；智界获独立造车资格，计划上市。Anthropic与法律专家讨论AI Agent谈判规则，未来可替用户砍价、处理纠纷。", source: "极客公园", url: "http://www.geekpark.net/news/372514" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "云flare推出AI代理CLI工具", desc: "Cloudflare 推出面向 AI 代理的 CLI，并逐步停用 Wrangler。该 CLI 针对AI代理提供便捷操作，旨在提升开发效率。同时，Cloudflare 正逐步停用 Wrangler，以集中资源优化产品线。此举预计将对开发者体验产生积极影响，并推动 Cloudflare 在AI领域的布局。", source: "InfoQ", url: "https://www.infoq.cn/article/Ddda0DF68laqfoqa4Lju?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Tolan获得3000万美元融资", desc: "AI伴侣应用Tolan成功融资3000万美元，吸引了超过25万活跃用户。该应用旨在帮助用户导航生活，较此前预测的活跃用户数量大幅增长。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/19/tolan-snags-30m-for-its-ai-companion-that-helps-users-navigate-life/" }
+    ]
+  },
+  {
     date: "2026-10-19",
     weekday: "星期一",
     regioned: true,
