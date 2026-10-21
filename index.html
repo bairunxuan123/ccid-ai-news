@@ -2785,6 +2785,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-21",
+    weekday: "星期三",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，涵盖政策发布、技术突破、产业动态和投融资等多个方面。　【国外】AI行业政策、技术突破、产业动态和投融资均有所进展。",
+    items: [
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "签订百亿元AI算力大单，蜂助手手握3亿元货币资金却要采购超70亿元AI服务器", desc: "蜂助手为旗下子公司广东极算技术有限公司提供1.9958亿元借款担保，此前董事会已通过不超过60亿元担保计划。公司正全力向AI算力租赁转型，已签订超100亿元算力租赁订单，但手头仅3.3亿元货币资金，面临交付难题。", source: "钛媒体", url: "https://www.tmtpost.com/8175776.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "知名反编译社区关停，AI时代游戏代码岌岌可危？", desc: "知名反编译社区decomp.dev宣布停用公项目索引与新增项目功能。该平台原定于展示游戏反编译进度，助力研究者交流技术，但AI编程能力的提升导致一些参与者利用AI快速完成他人项目的分叉版本，社区协作机制面临挑战。据公告，AI已能在人工审查下显著加速匹配式反编译工作，但部分参与者利用AI抢先进度，影响社区原有机制。现有项目页面及历史数据仍将保留，但不再接受新项目。", source: "钛媒体", url: "https://www.tmtpost.com/8175821.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "首Token延迟降低32.4%！是石科技集群调度大招，国产推理再提效", desc: "是石科技发布TokenFleet调度框架，该框架将首Token延迟降低32.4%，显著提升国产推理效率。该框架旨在优化集群调度，为用户带来更高效的计算体验。", source: "量子位", url: "https://www.qbitai.com/2026/10/504421.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "580天暗战，爱奇艺的AI闯关路", desc: "爱奇艺推出了“跳看”功能，通过生成式AI实现长剧短看，自动识别并推荐精彩剧情点。该功能源于爱奇艺创始人龚宇对用户注意力稀缺的洞察，旨在通过供给侧改革，为用户提供更个性化的观影需求。在横店片场，导演金哲勇利用AI文生图、图生视频技术，在摄影棚内通过500平米的沉浸式LED幕墙实现场景模拟，背景视频素材均由AI生成。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/jJI2TPXI1eYWxECq.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "飞书豆包工作AI先锋未来人才大赛，企业争抢AI人才", desc: "飞书豆包工作AI先锋未来人才大赛由飞书豆包举办，旨在选拔会用AI解决问题的人才。该大赛吸引了众多企业参与，竞争激烈。比赛聚焦真实问题解决力，旨在培养具备AI应用能力的人才。", source: "量子位", url: "https://www.qbitai.com/2026/10/504608.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "小米MiMo-V2.5-Pro模型下线，替换为V2.6-Pro支持多模态理解", desc: "小米公司今日正式下线了MiMo-V2.5-Pro和MiMo-V2.5模型，并替换为V2.6-Pro和V2.6-flash。新版本将于10月14日18:00（UTC+8）起自动路由，V2.6-Pro支持多模态理解，API参数完全适配，而V2.5-pro仅支持文本输入。", source: "IT之家", url: "https://www.ithome.com/1/015/709.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "中科通量亮相RISC-V中国峰会，全栈RISC-V智能覆盖视频+智算全场景", desc: "中科通量亮相2026 RISC-V中国峰会，推出SmarCo AI工作站、智能视频编码一体机、智算加速卡等产品，展示国产RISC-V在视频与智算领域的全栈能力。峰会现场吸引多批专业观众、开发者与行业客户咨询，产品演示和生态交流成焦点。RISC-V已占据全球处理器市场25%份额，从边缘市场到高价值领域正走向规模化商用。中科通量核心技术团队拥有20+年视频智能技术积淀，研发人员占比超过50%，致力于重新定义视频智能的算力范式。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/2KBJmyhuJeiRQ7Op.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "北大博士黄文灏加入字节Seed，两年后离职，下一步或创业", desc: "北大博士、零一万物联创始人黄文灏加入字节跳动Seed计划两年后离职，下一步计划或创业。黄文灏在字节跳动期间参与了Seed计划，负责相关项目。离职后，黄文灏将利用在字节跳动积累的经验和资源，探索新的创业机会。", source: "InfoQ", url: "https://www.infoq.cn/article/Xkjg7bLE3o6l9qCidVX0?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "DeepSeek开源大规模云服务推理框架", desc: "DeepSeek宣布开源内部推理框架DeepInfer，实现DeepSeek V4.1 Flash高吞吐、低延迟的大规模推理服务，Muse下载量上线40天突破1000万次，用户留存优于ChatGPT等AI竞品，Meta合作华为、宁德时代换电车型拟2027年上市。", source: "极客公园", url: "http://www.geekpark.net/news/372650" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "英伟达发布RTX PRO 5500显卡", desc: "英伟达推出RTX PRO 5500专业工作站显卡，引发国内采购热潮。夏寅卿称订购规模已达数百万张，接近全球产能。大厂计划采购100万张，天阳科技签订2万张采购合同。同时，RTX 5090价格攀升至5.7万元左右。新卡未交付，买家已争相下注，现有显卡供需和价格推至新风口。", source: "雷峰网", url: "https://www.leiphone.com/category/chips/STx9ZzfDNh5W80Bm.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Spotify移除5000万首AI音乐", desc: "Spotify 发布公告，过去一年从推荐流中移除超5000万首AI低质音乐，调整推荐系统优先展示人类创作者作品。平台编辑团队执行同样标准，听众反馈中关于推荐流出现这类内容的投诉明显减少。Spotify 并未要求所有 AI 曲目强制打上标签，但为使用虚拟 AI 身份的创作者推出了“AI Persona（AI 虚拟形象）”标识，并且不会推荐这类 AI 虚拟形象创作的音乐。", source: "IT之家", url: "https://www.ithome.com/1/015/804.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "OpenAI收购Orchestra Bio", desc: "OpenAI收购初创公司Orchestra Bio，加强其生物科技业务。OpenAI将整合Orchestra团队和技术，用于其生命科学研究的AI模型Rosalind及其相关工具Rosalind Workbench，旨在帮助研究人员规划实验和分析结果。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/20/openai-acquires-startup-orchestra-bio%e2%81%a0-to-beef-up-its-biotech-business/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic计划11月IPO", desc: "Anthropic计划于11月IPO前，其基础设施支出激增，但据称正面临难题，难以从云服务提供商那里获得足够的计算资源，因为这些提供商越来越多地将其视为竞争对手。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/20/anthropics-cloud-partnerships-are-getting-messy/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Meta推出Muse幻灯片工具", desc: "Meta宣布暂停Muse分享功能，该功能允许用户分享与AI助手的对话。研究人员发现超过6800个Muse链接在网络上公开，可被链接持有者访问。Meta表示，在审查该报告期间，已暂停此功能。", source: "The Verge", url: "https://www.theverge.com/tech/1014627/meta-muse-ai-sharing-ai-chats" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "SpaceX第三季度AI支出再创新高", desc: "SpaceX发布第二份财报，显示第三季度AI资本开支达164亿美元，资本开支总额约196亿美元，用于AI业务。预计资本开支将增至350亿至400亿美元，新投资能迅速收回成本。财报公布后，SpaceX股价盘后上涨4%。", source: "IT之家", url: "https://www.ithome.com/1/015/669.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Eka Robotics估值达14.5亿美元", desc: "Eka Robotics发布了一款名为Eka的机器人手臂，该手臂能精准抓取多种物体，操作流畅，宛如人类。这使得Eka Robotics的估值达到了14.5亿美元，引起行业专家的高度赞誉。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/20/eka-is-worth-1-45-billion-thanks-to-a-physical-ai-model-that-has-experts-raving/" }
+    ]
+  },
+  {
     date: "2026-10-20",
     weekday: "星期二",
     regioned: true,
