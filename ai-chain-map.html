@@ -2785,6 +2785,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-22",
+    weekday: "星期四",
+    regioned: true,
+    summary: "【国内】国内AI产业政策密集发布，技术突破与融资动作频繁。　【国外】今日AI产业动态丰富，涵盖政策、技术突破、产业动态和投融资等多个方面。",
+    items: [
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "工信部印发《“人工智能+软件”专项行动实施方案》", desc: "工业和信息化部装备工业一司司长郭守刚在2026世界智能网联汽车大会上指出，全球驾驶辅助已实现规模化应用，自动驾驶即将进入商业化推广阶段。长安和北汽两家车企的L3级自动驾驶产品于2025年12月获得附条件准入许可，目前第二批准入试点工作正在进行。郭守刚强调，智能网联汽车正在加速驱动行业生态的重塑，预计到2030年，我国智能网联新能源汽车全产业链优势将进一步巩固，实现规模应用。", source: "IT之家", url: "https://www.ithome.com/1/016/347.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "宇树科技王兴兴：目前物理 AI 已经看到被击穿的苗头", desc: "宇树科技创始人王兴兴在2026世界物理AI大会上表示，随着GPT-6的发布，物理AI已现被击穿苗头，预计1-2年或2-3年内具身智能将迈过ChatGPT时刻的核心挑战。他认为，商业服务落地将比家庭、工业领域更快。大会于10月22日在杭州国际博览中心举行，主论坛聚焦全球物理AI技术创新与产业未来。", source: "IT之家", url: "https://www.ithome.com/1/016/326.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "首都在线：账面扭亏，AI算力持续投入", desc: "首都在线发布2026年三季报，前三季度营收9.56亿元，同比增长3.14%；归母净利润879.62万元，扭亏为盈；经营活动现金流量净额2.17亿元，同比大增148.37%。但扣非净利润仍亏损5618.03万元，资产负债率攀升至68.31%。第三季度营收2.90亿元，同比下降2.36%，归母净利润4098.12万元，弥补上半年亏损。扭亏主要靠设备处置和政府补助，前三季度处置设备等资产收益5542.60万元，政府补助1719.45万元。", source: "钛媒体", url: "https://www.tmtpost.com/8176619.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "DeepSeek 最新一轮融资筹集近千亿元", desc: "DeepSeek 在最新一轮融资中筹集了约1000亿元人民币，成为中国史上规模最大的融资之一。宁德时代和腾讯控股是本轮融资的主要投资者之一。这笔融资有助于缩小DeepSeek与美国顶尖AI实验室的资金差距，但DeepSeek的财力仍远不及Anthropic和OpenAI。DeepSeek有望成为中国资本市场最受瞩目的上市项目之一。", source: "IT之家", url: "https://www.ithome.com/1/016/263.htm" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "MiniMax 股价跌破 IPO 发行价", desc: "MiniMax 发布新模型，股价跌破IPO发行价。2026年1月，公司以165港元定价上限登陆港交所，募集资金约55.4亿港元。上市首日股价大涨109%，3月冲高至1330港元，涨超7倍。但受行业竞争、商业化难题及高昂成本影响，股价下跌，10月19日跌幅达7.3%，亏损持续扩大。", source: "IT之家", url: "https://www.ithome.com/1/016/269.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "推动AI规模化落地，公共部门实践分享", desc: "InfoQ报道，公共部门领导者分享了推动AI规模化落地的三大经验。这些经验基于实践洞察，旨在指导技术趋势。具体细节未提及，但强调了实际应用中的关键因素。这些经验对后续AI技术的发展和应用具有指导意义。", source: "InfoQ", url: "https://www.infoq.cn/article/GVcxHscrQqv9HXGRowJh?utm_source=rss&utm_medium=article" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "DeepSeek开源最新推理框架，日吞吐155万亿Token", desc: "DeepSeek开源最新推理框架，单集群日吞吐量达155万亿Token，KVCache可保存7天。该框架在性能上较之前有显著提升。", source: "InfoQ", url: "https://www.infoq.cn/article/NBXP966Bz3eqr6Qidvaf?utm_source=rss&utm_medium=article" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "金融智能分析本体：四大核心要素与五条建设路线", desc: "InfoQ发布《金融智能分析本体：四大核心要素与五条建设路线》，详细阐述了金融智能分析的关键要素和建设路径。该文深入探讨了金融智能分析领域的最新发展趋势，为行业提供了有益的参考。", source: "InfoQ", url: "https://www.infoq.cn/article/Be94YQbRtbWj3pzZ9rSh?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "GitHub重构Copilot", desc: "GitHub 宣布将 Copilot 运行时迁移至 Rust 语言。这一技术调整旨在提升代码性能和安全性。较此前，Copilot 的运行效率得到显著提升，为开发者带来更流畅的编程体验。", source: "InfoQ", url: "https://www.infoq.cn/article/zGqDWHF8tHDtlYcImAJS?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Recursive发布AI编码模型", desc: "Recursive公司发布了Flint，一款由其AI研究系统主要构建的免费笔记本电脑大小编码模型，作为对自我改进AI的早期测试。该模型旨在通过AI技术提升编码效率。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/21/recursive-launches-flint-a-laptop-coding-model-it-says-was-largely-built-by-ai/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Meta发布AI新股份，用于AI研发和收购", desc: "Meta发布新股票类别以资助其AI计划。作为周三发布的第三季度财报的一部分，公司表示，这种非投票股票还将用于潜在收购和员工薪酬，交易将于2027年开始。Meta在新闻稿中表示，“在行业AI转型的大背景下，为了竞争、维持增长、扩展基础设施和追求新的战略计划，所需的投入规模是巨大的。”Meta首席财务官苏珊·李在财报电话会议期间补充说，新股票类别将支持公司的AI推进。", source: "The Verge", url: "https://www.theverge.com/tech/1015799/meta-shares-class-ai-q3-2026-earnings" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI提出AI安全法案，若50人以上死亡或可阻止模型发布", desc: "Anthropic发布了一项AI安全法案，该法案提出，如果一款AI模型可能导致50人以上死亡，则可能阻止其发布。这项政策看似为AI失控提供了保护，但实际上禁止联邦机构在未经法官许可的情况下阻止模型发布。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/20/anthropic-pitches-ai-safety-bill-that-may-block-a-model-if-50-people-could-be-killed/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "DeepSeek开源大规模云服务推理框架DeepInfer", desc: "DeepSeek宣布开源内部推理框架DeepInfer，Muse下载量40天内突破1000万次，用户留存优于ChatGPT等竞品。华为与宁德时代合作换电车型，拟2027年上市。开源模型与Agent工具链完善，有望降低应用开发成本，推动AICoding向多场景扩展。", source: "极客公园", url: "http://www.geekpark.net/news/372650" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "SpaceX AI业务盈利，收入达44亿美元", desc: "SpaceX在第三季度实现盈利，净收入达44亿美元，其中AI业务成为关键驱动力。TechCrunch报道，AI业务助力SpaceX在第三季度实现盈利，净收入达到44亿美元。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/20/spacexs-ai-business-is-beating-expectations/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic最快本周五公开提交上市申请，有望成为史上最大规模的IPO", desc: "Anthropic计划最快本周五公开提交上市申请，预计规模将超过SpaceX今年6月的IPO，募资数十亿美元用于AI基础设施建设，支持Claude系列模型训练和运行。今年上半年营收达163亿美元，净亏损超800亿美元。Anthropic上市将成检验投资者对AI热潮兴趣的重要考验。", source: "IT之家", url: "https://www.ithome.com/1/016/243.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Spotify从推荐列表中移除5000万AI生成歌曲", desc: "Spotify发布声明称，过去一年内从用户推荐中移除了超过5000万首被认为是AI生成垃圾音乐或垃圾信息。该公司还对其推荐系统进行了调整，以突出更多由人类艺术家创作的音乐。Spotify表示，自调整以来，听众对推荐内容中出现此类内容的担忧显著减少。", source: "The Verge", url: "https://www.theverge.com/entertainment/1014284/spotify-ai-slop-spam-songs-removed" }
+    ]
+  },
+  {
     date: "2026-10-21",
     weekday: "星期三",
     regioned: true,
