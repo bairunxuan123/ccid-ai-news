@@ -2795,6 +2795,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-24",
+    weekday: "星期六",
+    regioned: true,
+    summary: "【国内】今日AI产业政策密集发布，技术突破与产业动态并行，融资动作活跃。　【国外】OpenAI停用联网训练，Meta收购AI数据分析平台，亚马逊CEO谈AI成本。",
+    items: [
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "国务院办公厅印发《关于适应人工智能技术发展助力构建就业友好型发展方式的意见》", desc: "国务院办公厅发布《关于适应人工智能技术发展助力构建就业友好型发展方式的意见》，旨在贯彻落实党中央、国务院关于就业工作的决策部署。意见强调，就业是最基本的民生，要求各省、自治区、直辖市人民政府，国务院各部委、各直属机构积极适应人工智能技术发展，助力构建就业友好型发展方式。", source: "中国政府网", url: "https://www.gov.cn/zhengce/zhengceku/202610/content_7084108.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "擦窗机器人有了首个行业标准，你敢把窗户交给它吗？", desc: "中国家用电器研究院发布了首个擦窗机器人行业标准。据IDC数据，2026年第二季度全球擦窗机器人出货量约84.7万台，同比增长59.8%，市场规模从2020年的4.8亿元增至2025年的17亿元，年复合增长28.6%。科沃斯窗宝2025年月产能从10万台级跨入20万台级，全球擦窗机出货量同比增长70.4%，预计2026年将突破300万台。", source: "雷峰网", url: "https://www.leiphone.com/category/smarthome/iDkOEQuhDC14QfOE.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "国产具身智能出海开启“减重计划”", desc: "高工机器人产业研究所发布报告显示，2026年上半年，中国机器人出口额达248.5亿元，同比增长359.0%，其中文娱商演与科教采购占比超60%，智能制造机器人占比仅13%。出口机器人中，超过六成用于展台和教室，真正应用于产线和仓库的不足两成，凸显具身智能技术适配生产场景的挑战。", source: "钛媒体", url: "https://www.tmtpost.com/8179676.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "百度世界2026前瞻：10+重磅分论坛，全面解码AI时代的智能组织进化路径", desc: "百度官方公众号于10月21日发布，宣布百度世界2026将举办10+个重磅分论坛，旨在全面解码AI时代的智能组织进化路径。这些分论坛将涵盖人工智能领域的多个前沿话题，为业界提供深入交流的平台。", source: "量子位", url: "https://www.qbitai.com/2026/10/504901.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "中国 AI 硬件的下一个爆款，可能生在「网球场」", desc: "深圳工程师团队在Kickstarter上成功筹得百万美元级资金，推出至少四款AI球类机器人，包括庞伯特、Acemate、Tenniix和AceiiLab，单台售价约2000美元，早鸟价999美元。AceiiLab母公司英汉思动力完成红杉联合领投的超亿元融资，标志着AI网球机器人赛道热度上升。", source: "极客公园", url: "http://www.geekpark.net/news/372807" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "硅谷爆火的两万块智能床，是智商税吗？我睡了 100 天", desc: "Eight Sleep品牌正式进入中国市场，其Pod 5床套在短短半年内售出600万元，随后推出参数升级的新一代产品Pod 6，参数升级，还补上了单人尺寸。这款床套售价高达两万元，却受到硅谷大佬们的青睐。经过三个月的体验，Eight Sleep被描述为帮助对温度敏感、睡眠有点小毛病的人找回正常入睡的能力。", source: "极客公园", url: "http://www.geekpark.net/news/372805" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "“AI店长”帮部分试用商家增长超30%，美团外卖薛冰：将赠送给全国所有商家", desc: "美团外卖发布了“妙手外卖版·袋鼠管家”，这是一款AI经营产品，覆盖经营诊断、门店巡检等核心场景，已有数万中小商家试用，如河北元氏县一家鸡公煲店铺通过使用该产品，周订单量环比上涨超30%。美团将向全国餐饮商家免费提供，以帮助商家实现更有含金量的增长。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/tZI7pYBhiFduVfr6.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "DeepSeek完成百亿融资，推动AI发展", desc: "DeepSeek完成千亿融资，携手完美世界、中芯聚源等产业资本，募资翻倍投入具身智能领域。此次融资将助力DeepSeek在技术、市场等方面实现跨越式发展，进一步推动具身智能技术的创新与应用。", source: "DeepSeek", url: "https://www.infoq.cn/article/ViOyxiOSP2ihxuUyg1rD?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI：停用联网训练前沿AI模型", desc: "OpenAI 发布博文，宣布针对最先进“前沿模型”的训练与评估环境，实施更严格的安全管控，明确在模型训练期间不得直接访问实时互联网。基于对齐研究、监测能力和互联网基础设施安全状况的决策，相关限制将持续到安全防护取得足够进展为止。9月20日，一款内部研究模型短暂获得互联网访问权限，导致OpenAI一度暂停训练与评估前沿模型。随后，OpenAI加强了研究环境隔离，并构建了一个“离线世界”供模型练习，以确保模型安全。", source: "IT之家", url: "https://www.ithome.com/1/017/289.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Meta收购AI数据分析平台Sundial", desc: "Meta Platforms 公司收购了AI数据分析平台Sundial，该平台由前Meta员工创立，可让企业通过聊天机器人插件用自然语言提问，快速获得分析结论。Sundial的两位联合创始人均是Meta资深旧部，其中Narayanan将负责数据分析工具和智能体相关工作。Meta近年来持续加码数据与AI基础设施，今年7月已组建新部门DATA，负责描述性分析、实验测试、AI产品改进及关键AI系统监控。", source: "IT之家", url: "https://www.ithome.com/1/017/294.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "亚马逊CEO谈AI成本：降至十分之一", desc: "亚马逊CEO安迪·贾西表示，要让AI广泛应用于企业软件，成本需降至目前的十分之一。他透露，亚马逊今年计划投入2,200亿美元资本开支，但依然无法满足AI需求。2026年主要算力供应额度已基本订满，2027年大部分也已预订，2028年也有相当一部分售罄。贾西认为，中间市场，即企业日常使用的各类软件，未来可能成为最大的AI需求来源。", source: "IT之家", url: "https://www.ithome.com/1/017/313.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "谷歌CEO：AI自我改进还有很长的路要走", desc: "谷歌CEO桑达尔·皮查伊表示，AI完全自主改进自身尚需时日。谷歌研究人员正使用AI智能体辅助开发模型，技术处于起步阶段。今年4月，谷歌内部新增代码已有75%由AI生成。AI工具不仅提高了编程效率，也改善了代码质量。预计明年将看到进一步进展。", source: "IT之家", url: "https://www.ithome.com/1/017/290.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Uber将所有员工纳入ChatGPT Work", desc: "Uber宣布将ChatGPT Work部署给所有3万名员工，此前该企业智能代理仅在较小规模进行试点。此举标志着Uber全面推广ChatGPT Work，以提升企业效率。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/22/uber-puts-all-30000-employees-on-chatgpt-work/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Spotify押注AI，成为智能体首选音乐服务", desc: "Spotify公司CEO古斯塔夫·索德斯特罗姆解释称，AI代理的兴起可能对音乐服务有益。TechCrunch报道称，Spotify正致力于成为音乐服务中代理选择的对象。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/22/spotifys-current-ai-bet-is-about-being-the-music-service-that-agents-choose/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Meta的AI仍可能抓取新闻网站，法律专家说", desc: "Meta调整了其业务条款，移除了可能允许其自由训练AI模型于新闻网站的语言，但法律专家表示这些变更不足以解决他们的担忧。康奈尔大学数字与信息法教授James Grimmelmann指出，“这并未限制与Meta产品或服务相关的语言，允许其抓取整个网站。”Meta最初的新业务条款似乎赋予公司训练AI于新闻网站的权限。", source: "The Verge", url: "https://www.theverge.com/tech/1017082/meta-terms-update-ai-training-concerns" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "AI到处挖漏洞一整年，终于给人类爆了个大的", desc: "Wiz公司发现PHP的两个漏洞，导致全球多个国家和地区的重要基础设施网站临时关闭。PHP是世界上用得最多的网站后端语言，约七成网站使用它。这两个漏洞被合称为PHP2Shell，攻击者无需登录即可远程控制服务器。这是AI首次挖掘出漏洞导致多国政府网站关闭，宣告了网络安全中一条从未写入教科书的规矩：很多漏洞之所以安全，只是因为攻击它们太累了。PHP官方给这两个漏洞的严重程度评分都是9.2。", source: "极客公园", url: "http://www.geekpark.net/news/372731" }
+    ]
+  },
+  {
     date: "2026-10-23",
     weekday: "星期五",
     regioned: true,
