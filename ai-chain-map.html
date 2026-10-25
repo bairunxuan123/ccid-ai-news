@@ -2785,6 +2785,27 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-25",
+    weekday: "星期日",
+    regioned: true,
+    summary: "支付宝AI支付发起年度黑客松大赛，邀开发者把AI创意变成生意、单季净赚212亿，两天跌去近15%：AI行情到底在杀什么？、DeepSeek完成近1000亿元融资，宁德时代、腾讯参投",
+    items: [
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "支付宝AI支付发起年度黑客松大赛，邀开发者把AI创意变成生意", desc: "支付宝AI支付联合观猹于10月24日发起“PAYATHON 2026”年度黑客松，邀请开发者参赛，报名截至12月1日，线下决赛将于12月26日举行。本次大赛面向个人开发者与团队，设置五大赛道，总奖池20万元。这是支付宝AI支付“开发者为先”产品战略的重要举措，旨在降低AI产品的商业化门槛，让好项目更快变成好生意。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/ykWM8XAjpHi0biY1.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "单季净赚212亿，两天跌去近15%：AI行情到底在杀什么？", desc: "宁德时代发布三季报，营收1652.21亿元，同比增长58.58%，但综合毛利率连续三个季度下滑，从24.82%降至20.69%，单季归母净利润212.46亿元，低于机构预测，股价两天内下跌近15%。与此同时，移远通信、恒玄科技、瑞芯微等端侧AI相关股票表现强劲。", source: "钛媒体", url: "https://www.tmtpost.com/8179663.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "DeepSeek完成近1000亿元融资，宁德时代、腾讯参投", desc: "宁德时代、腾讯参投DeepSeek完成近1000亿元融资，知情人士回应宁德时代董秘被打事件，娃哈哈集团董事长许思敏离职，山姆紧急召回检出污染物的“好健康”牡蛎精胶囊。", source: "雷峰网", url: "https://www.leiphone.com/category/zaobao/IlrVRbBiK9Klcuj1.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "中国 AI 硬件的下一个爆款，可能生在「网球场」", desc: "深圳工程师团队在Kickstarter上推出至少四款AI球类机器人，包括庞伯特、Acemate、Tenniix和AceiiLab，筹得百万美元级资金，其中庞伯特超募率26255%，筹得265万美元；Tenniix母公司英汉思动力完成红杉联合领投的超亿元融资；AceiiLab首批量产正在交付，单台售价约2000美元。这场竞赛中，硬件只是入场券，关键在于如何定位机器人为器材或对手，以吸引用户。", source: "极客公园", url: "http://www.geekpark.net/news/372807" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "2027 —— 人形机器人“电影宣发”大撞车之年", desc: "斯马克开源、钛媒体等机构报道，2027年成为人形机器人行业的关键节点。马斯克、何小鹏、邓泰华等机器人公司纷纷宣布在2027年推出新品或实现重大突破，如马斯克交付Optimus、何小鹏的IRON正式上市、智元营收破百亿等。此外，中国首批六项人形机器人国家标准将于2027年4月1日实施，人形机器人产能扩大至一万台。这一系列动作预示着人形机器人行业将迎来快速发展。", source: "钛媒体", url: "https://www.tmtpost.com/8180836.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "擦窗机器人有了首个行业标准，你敢把窗户交给它吗？", desc: "中国家用电器研究院发布了首个擦窗机器人行业标准。据IDC数据，2026年第二季度全球擦窗机器人出货量约84.7万台，同比增长59.8%，预计2026年将突破300万台。2020至2025年中国市场规模从4.8亿元增至17亿元，年复合增长28.6%。科沃斯窗宝2025年月产能从10万台级跨入20万台级，产能扩张显著。", source: "雷峰网", url: "https://www.leiphone.com/category/smarthome/iDkOEQuhDC14QfOE.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "AI 漫剧越做越快，赚钱却没那么容易了", desc: "阅文集团发布了首批AI精品动画项目，将DramaBuddy漫画助手升级为OPC一站式平台，并推出“IP委员会”模式，旨在将故事创作从文字到影像再到后续开发的过程连接起来。一年前，漫剧制作成本约10万元，而如今80分钟高质量漫剧单分钟成本已降至400元，总成本约4万元，产能翻了几倍，但营收却未显著增长。", source: "极客公园", url: "http://www.geekpark.net/news/372746" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "宇树 10 周年，王兴兴：我劝你相信 AI", desc: "宇树科技在2026年举办的世界物理AI大会上，创始人王兴兴强调AI的重要性，并反思自己“相信AI还不够”。他指出，AI已攻下顶尖数学难题，逆向工程打破传统软件公司壁垒，视频AI表情甚至超越真人，顶尖大模型公司实现模型自进化。王兴兴认为，以当前模型能力，信息世界已被“完全击穿”。", source: "极客公园", url: "http://www.geekpark.net/news/372759" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "美国宾夕法尼亚州通过 AI 广告法案", desc: "宾夕法尼亚州州长Josh Shapiro签署了《人工智能误导性广告法案》，要求在AI生成的广告上注明。该法案规定，任何“通过人工智能显著修改或生成”的广告——无论形式是静态图像、视频、音频还是文本——都必须在其自身格式中包含一个标签。这适用于来自亿万富翁公司的电视广告，以及餐馆关于其鸡翅特价的丑陋、拥挤的传单。宾夕法尼亚州成为首个要求对AI内容进行披露的州之一。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1018187/pennsylvania-ai-deceptive-advertising-act" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI 限制前沿模型访问互联网", desc: "OpenAI宣布将不再在互联网上训练其AI模型，称存在“重大风险”。此举发生在其一名工程师表示该解决方案不可行后不久。公司表示，此举是为了降低风险，并确保其前沿模型的安全性和可靠性。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/23/openai-says-it-will-no-longer-train-its-ai-models-on-the-live-internet-citing-significant-risks/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "微软 Mustafa Suleyman：AI 诊断系统胜过医生", desc: "微软（Microsoft）推出了一项新的AI诊断系统，根据《科学》杂志上的研究，该系统在处理复杂病例时优于普通医生。研究发现，大部分改进来自AI模型本身，而非微软的系统。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/22/microsofts-mustafa-suleyman-says-its-ai-outperforms-doctors-on-hard-cases-as-he-chases-medical-superintelligence/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Meta延迟执行AI抓取新条款", desc: "Meta推迟了其新商业条款的实施，原定于10月30日生效，现推迟至11月20日，以给予更多时间向合作伙伴和利益相关者解释变化内容。此举源于出版商对Meta可能利用AI抓取新闻网站内容的担忧。Meta发言人Daniel Roberts表示，延迟实施是为了让各方有更多时间理解变化内容。", source: "The Verge", url: "https://www.theverge.com/tech/1017450/meta-business-terms-delayed-ai-scraping" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "软银投资农业无人机创企极飞科技", desc: "极飞科技，获得软银投资的中国农业无人机企业，推出无需飞手操控的植保无人机，旨在应对农业劳动力减少和气温升高的挑战。公司推出自动化无人机场产品，无人机降落后可自动清洗、充电和补充药液，系统自行规划喷洒航线。预计未来三年中国需300万架无人机，若覆盖全国耕地，需求量最高可达1200万架。", source: "IT之家", url: "https://www.ithome.com/1/017/552.htm" }
+    ]
+  },
+  {
     date: "2026-10-24",
     weekday: "星期六",
     regioned: true,
