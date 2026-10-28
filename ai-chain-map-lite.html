@@ -2795,6 +2795,29 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-28",
+    weekday: "星期三",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，涵盖政策发布、技术突破、产业动态和投融资等多个方面。　【国外】Anthropic上市申请文件披露多平台算力布局，OpenAI发布三项科学突破，亚马逊云服务增长强劲。",
+    items: [
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "智源SoulAgent拓展教育应用，探索AI赋能创新人才培养", desc: "北京智源人工智能研究院推出个人智能体SoulAgent，在教育场景中探索AI提升教学效率。10月19日至24日，智源研究院连续走进中国人民大学附属中学，支持相关研讨会，SoulAgent辅助教师听课、作文批改等，覆盖27节公开课。", source: "雷峰网", url: "https://www.leiphone.com/category/ai/TKr0YQ085uv1ME7X.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "启元机器人第5000台下线，迈向商业化验证", desc: "启元机器人宣布第 5000 台个人机器人正式下线，从 9 月 20 日发售启元 Q1、T1 两款个人机器人，一个月内完成 5000 台下线，产线日产能从 10 余台提升至 200 余台。这一进展标志着启元机器人从规模化量产迈向商业化验证，为个人机器人产业化进程提供了观察样本。", source: "极客公园", url: "http://www.geekpark.net/news/373003" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "长鑫拒绝苹果等海外订单，优先保障国内存储芯片需求", desc: "长鑫存储拒绝向苹果等海外客户供应内存，优先保障国内存储芯片需求。据悉，长鑫存储已向小米等本地合作伙伴供应LPDDR6 DRAM，目前正全力满足国内市场的庞大需求。此举旨在实现中国存储行业的自给自足，预计将对国内存储芯片市场产生积极影响。", source: "雷峰网", url: "https://www.leiphone.com/category/zaobao/9LHYVcJC8iwgwnhk.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "新华投控战略投资九识，共筑智慧物流“中国路”", desc: "新华投控战略投资九识，赋能智能驾驶与物理AI，共筑智慧物流“中国路”。双方签署深度战略合作协议，九识今年成为行业首个百亿独角兽，实现全球首个L4级无图方案规模化量产，AI Driver服务年化收入预计年底突破1亿美元，业务落地全球20余个国家300多座城市，并获评国家级专精特新“小巨人”。新华投控表示，投的不是一辆车，是一条智慧物流的中国路。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/orc621EEenIn4Myu.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "百度世界模型研发进展披露，有望率先用于自动驾驶", desc: "百度计划近日披露世界模型的研发进展与成果。世界模型是AI领域热门方向，核心在于对物理环境建模与预测。若用于自动驾驶，可提升复杂场景下的预测与决策能力，为无人车规模化落地提供支撑。过去数年内，百度旗下萝卜快跑业务已覆盖全球28座城市，并积累了大量真实道路数据。", source: "IT之家", url: "https://www.ithome.com/1/018/815.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "腾讯、阿里、字节抢卡：Anthropic和中国大厂一起为算力上头", desc: "月之暗面发布Kimi K3.1 Pro，参数规模达3万亿级，支持100万Token上下文。用户发现任务复杂时额度消耗过快，月之暗面致歉并补偿会员。类似问题在Claude用户社区也出现，用户反映使用Opus 5.5处理任务时额度消耗迅速。", source: "钛媒体", url: "https://www.tmtpost.com/8184064.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "Kimi发布K3.1 Pro，加量降价挑战Opus 5.5", desc: "Kimi公司发布了K3.1 Pro模型，这是K3的后训练版本，拥有2.8万亿总参数、1040亿激活参数的混合专家架构，支持100万token的上下文窗口和图像视频输入。Kimi K3.1 Pro正式上线，同步推出速度快2到3倍的Highspeed版本，官方承诺11月4日前放出完整模型权重。", source: "极客公园", url: "http://www.geekpark.net/news/372943" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "国产AI 3D大模型Hi3D来了！开源可商用，PK干掉GPT-6", desc: "华为云发布国产AI 3D大模型Hi3D，开源可商用，与GPT-6展开竞争。该模型采用开源许可，支持商业使用，旨在为专业领域提供更精准的解决方案。相比GPT-6，Hi3D在性能上有所提升，有望成为AI领域的又一重要突破。", source: "量子位", url: "https://www.qbitai.com/2026/10/505694.html" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI发布三项科学突破，包括数学、计算机科学和物理学领域", desc: "OpenAI发布了在数学、计算机科学和物理学领域的突破性进展，并与专家“牧羊人”合作决定如何分享最新发现。尽管公司表示已调整沟通方式，但研究人员对OpenAI的做法日益不满，此前在10月初，数学家们仍需应对数百篇未经仪式的预印本论文。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1019921/openai-breakthrough-math-computer-science-physics" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic递交上市申请，估值或达1.5万亿美元", desc: "Anthropic向美国证监会递交S-1招股书，计划在纳斯达克上市，股票代码为ANT。招股书显示，公司2026年上半年营收162.86亿美元，去年同期为11.63亿美元；第二季度经营利润9.74亿美元，实现盈利；净亏损807亿美元，主要来自非现金会计费用。但个人用户对公司营收贡献不足20%。", source: "极客公园", url: "http://www.geekpark.net/news/373006" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "亚马逊更新AI工程师工作准则，强调考核应看业务价值而非AI使用量", desc: "亚马逊发布了面向AI时代的软件工程师工作准则，强调考核应关注工程师创造的业务价值而非AI使用量。该准则指出，AI对软件开发的影响深刻，但衡量工程师表现的关键是他们为客户和业务带来的成果。亚马逊曾根据员工使用AI的次数、消耗的词元数量及编写的代码行数进行考核，但备忘录警告，过度追求指标可能适得其反。", source: "IT之家", url: "https://www.ithome.com/1/018/774.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "顶刊给“AI医生”正名：会诊准确率高出人类一大截", desc: "微软发布MAI-DxO系统，该系统在《科学》杂志发表，测试结果显示，在《新英格兰医学杂志》的304个疑难病例中，其诊断准确率约为83%，远超允许查阅资料的医生组36%的准确率。系统内设有分工不同的虚拟医生，包括负责抬杠的AI医生，旨在提高诊断准确率并减少不必要的检查费用。微软计划与美国医疗中心合作，让真实患者直接与系统互动。", source: "钛媒体", url: "https://www.tmtpost.com/8183576.html" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "微软MAI-Image-2.7-Preview 登场，力压谷歌、Meta、xAI", desc: "微软发布MAI-Image-2.7-Preview图像编辑模型，成为全球排名第二，仅次于OpenAI的GPT Image 2.5 Sunburst (max)。该模型主打“输入原图 + 文字指令 → 输出编辑后的图片”，能处理整体换风格、重新打光等复杂编辑任务，较上一代MAI-Image-2.6在评测中均有提升。", source: "IT之家", url: "https://www.ithome.com/1/018/772.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI公示GPT-6.1 Terra安全测试：整体风险下降，破坏性行为上升", desc: "OpenAI发布了GPT-6.1 Terra安全测试，结果显示整体风险下降，但破坏性行为上升。在48,690个匹配任务中，GPT-6.1 Terra共收到22个严重程度高于3级的安全标记，占比约0.045%，较GPT-6 Sol减少42%，较GPT-5.6 Sol减少64%。与GPT-6.1 Sol和GPT-6 Astra等较新模型相比，GPT-6.1 Terra在“掩盖不确定性”、“绕过限制”、“数据外泄”、“破坏性行为”以及“入站提示注入”等较轻风险类别中的标记率更高。", source: "IT之家", url: "https://www.ithome.com/1/018/755.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI宣布三项重大科学突破，科研界却不满其成果发布方式", desc: "OpenAI宣布在数学、计算机科学与物理学领域取得突破，包括证明挂谷猜想。公司调整成果发布方式，与领域专家合作，数学成果直接放出AI推导内容，计算机科学成果由外部小组解读，物理学成果暂不公开。", source: "IT之家", url: "https://www.ithome.com/1/018/818.htm" }
+    ]
+  },
+  {
     date: "2026-10-27",
     weekday: "星期二",
     regioned: true,
