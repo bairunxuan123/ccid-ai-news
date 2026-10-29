@@ -2785,6 +2785,27 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-29",
+    weekday: "星期四",
+    regioned: true,
+    summary: "【国内】今日国内AI产业政策发布密集，技术突破和产业动态活跃，投融资事件持续涌现。　【国外】AI行业政策加强，技术突破与产业动态活跃，资本运作频繁。",
+    items: [
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "国务院发布《关于适应人工智能技术发展助力构建就业友好型发展方式的意见》", desc: "国务院办公厅发布《关于适应人工智能技术发展助力构建就业友好型发展方式的意见》，提出减缓AI应用的就业替代影响等18项任务。Salesforce客服团队缩减至约5000人，AI承担更多客户咨询。过去两年，AI成为科技公司裁员高频词，但企业减少人工需求，部分员工被重新安排岗位。", source: "钛媒体", url: "https://www.tmtpost.com/8185164.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "文心 Unlimited OCR 2 开源发布，实现任意页数文档解析", desc: "百度发布并开源文心 Unlimited OCR 2，全球首次实现任意页数文档解析，将 OCR 处理上限从数十页推向“无限”，并达到最先进水平（SOTA）。实测显示，该模型可一次性解析《哈利·波特》全系列 7 部作品，累计超过 3600 页，在文档长度大幅增加的情况下，依然保持较高的精度和处理效率。公开基准测试显示，在面向多页文档解析的 MPDocBench，以及专门评估百页级超长文档解析能力的 MarathonDocBench 上，文心 Unlimited OCR 2 的综合得分分别为 84.6分和 77.1分，达到端到端性能SOTA，大幅领先其他模型。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/2U4kLHAVeff62mJx.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "摩尔线程单季扣非净利润首次转正，国产GPU生意走到哪一步了？", desc: "摩尔线程发布2026年第三季度报告，该季度实现营业收入15.52亿元，同比增长1773.92%，环比增长55.4%；归母净利润4926.04万元，扣非归母净利润2007.24万元，均同比扭亏为盈。预计2027年实现盈利，收入增长得益于人工智能产业对算力及全功能GPU的需求，客户包括京东云、中国移动等。", source: "钛媒体", url: "https://www.tmtpost.com/8185837.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "启元机器人第 5000 台下线，从规模化量产迈向商业化验证", desc: "启元机器人正式下线第5000台个人机器人，从9月20日发售启元Q1、T1两款个人机器人，到一个月后完成5000台下线，仅用时1个月，日产能从10余台提升至200余台。这一成就标志着启元在产能爬坡、制造体系与供应链协同上取得阶段性进展，为个人机器人产业化进程提供了具体样本。", source: "极客公园", url: "http://www.geekpark.net/news/373003" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "Kimi 发布 K3.1 Pro，加量降价挑战 Opus 5.5", desc: "Kimi官方发布了K3.1 Pro模型，这是K3的后训练版本，采用2.8万亿总参数、1040亿激活参数的混合专家架构，支持100万token的上下文窗口和图像、视频输入。K3.1 Pro在程序员节前夕上线，同时推出速度快2到3倍的Highspeed版本，官方承诺11月4日前放出完整模型权重。", source: "极客公园", url: "http://www.geekpark.net/news/372943" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "长鑫拒绝苹果等海外订单，优先保障国内存储芯片需求", desc: "长鑫存储拒绝向苹果等海外客户供应内存，优先保障国内存储芯片需求。据悉，长鑫存储已向小米等本地合作伙伴供应LPDDR6 DRAM，目前正全力满足国内市场的庞大需求。此举旨在实现中国存储行业的自给自足，预计将对国内市场产生积极影响。", source: "雷峰网", url: "https://www.leiphone.com/category/zaobao/9LHYVcJC8iwgwnhk.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "华为昇腾950DT超节点集群在武汉上线，全面支撑万亿参数大模型训练与智能体推理", desc: "华为在武汉上线全国首个昇腾950DT 1024卡智算集群，由湖北科投投资建设。该集群单节点搭载1024张昇腾NPU加速卡，FP8算力达1EFLOPS，配备256TB全局统一内存，全面支撑万亿参数大模型训练与智能体推理。从项目启动到落地点亮仅用时1个月，将为湖北省内大模型训练和行业AI智能体开发提供本地算力支撑。", source: "IT之家", url: "https://www.ithome.com/1/019/419.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "AI做中学 创未来｜智源SoulAgent持续拓展教育应用", desc: "北京智源人工智能研究院推出个人智能体SoulAgent，应用于教育场景，支持教师听课、作文批改、教学答疑等，辅助提升教学效率。10月19日至24日，SoulAgent走进中国人民大学附属中学，支持相关研讨会，通过AI速记、智能总结等功能，为教师提供课堂回顾与提问支持。", source: "雷峰网", url: "https://www.leiphone.com/category/ai/TKr0YQ085uv1ME7X.html" },
+      { region: "intl", cat: "policy", catLabel: "政策发布", title: "韩国政府投入5万亿韩元支持中小企业普及物理AI", desc: "韩国政府计划到2030年投入5万亿韩元，推动中小制造企业引入物理AI，通过“3X战略”将AI应用率从1%提高至10%。《中小制造业物理AI推广战略》旨在将采用AI的企业从600家增加至6000家，实施数字化转型的企业从1.8万家增加至3万家。政府将支持建设智能工厂、升级设备，推广制造机器人，并提供不同层次的支持，涵盖基础智能工厂建设、生产环节AI应用及AI自主工厂建设。", source: "IT之家", url: "https://www.ithome.com/1/019/421.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Microsoft从OpenAI获得100亿美元收入", desc: "微软宣布，在截至9月30日的季度内，通过与其商业合作伙伴OpenAI的合作关系，实现了100亿美元的营收，包括分成支付。这一数据凸显了双方合作的巨大经济依赖性。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/28/microsoft-recorded-10-billion-in-revenue-from-openai/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Nvidia发布新的开源语音转文字模型，支持40种语言", desc: "NVIDIA发布了新的免费语音转文字模型，该模型可转录多达40种语言，但仅适用于录音，不适用于实时音频，这对会议和医疗转录工具是一大进步，但仍将实时应用留给竞争对手如ElevenLabs。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/28/voice-ai-in-vogue-nvidia-releases-new-open-transcription-model/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "亚马逊云科技开源智能体“决策器”和“安全箱”", desc: "亚马逊云科技发布了开源智能体“决策器”和“安全箱”，旨在提升智能体的并发处理能力和安全性。这两款智能体在开源社区中受到关注，但并发与冷启动问题仍需进一步解决。相较于之前的预测，此次开源的智能体性能有望实现显著提升。", source: "InfoQ", url: "https://www.infoq.cn/article/YmgmEh686wTClmj3PY8o?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "VCs将凭借Anthropic的IPO赚取数十亿美元，亚马逊将赚取更多", desc: "Anthropic即将IPO，风险投资公司预计将从中获得数十亿美元收益。然而，亚马逊在Anthropic的持股比例揭示了其在该公司的真正影响力。TechCrunch报道称，亚马逊对Anthropic的持股比例远超预期，这表明亚马逊将从Anthropic的IPO中获得巨额回报。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/27/vcs-will-make-billions-on-anthropics-ipo-but-amazon-is-set-to-make-much-much-more/" }
+    ]
+  },
+  {
     date: "2026-10-28",
     weekday: "星期三",
     regioned: true,
