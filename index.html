@@ -2785,6 +2785,28 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-10-31",
+    weekday: "星期六",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，涵盖政策发布、技术突破、产业动态和投融资等多个方面。　【国外】英伟达、苹果、谷歌等科技巨头在AI领域持续发力，政策监管、技术突破、产业动态和投融资动作频繁。",
+    items: [
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "国家市场监管总局发布生物芯片国家标准", desc: "国家市场监管总局批准发布《生物芯片基本术语》和《人体疾病易感 DNA 多态性检测微阵列芯片》两项新版国家标准，自2027年2月1日起实施。新标准系统重构了生物芯片领域概念体系，新增核酸检测芯片、免疫检测芯片等核心术语，覆盖基础术语、芯片探针等四大板块，将有效消除技术交流中的概念歧义，助力学术研究、产业协同与国际对接。", source: "IT之家", url: "https://www.ithome.com/1/020/458.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "阿里巴巴与Apple合作，将千问集成至Apple智能", desc: "阿里巴巴与Apple达成合作，将千问集成至Apple智能，中国用户可在Siri、写作工具及视觉智能中调用千问的文本与图像理解、内容生成能力。11月4日起，这些功能将随iOS开发者Beta版开放测试，并于12月iOS 27.3正式发布时面向中国用户推出。Siri可直接调用千问知识，用户可通过相机识别周围环境，并自主选择是否开通千问集成功能。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/es0ZV9LsDEsG7QLE.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "教育部职教发展中心与京东物流推进新型智能物流人才培养项目", desc: "教育部职业教育发展中心与京东物流共同推进了新型智能物流人才培养项目，预计3年内覆盖超100所院校，惠及数万名在校学生。项目周期3年，支持126所高职院校，设三类子项目，包括“供应链数字工匠”、“任务工单”和“云上亚一”。京东物流将开放真实场景和技术平台，融入专业建设、课程开发、实训教学和教师培养，让学生在真场景中练真本领。", source: "IT之家", url: "https://www.ithome.com/1/020/469.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "摩尔线程2026年三季报点评：营收暴增背后的现金流隐忧", desc: "摩尔线程发布2026年三季报，第三季度营业收入15.52亿元，同比增长1773.92%，净利润4926.04万元，扣非净利润2007.24万元，扭亏为盈。前三季度营业收入32.89亿元，同比增长319.15%，净利润扭亏为盈，但扣非净利润仍亏损1.31亿元。公司战略布局三大AI工厂，智算产品加速落地，但现金流压力显著累积，存货账面价值激增152%，预付款项增长45%。", source: "钛媒体", url: "https://www.tmtpost.com/8188359.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "天数智芯天垓300实测对标H200，国产GPU竞争转向系统效率", desc: "天数智芯在媒体开放日上展示了最新一代天垓300，与H200实机对比，实测性能达到H200的1.05倍。测试覆盖四大主流模型、三类场景，天垓300在典型PD分离部署下，单卡端到端吞吐达到H200的1.05倍。这表明国产通用GPU在高端推理负载中具备与H200直接竞争的性能基础。天数智芯也在拓展产品布局，将竞争延伸到不同形态的算力需求中。", source: "雷峰网", url: "https://www.leiphone.com/category/chips/748GRHfg9VPRbp7x.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "智能驾驶进入物理AI时代？7位行业嘉宾给出最新判断", desc: "第八届智能驾驶大会暨2026环秀湖物理AI产业发展推介会在苏州相城举行，会上7位行业嘉宾就智能驾驶和物理AI的最新发展趋势进行了讨论。大会聚焦车路云一体化、智能驾驶出海和无人驾驶商业化等议题，并探讨了世界模型、强化学习、端侧智能、虚拟仿真等前沿技术。与会嘉宾认为，智能驾驶正在成为物理AI进入现实世界的试验场，未来AI将真正融入汽车、机器人、飞行器等领域，推动相关技术的规模化运行。", source: "雷峰网", url: "https://www.leiphone.com/category/transportation/pqEtZnYepE5D1PzD.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "百度 APP 发布四大 AI 升级，搜索已实现递归自我进化", desc: "百度APP发布四大AI升级，实现递归自我进化，搜索AI API活动期间最低价4.9元/千次，低于DeepSeek搜索API。围绕搜索框、AI镜头、GUI可视化、AI互动应用等方向推出重大升级，覆盖170余种场景，AI镜头支持多目标同步识别与动态追踪，并可用9种方言实时对话。搜索结果页GUI互动场景提升5倍，接入超50亿数据资源，AI互动剧与互动应用同步上线。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/7pQrGMmdsjx5dOSR.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "伯牙智能刘欣：GPT-6 之后，轮到硬件拖机器人后腿了 | 物理AI 50人", desc: "伯牙智能创始人刘欣指出，国内灵巧手市场出货量近2万只，但大部分产品因性能不足或成本高昂而未能得到有效应用。他认为，灵巧手行业需开辟第三个市场，以可接受的成本将科研级操作能力带入实际应用。目前顶尖的灵巧手与人手能力仍有较大差距，伯牙智能有望填补这一市场空白。", source: "雷峰网", url: "https://www.leiphone.com/category/robot/EnKFLg1RRmN9SaHJ.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "苹果与阿里巴巴合作推出Apple智能", desc: "苹果中国官网正式上线Apple智能功能，11月随iOS 27.3正式版面向中国用户推出。该功能首批核心功能将于今年稍晚推出，从2024年6月WWDC亮相算起，国行iPhone等了整整两年半。7月15日，网信办公告7款手机端侧生成式AI服务完成备案，其中苹果技术开发（上海）有限公司的Apple智能在列。", source: "极客公园", url: "http://www.geekpark.net/news/373238" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "DeepSeek完成1055亿元融资，估值达6155亿元", desc: "苹果宣布国行Apple智能首批功能将于11月4日随iOS开发者Beta版开放测试，12月正式推出，支持多款机型；DeepSeek完成1055亿元融资，估值达6155亿元；英特尔股价开盘跌超30%。", source: "极客公园", url: "http://www.geekpark.net/news/373220" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI等四巨头联合推出AI抓取标准，可拒绝被爬取", desc: "OpenAI、Google、Microsoft和Anthropic共同推出一项新标准，允许出版商选择不被AI抓取。该标准通过共享“策略令牌”信号，让出版商能在多个AI公司间统一设置AI训练偏好，而非逐个设置。该信号将嵌入网站的robots.txt文件中，以控制爬虫行为。", source: "The Verge", url: "https://www.theverge.com/tech/1023763/openai-google-microsoft-ai-scraping-standard-opt-out" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic IPO估值达6155亿元，预期获得高评级", desc: "Anthropic发布IPO计划，据FT报道，预计将获得高“垃圾级”信用评级。Blackstone预测，这将使得Anthropic融资难度增加，成本上升，影响其维持大规模支出的能力。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/30/anthropic-expected-to-receive-high-junk-rating-from-credit-agencies-following-ipo-report-says/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Claude Opus 5.5不再支持AI复刻游戏", desc: "Anthropic 在 AI 编程工具 Claude Code 中限制了 Opus 5.5 模型，禁止其帮助用户复刻特定现有游戏。该限制于 10 月 27 日前后实施，要求用户只能制作原创游戏、某一类型的游戏，以及基于自有设计与素材的游戏。Anthropic 在 Claude Code 的提示词中加入了“两句引导内容”，以避免模型重现他人特定游戏，强调使用 Claude 侵犯知识产权违反平台使用政策。目前，这项限制仅针对 Opus 5.5 模型中的 Claude Code。", source: "IT之家", url: "https://www.ithome.com/1/020/471.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "大厂缩减市场预算，增加AI预算", desc: "Alphabet、Meta、微软等大厂开始缩减市场预算，同时加大AI投资。2019年至2025年，这三家公司收入增长147.1%，推广费仅增长42.5%，推广费用率从13%降至7.5%。AI相关领域如数据中心、芯片、模型研发和AI人才获得更多投入，Alphabet和Meta的资本开支分别从525亿美元增至914亿美元和722亿美元至1150-1350亿美元。大厂在追求效率的同时，对AI领域的投入正在增加。", source: "钛媒体", url: "https://www.tmtpost.com/8188331.html" }
+    ]
+  },
+  {
     date: "2026-10-30",
     weekday: "星期五",
     regioned: true,
