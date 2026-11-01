@@ -2795,6 +2795,27 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-01",
+    weekday: "星期日",
+    regioned: true,
+    summary: "【国内】今日AI产业聚焦政策发布、技术突破、产业动态和投融资，华为、阿里巴巴等企业动态活跃。　【国外】欧盟AI法案影响全球，AI算力与产业动态活跃，政策监管与技术创新并行。",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "华为乾崑智驾累计辅助驾驶里程突破170亿公里", desc: "华为智能汽车解决方案BU发布视频，宣布乾崑智驾累计辅助驾驶里程突破173亿公里，已过173亿公里真实行车验证，搭载乾崑智驾车辆累计行驶总里程突破483亿7207万公里，累计主动避免可能的碰撞超691万8217次。", source: "IT之家", url: "https://www.ithome.com/1/020/693.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "阿里巴巴与Apple达成合作，将千问集成至Apple智能", desc: "阿里巴巴与Apple达成合作，将千问集成至Apple智能，中国用户可在Siri、写作工具及视觉智能中直接调用千问的文本与图像理解、内容生成等能力。这些功能将于11月4日起随最新的iOS开发者Beta版开放测试，并将于12月iOS 27.3正式发布时面向中国用户推出。Siri可以直接调用千问的广博知识，并在Siri中直接回复用户问答。千问也已接入Apple的系统级写作工具中，为用户提供“千问创作”功能，帮助用户基于任意主题生成内容。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/es0ZV9LsDEsG7QLE.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "天数智芯天垓300实测对标H200，国产GPU接下来拼什么？", desc: "天数智芯发布了新一代天垓300 GPU，并在媒体开放日上与英伟达H200进行实机对比。测试显示，天垓300在典型PD分离部署下，单卡端到端吞吐达到H200的1.05倍，展现了国产通用GPU在高端推理负载中的竞争力。天数智芯同时强调，将拓展产品布局，将竞争延伸到不同形态的算力需求中。", source: "雷峰网", url: "https://www.leiphone.com/category/chips/748GRHfg9VPRbp7x.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "百度APP发布四大AI升级，搜索已实现递归自我进化", desc: "百度公司发布四大AI升级，搜索功能实现递归自我进化，标志着搜索技术的一大突破。此次升级涵盖了语音识别、图像识别、自然语言处理等多个领域，旨在提升用户体验。与此前相比，搜索技术已实现更智能的自我进化，为用户提供更加精准和个性化的搜索结果。", source: "量子位", url: "https://www.qbitai.com/2026/10/506771.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "智能驾驶进入物理AI时代？7位行业嘉宾给出最新判断", desc: "第八届智能驾驶大会暨2026环秀湖物理AI产业发展推介会在苏州相城举行，大会讨论从智能驾驶延伸至物理AI。嘉宾们就世界模型、强化学习等技术方向发表观点，探讨AI在汽车、机器人等物理设备中的应用。智能驾驶正成为物理AI的试验场，从自动驾驶到机器人、低空飞行器，不同技术路线探索AI进入物理世界的可能性。", source: "雷峰网", url: "https://www.leiphone.com/category/transportation/pqEtZnYepE5D1PzD.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "腾讯AI Lab又一核心骨干去向确认！叶德珩加入字节Seed", desc: "腾讯AI Lab确认其核心骨干叶德珩加入字节Seed，担任“王者绝悟”前技术负责人。叶德珩在腾讯AI Lab期间负责多项关键技术，此次加入字节Seed将带来丰富的AI经验。字节Seed作为字节跳动旗下的AI研究机构，此次引进叶德珩将进一步强化其在AI领域的研发实力。", source: "InfoQ", url: "https://www.infoq.cn/article/u23wUVUDcFqL7hLBWXuW?utm_source=rss&utm_medium=article" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "透视A股三季报：AI算力领跑，材料量价齐升，地产和消费寻底", desc: "钛媒体发布A股2026年三季报，显示5572家上市公司营收56.65万亿元，同比增长5.42%，净利润5.10万亿元，同比增长7.76%。其中，AI算力产业链带动信息技术板块营收、净利润分别增长31.95%和140.25%，材料板块营收、净利润分别增长14.06%和54.03%，而日常消费净利润增速下滑最多。工商银行以3431.10亿元净利润领跑A股，房地产亏损531.87亿元。", source: "钛媒体", url: "https://www.tmtpost.com/8188863.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "联想天禧AI 4.5全端升级，打造职场超能搭档", desc: "联想集团发布联想天禧AI 4.5全端升级，于10月30日正式推出AIPC端。此次升级涵盖三大场景，旨在打造“职场超能搭档”。", source: "量子位", url: "https://www.qbitai.com/2026/10/506779.html" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "DeepSeek发布Super Agent架构", desc: "DeepSeek发布全新Agent架构Super-agent，通过双层架构等创新技术，突破多任务和团队协作限制，目前内部实例已持续运行。苹果市值超越英伟达重回第一，同时传Meta与傅利叶合作打造Muse机器人。", source: "极客公园", url: "http://www.geekpark.net/news/373243" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Agility Robotics上市前夜解析", desc: "Agility Robotics，全球首家在美国上市且拥有真实商业部署的纯血人形机器人公司，于2026年11月5日将在纳斯达克上市。公司2025年全年确认营收178.2万美元，对应25亿美元投前估值，市销率超过1400倍，其中约63.5%来自关联方销售。信托账户从约4.24亿美元缩至约1.64亿美元，SPAC股东赎回六成以上，总募资从超6.2亿降至约4.65亿。这是具身智能行业首次被推到公开市场，需回答此前从未被要求回答的问题。", source: "钛媒体", url: "https://www.tmtpost.com/8188901.html" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "OpenAI新一轮融资目标下调", desc: "OpenAI在最新一轮融资中未能达到预期目标。据报道，该公司在此次融资中的目标有所降低，但具体细节尚未公布。此次融资的调整可能反映了市场对人工智能领域的看法发生了变化，或是对公司未来发展的信心有所减弱。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/31/openai-reportedly-lowers-funding-target-for-new-round/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "美国NAACP起诉SpaceXAI污染", desc: "美国国家有色人种协进会（NAACP）起诉SpaceX拥有的AI公司，指控其违反《清洁空气法案》。该诉讼指控SpaceX的数据中心污染环境。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/31/judge-allows-naacp-lawsuit-over-xai-data-center-pollution-to-move-forward/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "世界模型首次指导设计芯片，算力提升99%", desc: "量子位发布世界模型首次指导设计芯片，推出超大核NPU，算力达700TOPS，99%算力可用。这一突破性进展，较此前预测近乎翻倍。", source: "量子位", url: "https://www.qbitai.com/2026/10/506866.html" }
+    ]
+  },
+  {
     date: "2026-10-31",
     weekday: "星期六",
     regioned: true,
