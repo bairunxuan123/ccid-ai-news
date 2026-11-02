@@ -2795,6 +2795,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-02",
+    weekday: "星期一",
+    regioned: true,
+    summary: "【国内】国内AI产业政策密集出台，技术突破与产业动态活跃。　【国外】OpenAI与三星合作深化AI芯片与数据中心合作，韩国公布史上最大规模预算案重点投向AI与半导体，苹果宣布Apple智能接入阿里千问。",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "清华大学姚期智团队发布代数世界模型，AI像牛顿一样思考", desc: "清华大学姚期智团队发布了代数世界模型，旨在让AI像牛顿一样思考。该模型通过模拟代数运算，提升AI的推理能力。这一创新技术有望推动AI领域的发展，为未来AI的智能化提供新的思路。", source: "量子位", url: "https://www.qbitai.com/2026/11/507031.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "天数智芯天垓300实测对标H200，国产GPU竞争转向系统效率", desc: "天数智芯发布新一代天垓300，实测性能达到H200的1.05倍，在典型PD分离部署下，单卡端到端吞吐领先。此次测试覆盖四大主流模型、三类场景，天垓300展现出与H200直接竞争的性能基础。天数智芯正拓展产品布局，将竞争延伸至不同形态的算力需求中。", source: "雷峰网", url: "https://www.leiphone.com/category/chips/748GRHfg9VPRbp7x.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "小米开源150元AI小玩意，配件涨价", desc: "小米公司发布了一款售价150元的AI配件，具备指挥Agent和智能家居控制功能。该产品一经推出，便受到市场热烈欢迎，导致相关配件价格上涨。", source: "量子位", url: "https://www.qbitai.com/2026/11/507107.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "阿里巴巴与Apple合作，将千问集成至Apple智能", desc: "阿里巴巴与Apple达成合作，将千问集成至Apple智能，中国用户可在Siri、写作工具及视觉智能中直接调用千问的文本与图像理解、内容生成等能力。11月4日起随iOS开发者Beta版开放测试，12月iOS 27.3正式发布时面向中国用户推出。千问接入Apple系统级写作工具，提供“千问创作”功能，用户可通过视觉智能功能在iPhone上更深入地了解周围环境。用户可自主选择是否开通千问集成功能，启用后可通过Apple登录或使用自己的千问App账户登录使用。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/es0ZV9LsDEsG7QLE.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "百度搜索AI API千次仅需4.9元，低于DeepSeek", desc: "百度发布AI API，千次调用仅需4.9元，低于DeepSeek。该API提供高效便捷的AI服务，价格为4.9元/千次调用，远低于DeepSeek。此举将进一步推动AI技术的发展和应用。", source: "InfoQ", url: "https://www.infoq.cn/article/HJgTwfsPAugNBJ2jUefj?utm_source=rss&utm_medium=article" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "北京市商务局发布《促进智能眼镜消费政策指南》", desc: "北京市商务局发布《促进智能眼镜消费政策指南》，推出七项支持举措，包括购新补贴、首店首发、品牌联名等。对符合条件的智能眼镜产品，补贴最高达15%，每件最高500元；支持企业开设首店，给予最高100万元奖励；支持企业联动全球知名IP开发周边产品，给予最高100万元奖励。", source: "IT之家", url: "https://www.ithome.com/1/021/060.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "Kimi半年三次道歉，模型越强，生意却越难做？", desc: "月之暗面旗下新模型Kimi K3.1 Pro上线12小时即引发争议，被曝宣传模板要求藏付费标签，用户抱怨额度消耗过快。Kimi已为此致歉，一次性恢复25%月度额度，并减少不必要的子Agent调用。Kimi凭借长文本处理能力，在国产大模型中独树一帜，但今年以来用户对订阅套餐告罄快的吐槽不断。", source: "钛媒体", url: "https://www.tmtpost.com/8189784.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "Meta与中国企业合作开发人形机器人？傅利叶：暂不方便回复", desc: "Meta与中国机器人公司傅利叶合作开发人形机器人原型Max，身高1.5米，体重48.1千克，搭载英伟达Thor芯片。傅利叶创始人顾捷暂未回应。两家公司于今年9月启动研发，预计将重新设计躯干部分并进行升级。", source: "IT之家", url: "https://www.ithome.com/1/021/004.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "韩国公布史上最大规模预算案，重点投向AI与半导体", desc: "韩国总统李在明公布该国史上最大规模预算案，承诺投入820.9万亿韩元，其中21.3万亿韩元投向半导体、物理人工智能和人工智能数据中心，4.7万亿韩元研发自主人工智能大模型，目标为全球顶尖性能。此外，政府计划培养2000名专业人才，扩大人工智能相关教育，并与三星电子、SK海力士等企业合作。国际货币基金组织预测韩国2026年经济增速可达3.3%，新发债券将用于置换存量债务。", source: "IT之家", url: "https://www.ithome.com/1/021/051.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI CEO密访韩国，深化与三星、SK集团AI芯片与数据中心合作", desc: "OpenAI首席执行官萨姆·奥尔特曼密访韩国，与三星、SK集团深化AI芯片与数据中心合作。奥尔特曼会见了三星约五十名高管，并与SK集团会长崔泰源共进午餐，双方可能围绕AI芯片与数据中心展开合作。奥尔特曼曾在2025年10月访问韩国，宣布与三星、SK集团达成合作，这是OpenAI“星门”计划的一部分，旨在全球扩建AI基础设施。", source: "IT之家", url: "https://www.ithome.com/1/021/058.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "苹果官宣Apple智能接入阿里千问，DeepSeek完成第二轮1055亿元融资", desc: "苹果宣布国行Apple智能将于11月开放测试，首批功能包括实时翻译等，支持多款iPhone。DeepSeek完成1055亿元融资，估值达6155亿元。英特尔股价开盘跌超30%。OpenAI撤销Pro 200降额计划，Pro 100和Pro 500额度翻倍。", source: "极客公园", url: "http://www.geekpark.net/news/373220" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "GPT-6.2 Astra开启灰测！Claude Mythos 5.5同日曝光", desc: "HuggingFace疑似泄露权重已被下5000次，GPT-6.2 Astra开启灰测，Claude Mythos 5.5同日曝光。HuggingFace疑似泄露权重已被下5000次，GPT-6.2 Astra开启灰测，Claude Mythos 5.5同日曝光。", source: "量子位", url: "https://www.qbitai.com/2026/11/507082.html" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "三星预计2027年芯片产线利用率达100%", desc: "三星发布预测，预计2027年8nm及以下制程产线利用率将突破100%，2nm制程项目同比增长1倍以上。2026年第三季度，三星存储业务营收创纪录，晶圆代工业务复苏，8nm及以下制程需求将超越现有产能。三星考虑在美国和韩国投资新晶圆厂，扩大8nm、4nm和2nm产能，以满足持续增长的AI/HPC芯片需求。", source: "IT之家", url: "https://www.ithome.com/1/020/970.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "星巴克欲利用AI展示个性化数字菜单", desc: "星巴克计划在Drive-thru窗口使用AI展示个性化数字菜单。周四的财报电话会议中，星巴克CEO Brian Niccol表示，公司将探索“识别到达的参与客户，展示个性化数字菜单，并使支付更加便捷”的体验。这类似于塔可钟正在试验的技术，可以根据每辆车的需求改变数字菜单板的布局、内容和视觉。麦当劳也最近展示了类似技术。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1023440/starbucks-ai-personalized-menu-drive-thru" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "OpenAI据悉下调新一轮融资目标", desc: "OpenAI在最新一轮融资中未能达到预期目标。据报道，该公司原本设定的融资目标有所下调。具体而言，OpenAI在此次融资中的目标金额并未达到之前预期的水平，显示出市场对其增长潜力的担忧。这一变化可能会影响公司未来的发展策略和市场地位。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/31/openai-reportedly-lowers-funding-target-for-new-round/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic IPO后预计将获得高‘垃圾级’信用评级", desc: "Anthropic发布IPO计划，据FT报道，预计将获得高“垃圾”评级。Blackstone预测，这一评级将使Anthropic在筹集资金以维持其大规模支出方面面临更大困难和更高成本。", source: "TechCrunch", url: "https://techcrunch.com/2026/10/30/anthropic-expected-to-receive-high-junk-rating-from-credit-agencies-following-ipo-report-says/" }
+    ]
+  },
+  {
     date: "2026-11-01",
     weekday: "星期日",
     regioned: true,
