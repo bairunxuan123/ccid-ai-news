@@ -2795,6 +2795,27 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-03",
+    weekday: "星期二",
+    regioned: true,
+    summary: "【国内】国内AI产业政策密集发布，技术突破与应用场景拓展并行推进。　【国外】今日AI产业聚焦政策发布、技术突破、产业动态和投融资，涵盖数据隐私、算力布局、产品发布和融资动态。",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "小米机器人挑战工厂8小时作业，家庭长程任务成功突破", desc: "小米集团在2026世界互联网大会上荣获“杰出贡献奖”创新突破类奖项，其机器人业务获“领先科技奖”。小米人形机器人在工厂场景中首次挑战8小时作业任务，满足全天生产需求，实现自主纠偏与产线系统级协同。在家庭场景中，小米具身基座模型在小米青年公寓完成连续超30分钟、覆盖3个房间、包含50+任务的长程任务验证。小米机器人VLA大模型Xiaomi-Robotics-0采用大小脑混合架构，推理延迟80毫秒；Xiaomi-Robotics-1预训练模型在RoboCasa 365、RoboDojo榜单综合排名第一。", source: "IT之家", url: "https://www.ithome.com/1/021/525.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "阿里巴巴千问开源模型已超470款，全球累计下载量突破40亿", desc: "阿里巴巴集团联合创始人及董事会主席蔡崇信在2026年世界互联网大会上表示，只有开源才能推动AI普及，目前阿里千问已开源超过470款模型，全球累计下载量突破40亿，衍生模型超过33万。蔡崇信呼吁欧洲建设自己的算力基础设施，用于训练和运行AI模型，并预判未来AI将像互联网一样融入业务每个环节。", source: "IT之家", url: "https://www.ithome.com/1/021/495.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "腾讯云助力企业打造AI原生生产力飞轮", desc: "腾讯云推出助力企业打造AI原生生产力飞轮方案，旨在提升企业智能化水平。该方案覆盖多个行业，与众多企业合作，共同推动AI技术落地。通过这一方案，企业能够更高效地利用AI技术，提升生产力和创新能力。", source: "InfoQ", url: "https://www.infoq.cn/article/q3GxjwqlYQbIZDYsJ2Uf?utm_source=rss&utm_medium=article" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "华为云发布openPangu-2.0模型停售公告", desc: "华为云发布停售公告，宣布将于11月6日停止销售openPangu-2.0-Flash和openPangu-2.0-Pro两款模型服务，并于11月30日正式下线。新版本模型已在规划中，后续将逐步推出。华为云建议用户在正式下线前完成迁移，并提供了替代方案。", source: "IT之家", url: "https://www.ithome.com/1/021/526.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "MIT：GPT-6 Astra能直接修改Qwen权重，数学能力暴涨6倍", desc: "麻省理工学院（MIT）发布了GPT-6 Astra模型，该模型能直接修改Qwen权重，使得数学能力提升6倍，同时指令执行能力也同步提升。这一技术突破显著增强了模型在数学领域的应用潜力。", source: "量子位", url: "https://www.qbitai.com/2026/11/507322.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "元环智能获数亿元融资，用「元模型」让AI长出「直觉」", desc: "元环智能完成连续两轮共计数亿元融资，用于元模型核心算法迭代与阶段性产品探索。公司种子轮由顺为资本领投，上海未来产业基金等跟投；种子+轮吸引上海半导体产投、360战投等产业方及国资背景机构，以及BV百度风投等知名双币基金。元环智能的“元模型”能直接生成模型架构和训练超参数，为AI行业装上“上帝视角”。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/HzAPRXlFEuzBUnsf.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "世界互联网大会聚焦智能体安全，360推动AI安全治理", desc: "360集团首席科学家、高级副总裁潘剑锋以人工智能专委会副主任委员身份出席世界互联网大会人工智能专业委员会会议，审议的2027年度工作计划提出，专委会安全与治理推进计划将进一步聚焦“智能体安全可控与协同治理”，推动AI安全治理进一步向智能体行为管控、治理能力建设和全球治理机制延伸。360在智能体安全领域的持续研究与实践与这一方向高度呼应，并计划在2027年就智能体权限管理、自主决策与人类管控、多智能体协作安全、全周期安全管理等方向开展专题研讨和联合研究。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/z4pIQvELeZ9lYfrG.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "AI产品淘汰赛开始：最快76天消失，千万用户也难逃破产", desc: "腾讯QClaw在9月底宣布年底停止运营，内测仅199天；元器、阿里悟空等AI产品线也进行整合或停服；Character.AI启动破产程序，仍拥有1200万活跃用户。AI产品淘汰赛加速，市场不确定性增加。", source: "雷峰网", url: "https://www.leiphone.com/category/yanxishe/YK9Yap3kAJ0F1lWv.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "特斯拉Robotaxi在沃斯堡上线，自动驾驶出租车服务再扩张", desc: "特斯拉宣布，其自动驾驶出租车（Robotaxi）服务已在美国沃斯堡上线，服务范围覆盖约143平方英里。这是特斯拉近三个月来新增的首个自动驾驶出租车落地城市，目前与奥斯汀、达拉斯、休斯顿等城市并列，成为第七个开通无安全员自动驾驶乘车服务的城市。沃斯堡的电子围栏服务区域面积仅次于奥斯汀和休斯顿，排名第三。", source: "IT之家", url: "https://www.ithome.com/1/021/538.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "DeepSeek发布Super Agent架构，推动AI向更自主发展", desc: "DeepSeek发布全新Agent架构Super-agent，通过双层架构等创新突破现有Agent设计限制，实现跨会话上下文保持与多任务推进。苹果市值超越英伟达重回第一，同时微软、谷歌等巨头承诺投入超3万亿美元于AI基础设施建设。", source: "极客公园", url: "http://www.geekpark.net/news/373243" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI计划合并ChatGPT的Chat和Work标签，提升用户体验", desc: "OpenAI宣布将ChatGPT的Chat和Work标签合并，ChatGPT和Codex将共享同一分配池，这一变化后，两者将共同使用资源。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/02/openai-is-finally-merging-chatgpts-chat-and-work-tabs/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI计划更名数据中心为AI compute campuses", desc: "OpenAI决定将其数据中心重新命名为“AI compute campuses”。这一变化反映出数据中心在公众中的不受欢迎程度。TechCrunch报道，OpenAI的这一举措可能与其对数据中心的重新定位有关，旨在提升其形象。具体影响和后续计划尚不明确。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/01/openai-might-rebrand-its-data-centers-as-ai-compute-campuses/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "摩根大通副董事长：AI板块估值高，预计将出现回调", desc: "摩根大通副董事长Daniel Pinto在投资峰会上表示，AI领域估值过高，预计将出现回调。他指出，AI产业需要证明庞大的投资规模和当前的估值是合理的，目前的步伐可能过快。Pinto认为，市场对AI公司营收和获利增长的预期可能过于乐观，可能导致整个产业重新定价。摩根大通资产管理全球市场策略师戴维·莱博维茨指出，投资者正在更成熟地区分AI带来的风险和回报，并开始细致区分AI产业链的不同环节。", source: "IT之家", url: "https://www.ithome.com/1/021/521.htm" }
+    ]
+  },
+  {
     date: "2026-11-02",
     weekday: "星期一",
     regioned: true,
