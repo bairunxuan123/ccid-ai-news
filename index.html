@@ -2785,6 +2785,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-04",
+    weekday: "星期三",
+    regioned: true,
+    summary: "【国内】今日AI产业聚焦智能体安全、大模型发展、产业自律公约发布等方面。　【国外】今日AI产业动态丰富，涵盖政策发布、技术突破、产业动态和投融资等多个方面。",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "腾讯混元Hy4正式版发布，跻身最强开源模型之列", desc: "腾讯今日发布最新一代大语言模型 Hy4 正式版，该模型首次跻身最强开源模型之列，将于近期开源模型权重，并扩展了预训练和后训练规模，引入视觉能力，支持电脑操作。Hy4 在模型尺寸、上下文长度、数据规模上均进行了显著扩展，可用于视觉与电脑任务、前端与游戏开发等多种场景，较此前 770 B 的总参数和 1M 的上下文长度有大幅提升。", source: "IT之家", url: "https://www.ithome.com/1/022/035.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "百度Apollo World世界模型突破“不可能三角”", desc: "百度Apollo首次发布面向物理AI的智能体驱动全模态世界模型Apollo World，该模型已用于萝卜快跑全球化测试与验证，助力无人驾驶规模化落地。Apollo World将虚拟场景内所有交通参与者建模为具备决策与交互能力的AI智能体，支持无人车在虚拟城市任意起终点通行，其一天完成的虚拟路测里程相当于一辆配备安全员的真实路测车连续测试约三年。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/NVxn28w1vAG2qbFy.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "蚂蚁灵波携机器人通用大脑亮相乌镇，展示模型研发、开源协作及场景应用新进展", desc: "蚂蚁集团旗下具身智能公司蚂蚁灵波在2026年世界互联网大会乌镇峰会上发布了全栈开源的机器人通用大脑。该大脑已向全球开源覆盖空间智能、灵巧操作与环境反馈的核心模型，LingBot系列模型开源9个月来，下载量突破220万，GitHub Star数超过3.3万。这套来自中国的机器人大脑，已走进全球科研与工程体系，如斯坦福大学、韩国FastOPD研究、瑞士洛桑联邦理工学院等均采用了其技术。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/ADcxxdwtaojQvzhp.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "追觅科技亮相2026世界互联网大会人工智能嘉年华，展示智能清洁领域技术创新成果", desc: "追觅科技亮相2026世界互联网大会人工智能嘉年华，携T70 Ultra Station、T60 Steam等多款旗舰洗地机展示技术创新成果，集成行业首创技术，拓展家庭清洁场景边界，实现5mm自动外扩和30mm手动外扩，覆盖沙发、床底等低矮空间，推动智能科技向实际生活场景落地。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/hRlEqJpWm8oawq9h.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "后摩智能完成数十亿元B轮融资，领跑端侧AI市场", desc: "后摩智能完成数十亿元B轮融资，端侧大模型AI芯片M50量产不到一年，已获得150多个产品定点，服务客户超过百家。据悉，本轮资金将主要用于扩大M50规模化交付，推进新一代M6X与下一代3D CIM产品研发，并持续完善软件工具链与产业生态。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/cyDQKpjtzDEPhrr8.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "心言巴布「Bubbo 1」：一台机器人，如何成为家人", desc: "心言机器人于2026年10月29日正式发布具身家庭智能体「巴布（Bubbo 1）」，售价9499元，前1000名订购者可享7999元优惠。该机器人基于心言自研的Bubbo OS，拥有13类、26个传感器，通过6个自由度和表情屏理解复杂情感，实现伙伴式交互。产品已在京东等官方渠道发售。", source: "极客公园", url: "http://www.geekpark.net/news/373399" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "6 台智元机器人直播在便利店 24 小时打工，4 台成功“转正”", desc: "智元机器人近日发起机器人直播在便利店“打工”挑战，6台精灵G2机器人连续24小时在岗，最终4台成功“转正”。在考核期间，机器人共完成任务1730次/件，接待顾客683人，商品取送369单，咖啡制作147杯，热食出品126份，巡检补货277次，桌面清理128次。这标志着智能机器人开始在便利店领域进行商业化尝试，为未来无人零售行业的发展提供了新的可能性。", source: "IT之家", url: "https://www.ithome.com/1/022/015.htm" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "“太空AI第一股”来了，80后造出百亿独角兽", desc: "成都国星宇航通过港交所上市聆讯，预计11月中下旬挂牌，估值超115亿元。公司累计发射AI卫星数量国内领先，手握34.75亿元订单，但近三年累计亏损5.72亿元。国星宇航曾获深创投、星河产业集团等2500万元天使轮投资，累计融资32轮，2026年4月Pre-IPO轮融资35.5亿元。", source: "钛媒体", url: "https://www.tmtpost.com/8192734.html" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic完成新一轮融资", desc: "Anthropic在计算经济学方面面临挑战，尽管其计算利润率本应改善，却反而恶化。据TechCrunch报道，Anthropic的计算成本在此时却出现下降趋势，与预期相反。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/03/anthropic-is-still-grappling-with-the-economics-of-compute/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "谷歌调整教育账户设置，强制开放AI搜索功能", desc: "谷歌宣布调整面向美国中小学的服务权限，规定学校若要开放谷歌搜索，必须同时启用搜索服务内置的AI功能。幼儿园至高三学生的账户默认无法使用相关服务，学校管理员需手动开启。此举旨在应对家长和学区对AI的抵触情绪，学校将面临二选一的抉择。", source: "IT之家", url: "https://www.ithome.com/1/022/039.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "苹果开始测试AI智能功能，Siri可调用第三方应用", desc: "苹果公司宣布，Siri人工智能助手将获得对第三方应用的访问权限。作为iOS 27.3更新的部分，苹果公司允许开发者将Siri AI的新功能整合至“所有应用”，使其能够根据用户个人上下文、处理自然语言提示以及利用屏幕意识来完成请求。此次更新作为开发者预览的一部分，还新增了“应用技能”功能，允许第三方开发者创建能够将多个任务合并为单一操作的技能。", source: "The Verge", url: "https://www.theverge.com/tech/1025694/apple-siri-ai-third-party-apps" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "苹果警告AI智能体行为难以预测，可能引发诉讼和声誉损害", desc: "苹果在年度财务报告中警告，AI智能体可能做出不符合预期、难以预测的行为，给公司带来法律诉讼和声誉受损的风险。报告指出，AI智能体可自主执行操作，如与系统交互、访问权限、运行代码等，但行为可能违背预期。此前已发生多起AI智能体失控事件，如Hugging Face事件。苹果已调整Mac的完全磁盘访问权限，但警告对第三方AI智能体的监督和控制能力可能有限。新任CEO约翰·特努斯表示，Siri的功能还有很大的拓展空间，希望确保用户清楚授权访问权限，并保障安全和隐私。", source: "IT之家", url: "https://www.ithome.com/1/022/137.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Anthropic正在开发AI模型身份验证系统，名为FlashProve", desc: "Anthropic发布了名为FlashProve的系统，该系统允许任何人验证AI响应是否真的来自其所声称的模型。FlashProve系统旨在解决AI身份验证问题，确保AI模型的身份真实可靠。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/03/anthropic-is-working-on-a-system-to-prove-ai-models-identity/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "马斯克回应Grok Bot额度消耗过快：服务成本高到难以为继", desc: "Anthropic 发布更新后的 S-1 招股文件，第三季度营收达 169.6 亿美元，同比增长 47%，营业亏损为 5.67 亿美元。公司承诺约 8954 亿美元的 AI 基础设施支出，部分算力依赖第三方融资。Meta 调整 VR 硬件优先级，转向可穿戴设备和 AI 业务，第三季度 Reality Labs 部门营收同比下降 6%，AI 智能眼镜业务强劲增长。", source: "极客公园", url: "http://www.geekpark.net/news/373358" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Netflix推出AI发现标签，根据用户情绪推荐内容", desc: "Netflix发布了新的AI发现标签，该功能允许用户根据当前心情获得推荐。这是Netflix在AI领域的一次实验性尝试，旨在提升用户体验。该功能将根据用户当前的心情提供个性化推荐，以帮助用户找到合适的观看内容。这一新功能预计将对Netflix的用户体验产生积极影响，并可能在未来进一步优化和扩展。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/03/netflixs-new-ai-discover-tab-helps-you-find-something-to-watch-based-on-your-mood/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Trajectory融资4500万美元，使AI模型训练对非技术专家变得可行", desc: "Trajectory公司成功融资4500万美元，旨在使AI模型训练对非技术专家变得易于访问。这家成立一年的初创公司估值已达到3亿美元。此次融资将助力公司扩大其AI模型训练平台的覆盖范围，并推动其技术发展，使更多非技术背景的用户能够利用AI技术。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/02/trajectory-raises-45m-to-make-ai-model-training-accessible-to-nontechnical-experts/" }
+    ]
+  },
+  {
     date: "2026-11-03",
     weekday: "星期二",
     regioned: true,
