@@ -2785,6 +2785,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-05",
+    weekday: "星期四",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，涵盖技术突破、产业合作、政策发布等多个方面。　【国外】谷歌新规引发争议，苹果智能国行上线，Meta收购AI编程初创公司，AI融资热潮持续。",
+    items: [
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "360联合北大发布AI原生人才标准", desc: "360集团亮相北大AI+X青年人才实践发展论坛，联合发布“AI原生人才标准”。论坛由中国技术交易所、北京大学信息科学技术学院联合主办，汇聚各方力量探讨AI时代青年人才培养。360集团副总裁卜思南发表主旨演讲，指出智能体技术正重构社会岗位价值逻辑，人才竞争核心升级为对智能体的调度与管控。360集团全面推进All in Agent战略，部署十万余个智能体，覆盖630个业务岗位，以实践成果衡量学业水平。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/litxyBn8AmWERGUM.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "腾讯前研究员获千万投资，专注物理AI", desc: "触觉智能企业“灵感机器人”完成数千万元天使轮融资，由力合资本、合肥创新投等机构投资。公司创始人张雅展博士毕业于港科大机器人专业，曾是腾讯资深AI研究员，主导过大规模数据管线及AI模型研发。灵感机器人独创“稠密力场”技术路线，发布Lux系列视触觉传感器，已实现规模化交付。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/30nTa8g0yzQmZGys.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "MIT神作被锤：Astra爆改Qwen权重？就吹吧！", desc: "MIT的spaCy作者发表长文炮轰，针对Astra对Qwen权重的爆改。Astra在未经充分测试的情况下，宣称对Qwen权重进行了重大调整。然而，spaCy作者指出，这种调整并未带来预期的效果，反而可能对模型性能产生负面影响。这一事件引发了业界对模型权重调整的讨论，提醒研究人员在进行此类操作时需谨慎。", source: "量子位", url: "https://www.qbitai.com/2026/11/507782.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "机器人格斗表演观赏性下降，宇树科技CEO回应", desc: "宇树科技CEO王兴兴在第九届虹桥国际经济论坛上回应，今年机器人格斗表演观赏性不如去年，原因在于机器人稳定性大幅提升，倒地、摔倒场面变少。宇树科技基于端到端世界模型实现机器人全自主格斗，机器人实时采集画面，由模型直接推理决策。", source: "IT之家", url: "https://www.ithome.com/1/022/772.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "360参与发起智能体发展自律公约", desc: "中国信息通信研究院、360、华为等共同发布《智能体发展自律公约》，提出八条自律措施，聚焦健全智能体信任体系、提升安全防护能力等。公约要求健全前瞻性风险评估等技术体系，360用AI治理AI，构筑“大模型安全”与“智能体安全”两道防线。360推出智能体安全防护与管理系统，覆盖资产发现、行为管控等环节，旨在提升智能体运行安全。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/UB25ocDFu1ntNMtz.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "智能体身份注册与解析平台发布，蚂蚁参与建设", desc: "蚂蚁集团参与发布了智能体身份注册与解析平台，该平台旨在解决身份编码、跨域解析和可信互通问题，并已接入运行平台，承载智能体接入与能力发布。目前，支付宝晓政、芝麻信用等首批服务已接入，并完成与其他平台智能体的可信连接，为后续跨平台协作积累了经验。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/KStlwPyruE6hJ107.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "研究发现：AI 生成代码受下游环节瓶颈制约，无法提升整体生产力", desc: "InfoQ研究发现，AI生成代码受下游环节瓶颈制约，无法提升整体生产力。研究指出，AI生成代码在执行效率、代码质量等方面存在局限性，导致其无法有效提升软件开发效率。这一发现对AI在软件开发领域的应用提出了新的挑战。", source: "InfoQ", url: "https://www.infoq.cn/article/c3vTLNrRwfCzw8SAmz90?utm_source=rss&utm_medium=article" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "混元 Hy4 实测：腾讯的产品基因，模型继承了几分？", desc: "腾讯发布了混元 Hy4 模型，这是其最新的人工智能产品。该模型在性能上继承了腾讯的产品基因，具体细节包括在点击查看原文中可了解。与此前相比，混元 Hy4 模型的表现如何，尚需进一步观察。", source: "InfoQ", url: "https://www.infoq.cn/article/C61Q16LQIDq45l0iCCzV?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "policy", catLabel: "政策发布", title: "谷歌：学校禁用AI将无法使用谷歌搜索", desc: "谷歌发布新规，要求使用其K-12教育软件的学校必须启用AI工具，否则将无法使用谷歌搜索。该规定引发美国政界人士批评，如佛蒙特州联邦参议员伯尼·桑德斯指责谷歌的做法属于“敲诈勒索”，康涅狄格州联邦参议员理查德·布卢门撒尔表示谷歌更关心强行引入AI工具而非帮助学生成功。美国联邦贸易委员会前主席莉娜·汗也谴责谷歌的决定涉嫌反竞争。", source: "IT之家", url: "https://www.ithome.com/1/022/773.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "谷歌发布ML Drift：为各类GPU加速端侧AI推理", desc: "谷歌发布了ML Drift，旨在为各类GPU加速端侧AI推理。该技术旨在提升AI推理效率，为不同GPU提供加速支持。此举措将进一步推动端侧AI推理技术的发展和应用。", source: "InfoQ", url: "https://www.infoq.cn/article/hHzARIJTeqoqYpjNKEuq?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "苹果智能国行上线，苹果大涨超6%重返美股市值第一", desc: "苹果公司发布智能国行版，随iOS 27.3 Developer Beta向中国用户开放测试，预计12月正式版推出。首批功能包括实时翻译、写作工具等，与阿里巴巴合作接入千问大模型。苹果股价大涨超6%，市值重返5万亿美元，重返美股市值第一。", source: "极客公园", url: "http://www.geekpark.net/news/373494" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Meta 收购 AI 编程初创公司 Conductor", desc: "Meta 收购了AI编程初创公司Conductor，该公司开发了一款AI编程工具，允许用户在多个并行工作空间中部署AI智能体，同时启动和推进多个软件项目。Conductor成立于2024年，其核心产品直到去年夏季才正式推出，其AI智能体团队可以部署在云端、本地设备或用户手机上，旨在帮助软件工程师协同处理同一项目中相互独立、彼此隔离的不同部分。此次收购预示着Meta在智能体编程赛道的加码，公司正在为下一代交互界面制定大胆计划，并计划明年年初为用户带来新功能。", source: "IT之家", url: "https://www.ithome.com/1/022/765.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI发布GPT-Image-2.6，支持GIF和SVG生成", desc: "清华大学 KEG 实验室发布了 GPT-Image-2.6，该模型最快6秒出图，支持直出 GIF 和 SVG 格式。同时，Astra 6.2 也正式亮相。这一更新使得模型在图像生成方面更加高效和便捷。", source: "量子位", url: "https://www.qbitai.com/2026/11/507707.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "美国 FCC 将机器人设备列入受控清单", desc: "美国联邦通信委员会将“外国生产的先进机器人设备”列入受控清单，影响扫地机器人、无线割草机器人等。美国市场收紧，新型号需走国防部批准或本土制造。欧盟对中国割草机器人发起反倾销调查，拟征收45.6%-53.3%反倾销税。清洁机器人出海面临高库存、高税率、高门槛挑战。", source: "雷峰网", url: "https://www.leiphone.com/category/weiwu/DGcLJU9RgJPPzGhP.html" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "谷歌 Gemini 4 Argon 优化 ADK 代码库", desc: "谷歌通过使用 Gemini 4 Argon 优化了其 ADK 代码库的 20 万行代码，这一动作显著提升了代码效率。相较于之前的代码库，此次优化几乎将代码行数翻倍。", source: "InfoQ", url: "https://www.infoq.cn/article/u4fAoAH5vZPCV4TVqAcO?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "OpenAI 总裁：明年具备上市条件", desc: "OpenAI 总裁格雷格·布罗克曼表示，公司目前营收大部分来自企业客户业务，并预计将在2027年具备上市条件。OpenAI正在加大面向企业客户的销售力度，与竞争对手Anthropic展开竞争，后者预计将在今年年底前上市。OpenAI正在积极推广旗下的Codex智能体等产品，以拓展企业市场。", source: "IT之家", url: "https://www.ithome.com/1/022/734.htm" }
+    ]
+  },
+  {
     date: "2026-11-04",
     weekday: "星期三",
     regioned: true,
