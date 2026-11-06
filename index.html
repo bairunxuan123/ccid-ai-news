@@ -2785,6 +2785,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-06",
+    weekday: "星期五",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，涵盖政策发布、技术突破、产业动态和投融资等多个方面。　【国外】AI产业政策持续完善，技术突破与投融资活跃，产业动态丰富。",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "百度开源文心5.5 Flash Base，多基准测试刷新同尺寸模型 SOTA", desc: "百度发布开源最新基座模型文心5.5 Flash Base，采用MoE架构，总参数量2800亿，预训练使用33.5万亿个Token，在多个基准测试中刷新同尺寸模型SOTA表现。该模型在保证能力的同时，通过优化注意力机制等关键环节提高资源利用效率，较此前模型性能大幅提升。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/XOv7MDFAP99kUMEW.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "菜鸟发布与AI及具身智能产业合作计划", desc: "菜鸟网络发布AI及具身智能产业合作计划，宣布开放全球仓网，打造全球最大AI及具身智能物流实景训练集群，支持技术训练、实景验证与产业落地；同时推出“科技出海三日达”服务，提供全链路供应链服务。菜鸟与多家AI及具身智能领域头部企业达成首批合作，近百家产业链企业代表到场。菜鸟国际总裁熊伟表示，菜鸟希望充分发挥自身全球网络优势，与AI和具身智能企业伙伴共建生态、加速创造产业价值。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/DUZcuKBxESiGrXWu.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "腾讯20年老兵创业AI体感主机，融资超六千万", desc: "创想悦动，由腾讯20年老兵刘丹创立的AI体感成长主机公司，已完成种子轮融资，投资方为创维战投、创维数字，总金额约六千万元。创想悦动核心团队来自腾讯、字节、阿里等头部互联网公司，首款AI体感成长主机Youdoo Box已发布，累计销量破2万台。公司计划进行更多后续内容开发、东南亚海外市场拓展、线下渠道铺设及下一代产品预研。", source: "雷峰网", url: "https://www.leiphone.com/category/weiwu/8xihmnpkWWIHsn9G.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "网信部门整治AI假冒公众人物：清理信息4.7万余条，处置账号3961个", desc: "网信办近期针对利用AI技术假冒仿冒公众人物开展集中整治，累计清理违法违规信息4.7万余条，处置账号3961个。此次整治聚焦虚假带货、吸粉引流、炮制谣言及低俗恶搞等行为，相关账号已被依法依约处置。通报了四类典型案例，覆盖了当前AI仿冒公众人物的主要违规形态。这轮整治嵌入了2026年网信部门对AI乱象的持续性治理框架，较此前已累计清理违法违规信息561万余条、查处账号4.9万余个。", source: "IT之家", url: "https://www.ithome.com/1/023/231.htm" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "前飞书CMO创业，为何用「水晶球」赌一个AI入口？", desc: "梅花创投领投，前字节飞书CMO孙峰创办的AI情绪科技品牌Ora-Orb完成数千万元融资，新一轮融资目标投后估值2亿元人民币。Ora-Orb主打桌面级AI情绪陪伴终端，定价365美元，计划2027年CES展会后登陆Kickstarter众筹。孙峰拥有20年互联网市场与出海经验，曾带领蓝湖产品9个月登顶行业第一。", source: "雷峰网", url: "https://www.leiphone.com/category/weiwu/MiJKpPLqwFGB14X7.html" },
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "工信部等六部门推进AI在养老领域应用", desc: "民政部、国家发展改革委、工业和信息化部等六部门联合发布《关于培育多元场景 促进适老用品产品消费的若干措施》，推动适老化改造、健康管理、智能安防等用品进家入户，鼓励社区养老服务中心等设施开设适老用品体验、租售网点，并引导各地整合现有设施培育综合为老服务中心，推动适老用品产品消费和老年人文体娱乐、教育培训等服务融合发展。鼓励大型商超、百货商场开辟适老用品专营区域，并引导连锁药店、社区便利店扩容经营辅助行走产品、适老食品等日常用品，增强消费便利度。", source: "IT之家", url: "https://www.ithome.com/1/023/230.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "Cloudflare CEO：AI引发软件漏洞浪潮将持续两年", desc: "Cloudflare CEO 马修 · 普林斯在第三季度财报电话会议中表示，预计未来两年，严重的网络安全威胁将持续出现。他指出，AI 正在加速发现软件安全漏洞，导致新的安全威胁接连出现，例如最近有6个严重漏洞被公开披露。Cloudflare 已与多家AI研究机构和网络安全公司合作，提前获取尚未公开的漏洞信息，并采取措施保护客户。与此同时，企业对网安服务的需求不断增长，众多企业签订大规模安全服务合同，以应对相关风险。", source: "IT之家", url: "https://www.ithome.com/1/023/322.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "广电总局重申：扶持真人微短剧，规范AI微短剧", desc: "国家广播电视总局相关负责人在京重申，扶持真人微短剧，规范 AI 微短剧。该负责人指出，AI 带来微短剧创作环节的降本增效，但技术本身无价值观，使用技术的人才有。深度伪造、侵权搬运等行为损害行业信誉，必须规范发展。扶持真人剧，在资金、算法、评优上给予支持；规范 AI 剧，稳量提质，守住版权底线。", source: "IT之家", url: "https://www.ithome.com/1/023/215.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Perplexity推出Teammate", desc: "人工智能企业Perplexity推出名为“Teammate“的功能，作为使用者的“团队成员”，能执行持续性复杂工作，简化规划工作。Teammate负责规划和协调项目，灵活调整工作方向，并提交成果供审核。需Perplexity Max订阅，最初在网页端推出，随后扩展至iOS端。未来数周将扩展访问权限和功能。", source: "IT之家", url: "https://www.ithome.com/1/023/335.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "OpenAI或2027年IPO", desc: "OpenAI总裁Greg Brockman在周三的华尔街日报科技大会上表示，公司可能在2027年准备好上市。他强调，OpenAI在企业市场取得了进展，竞争对手Anthropic已成功进入该市场。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/05/openai-president-greg-brockman-says-company-could-be-ipo-ready-in-2027/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Box采用Nvidia Nemotron", desc: "Box公司推出了基于Nvidia的Nemotron的新一代以代理为中心的内容检索系统。该系统声称查询速度提升至原来的四倍，错误率降低20%，同时使用的token数量减少90%。这一创新技术有望显著提升内容检索的效率和准确性。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/05/box-taps-nvidias-nemotron-for-new-agent-first-content-retrieval-system/" },
+      { region: "intl", cat: "policy", catLabel: "政策发布", title: "欧盟要求AI文本水印，欧盟AI生成文本水印法规", desc: "OpenAI发布了符合欧盟新规的文本水印技术textGrain，但测试显示水印在文本编辑或不足150字时难以存活，缺乏明确法律标准，其透明度规则难以满足，可能对公司和AI文本检测带来挑战。", source: "IEEE Spectrum", url: "https://spectrum.ieee.org/ai-watermark-openai-textgrain-europe" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Airbnb推AI旅行代理，Airbnb推出AI旅行代理", desc: "Airbnb计划于2027年上半年推出人工智能旅行代理，该代理将帮助旅客规划行程、比较选项、管理预订并在整个旅行过程中提供协助。这一新功能旨在提升用户体验，通过人工智能技术为旅客提供更加便捷和个性化的服务。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/05/airbnb-says-its-launching-an-ai-travel-agent-in-the-first-half-of-2027/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI承诺社区数据中心项目，OpenAI承诺社区数据中心项目", desc: "OpenAI宣布，在社区数据中心项目中，将不再使用与公职人员签订的非披露协议（NDAs）。此前，许多数据中心项目因依赖NDAs隐藏开发商与地方官员之间的讨论而受到审查。OpenAI表示，现在仅对合法的安全信息、商业秘密或专有或竞争敏感信息提供“狭窄的保护”。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1028454/openai-data-center-nda" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "苹果智能国行上线，苹果智能国行上线", desc: "苹果公司发布智能国行版，随iOS 27.3 Developer Beta向中国大陆用户开放测试，并计划12月正式推出。首批功能包括实时翻译、写作工具等，与阿里巴巴合作接入千问大模型。苹果股价大涨超6%，市值重返5万亿美元，重返美股市值第一。", source: "极客公园", url: "http://www.geekpark.net/news/373494" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Axiom Math保持AI远离数学，Axiom Math保持AI远离数学", desc: "Axiom Math正式推出AI验证服务，其AI代理已正式验证数学领域最大图书馆之一的Stacks Project。此举旨在应对AI在数学领域大量未经检查的证明，确保数学领域的准确性。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/05/axiom-math-wants-to-keep-ai-slop-out-of-mathematics/" }
+    ]
+  },
+  {
     date: "2026-11-05",
     weekday: "星期四",
     regioned: true,
