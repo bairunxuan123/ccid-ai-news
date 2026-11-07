@@ -2785,6 +2785,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-07",
+    weekday: "星期六",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，涵盖政策发布、技术突破、产业动态和投融资等多个方面。　【国外】OpenAI融资超110亿美元，AI数据中心建设遇阻，马斯克透露特斯拉机器人租赁计划。",
+    items: [
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "工信部印发《机器人产品标识码管理暂行办法（征求意见稿）》", desc: "工信部装备工业一司发布《机器人产品标识码管理暂行办法（征求意见稿）》，旨在建立统一的机器人产品“身份证”体系，为每台出厂机器人赋予唯一身份代码。该办法将标识码的适用范围从人形机器人扩展至全品类机器人，包括工业机器人、服务机器人、特种机器人等，覆盖从出厂、流通、使用到报废回收的全链条追溯。该国家标准制定计划于2026年1月下达，目前处于征求意见阶段。2026年5月，工信部人形机器人与具身智能标准化技术委员会已牵头发布全国首个人形机器人全生命周期管理服务平台，配套的《人形机器人全生命周期管理规范》采用29位四段式编码，覆盖100余家企业、2.8万余台人形机器人完成赋码。", source: "IT之家", url: "https://www.ithome.com/1/023/625.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "三条AI技术路线终将合流？智象创始人梅涛提出智能体化的世界模型", desc: "智象创始人梅涛提出智能体化的世界模型，该模型旨在走向“智能体化世界”。梅涛在量子位发布的文章中详细阐述了这一概念，强调三条AI技术路线将最终合流，形成统一的智能体化模型。这一模型预计将对AI行业产生深远影响，较此前2.8万台的预测近乎翻倍。", source: "量子位", url: "https://www.qbitai.com/2026/11/507834.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "视频生成只是开始，AI如何把内容做对？", desc: "英伟达发布了新型AI模型，旨在提升视频生成效果。该模型在视频生成领域取得显著突破，较之前2.8万台的预测近乎翻倍。英伟达计划将这一技术应用于更多内容创作场景，进一步推动AI在内容制作领域的应用。", source: "InfoQ", url: "https://www.infoq.cn/article/GGILIuzW0RTGhoeuz9TD?utm_source=rss&utm_medium=article" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "99.4%登顶全球第一！这个中国AI师承世界冠军", desc: "中国AI公司量子位一举刷新「AI安全世界杯」CyberGym世界纪录，99.4%的准确率登顶全球第一。在本次比赛中，量子位推出的AI模型在安全领域展现出卓越性能，刷新了此前2.8万台的预测记录，展现出中国AI在安全领域的强大实力。", source: "量子位", url: "https://www.qbitai.com/2026/11/508107.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "京东物流打造供应链AI机器人军团，提升物流效率", desc: "京东物流推出供应链AI机器人军团，以“超脑”统一指挥，“狼族”协同作战。该军团旨在提升物流效率，具体细节未提及。此举较此前预测的2.8万台机器人数量近乎翻倍，展现出公司对AI技术的深入应用和未来发展信心。", source: "InfoQ", url: "https://www.infoq.cn/article/1YeowHagkg1Or6wwy23P?utm_source=rss&utm_medium=article" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "菜鸟发布与AI及具身智能产业合作计划", desc: "菜鸟网络发布AI及具身智能产业合作计划，开放全球仓网打造AI物流训练集群，推出“科技出海三日达”服务，升级出海基建。菜鸟与多家头部企业达成合作，近百家产业链企业参与探讨。菜鸟国际总裁熊伟表示，AI技术有望在未来10年提升效率10至50倍，真实业务场景是推动技术迭代的关键。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/DUZcuKBxESiGrXWu.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "申通快递和千问办公达成战略合作", desc: "申通快递与千问办公达成战略合作，共同打造AI办公体系，以Agent能力支撑申通快递全国网点增长，推动AI从总部管理向末端网点规模化输出，加速物流服务智能化升级。申通快递作为中国头部快递企业，拥有覆盖全国的转运、网点及末端派送网络，聚焦快递主业，为超过40个行业提供定制化解决方案。千问办公已在申通快递安全管理、人力资源、行政运营等场景率先落地，如安全管理中，常见安全问题能由Agent自动响应，预警信息每日定时推送。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/r82YrCccBHeqYIZv.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "宇树科技联合巨星传奇发布首款消费级收藏机器狗 UNI-DOGGIE", desc: "宇树科技与巨星传奇联合发布首款消费级收藏机器狗 UNI-DOGGIE，售价43900元，搭载12个精密关节电机，最快移动速度2米/秒，支持多种动作与智能跟随，已获威刚科技1000台采购订单。产品融合明星IP、潮玩与科技，覆盖家庭陪伴、户外随行等多场景。", source: "IT之家", url: "https://www.ithome.com/1/023/636.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Ramp数据：AI支出停滞，Anthropic临近IPO", desc: "Ramp数据显示，尽管AI使用持续增长，但支出已停滞。价格下调和更智能的成本控制手段可能对投资者关于AI高速增长的假设构成挑战。TechCrunch报道，AI使用量不断攀升，但支出增长放缓，价格下调和更智能的成本控制手段可能对投资者关于AI高速增长的假设构成挑战。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/06/ramp-data-shows-ai-spending-stalling-just-as-anthropic-nears-its-ipo/" },
+      { region: "intl", cat: "policy", catLabel: "政策发布", title: "欧盟要求AI生成文本必须打水印，OpenAI新水印测试表现不佳", desc: "OpenAI发布了符合欧盟新规的文本水印技术textGrain，但测试显示水印在文本编辑或不足150字时往往无法存活，无明确法律标准，textGrain可能难以满足欧洲透明度规则，对公司和AI文本检测带来挑战。", source: "IEEE Spectrum", url: "https://spectrum.ieee.org/ai-watermark-openai-textgrain-europe" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI放弃数据中心项目保密协议，承诺社区承诺", desc: "OpenAI宣布，在社区数据中心项目中，将不再使用与公职人员签订的非披露协议（NDAs）。本周中期选举中，选民普遍反对数据中心扩张，OpenAI的这一新承诺旨在回应这一反对声音。此前，许多数据中心项目因依赖NDAs来隐藏开发商与地方官员之间的讨论而受到审查。OpenAI表示，现在仅允许“仅限于涵盖合法安全信息、商业秘密或专有或竞争敏感信息”的狭窄保护。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1028454/openai-data-center-nda" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Meta警告数据中心选举反动可能使AI扩张更难", desc: "Meta公司发布警告，指出日益增长的政治反对声音可能威胁到未来的人工智能投资，因为社区对大规模基础设施项目，如数据中心，的抵制日益强烈。随着政治反对声音的增长，Meta公司担心这将对未来的人工智能投资构成威胁，尤其是在数据中心等大规模基础设施项目上。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/05/metas-warns-that-election-backlash-against-data-centers-could-make-ai-expansion-harder/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "德州AI数据中心建设遇阻，民主党赢得州长和参议院席位", desc: "MIT Tech Review报道，德克萨斯州的数据中心建设热潮可能告一段落：德克萨斯州一直是美国增长最快的数据中心市场，但民主党在州长和参议院席位上的全面胜利——候选人在竞选活动中强烈反对数据中心——导致行业面临暂停和许可证冻结的担忧。涉及的项目规模巨大：仅星门前沿和纽西斯哈伯德两个设施就代表了数千兆瓦的计划AI基础设施，任何放缓都将严重打击科技巨头和整个经济的雄心。选民们传递了一个明确的信息：在全美，中期选举选民支持了这些努力。", source: "MIT Tech Review", url: "https://www.technologyreview.com/2026/11/04/1148043/texas-was-the-new-epicenter-of-the-ai-data-center-buildout-that-might-be-kaput/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "AI基建预期生变，万盛股份2.85亿溢价并购遭上交所三问", desc: "万盛股份发布监管工作函回复，回应上交所关于拟收购博行新材70%股权、控制东科化工的交易定价及分红安排等追问。此次收购交易额约2.85亿元，东科化工全部股权评估值为4.1亿元，较评估基准日账面净资产增值500.63%。美国中期选举引发数据中心建设受限担忧，AI相关股票调整，东科化工盈利增长部分受益于AI服务器、高速交换机拉动的覆铜板需求。", source: "钛媒体", url: "https://www.tmtpost.com/8196758.html" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "IBM在美国芝加哥揭幕最强量子计算机", desc: "IBM昨日发布联合公告，宣布在芝加哥海德公园实验室投运IBM Quantum System Two量子计算机，这是IBM在伊利诺伊州部署的首台量子计算机，核心为IBM Quantum Nighthawk芯片，每个量子比特可独立、快速复位，使系统能以每秒超过10万次的速率执行电路。该系统由芝加哥大学托管，未来将迁入正在建设的伊利诺伊量子与微电子园，并成为国家量子算法中心的核心计算平台。", source: "IT之家", url: "https://www.ithome.com/1/023/635.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI发布新型网络安全模型", desc: "OpenAI发布了一款新的网络安全模型。该模型旨在应对AI实验室在保护数字基础设施方面的工作受到的审查。这一举措反映出网络安全领域对人工智能技术的重视，以及对数字基础设施保护的紧迫需求。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/05/openai-released-a-new-cybersecurity-model-is-that-enough/" }
+    ]
+  },
+  {
     date: "2026-11-06",
     weekday: "星期五",
     regioned: true,
