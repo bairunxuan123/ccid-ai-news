@@ -2795,6 +2795,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-08",
+    weekday: "星期日",
+    regioned: true,
+    summary: "【国内】中国AI产业迎来快速发展，政策支持、技术突破、产业合作和资本涌入成为亮点。　【国外】今日AI产业动态丰富，涵盖政策发布、技术突破、产业动态和投融资等多个方面。",
+    items: [
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "博世利用AI助手豆包工作，提升工程师效率", desc: "博世研发事业部推出豆包工作，利用AI技术协助工程师处理信息，减少沟通环节，提高故障分析效率。工程师需整合项目、软件版本、车辆配置等多维度信息，豆包工作可协助整理，实现知识沉淀，避免经验断档。此举旨在提升研发效率，减少重复劳动。", source: "极客公园", url: "http://www.geekpark.net/news/373643" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "Menlo Ventures报告：中国AI模型占全球开源模型企业支出89%", desc: "硅谷风投公司 Menlo Ventures 发布报告显示，中国AI模型在全球企业开源模型支出中占比高达89%，其中Kimi系列以61%的份额位居第一，深度求索DeepSeek和智谱的GLM分别以15%和11%的份额位列第二和第三。相比之下，Meta Platforms旗下的Llama系列在开源模型企业支出中的占比仅为7%。", source: "IT之家", url: "https://www.ithome.com/1/023/885.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "智能装备龙头拓邦股份实控人离婚，分手费8.69亿", desc: "拓邦股份发布离婚公告，实控人武永强与罗少英办理解除婚姻关系，分割8729.77万股股份，市值约8.69亿元。公司前三季度营收90.75亿元，同比增长10.84%，但净利润同比下降52.87%。智能控制业务贡献营收5.86亿元，同比增长172.2%，占比6.4%，对业绩提升影响有限。", source: "钛媒体", url: "https://www.tmtpost.com/8197382.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "申通快递与千问办公达成战略合作，推动物流服务智能化升级", desc: "申通快递与千问办公达成战略合作，共同打造AI办公体系，以Agent能力支撑申通快递全国网点增长，推动AI从总部管理向末端网点规模化输出，加速物流服务智能化升级。申通快递作为中国头部快递企业，拥有覆盖全国的转运、网点及末端派送网络，聚焦快递主业，为超过40个行业提供定制化解决方案。千问办公将Agent套件能力与申通快递的行业经验深度融合，共同打造快递行业Agent规模化落地标杆，沉淀出可供整个物流行业持续复用的数字资产。此前，千问办公已在申通快递安全管理、人力资源、行政运营等场景率先落地，推动安全管理从“被动响应”转向“主动管理”。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/r82YrCccBHeqYIZv.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "世界互联网大会领先科技奖，Qoder获中国AI编程市场第一", desc: "阿里旗下智能体平台Qoder在2026年11月的世界互联网大会领先科技奖中荣获通用Agent领域唯一奖项。该奖项每年评选约15至20项获奖项目，涵盖基础研究、关键技术与工程研发。在工程研发组的8项获奖成果中，至少5项与AI相关。Qoder的获奖标志着阿里在AI编程市场的领先地位，与阿里云飞天开放平台在首届世界互联网领先科技成果发布活动中的亮相相呼应，见证了其从基础设施到行业Infra定位的转变。", source: "极客公园", url: "http://www.geekpark.net/news/373542" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "李佳琦卖出万份Token，天猫AI生意才刚开场", desc: "李佳琦直播间上架AI千问办公的Token算力，半小时售出10万份千问办公个人会员月卡，累计约2万亿Token。天猫设立“AI空间站”，三家厂商入驻，充值规格分为月卡、季卡和年卡三档；阿里旗下AI应用给出20%-40%优惠。Token成为可直接购买的商品，电商平台盯上Token，京东上线“AI软件充值馆”，腾讯云将MaaS升级为Token Hub。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/h454rlPtg41JIuFd.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "上交大张伟楠教授：AI如何走出屏幕，真正改变物理世界？", desc: "上海交通大学计算机学院教授、上海人工智能实验室物理智能中心负责人张伟楠在CNCC 2026上发表了题为《物理智能及关键技术概述》的演讲，指出AI在真实世界中形成感知、预测、行动与持续学习的完整闭环是物理智能的核心挑战。他强调，基础模型、世界模型、强化学习与高吞吐仿真、虚实迁移以及硬件成本的下降正在推动物理智能从研究愿景走向可行实践。", source: "雷峰网", url: "https://www.leiphone.com/category/academic/TRS6Uqs5TY2MaUU4.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "埃森哲报告被曝存在虚假引用案例，公司否认系AI幻觉所致", desc: "埃森哲发布了名为《跨越式发展》的研究报告，该报告涉嫌包含15条虚假引用和虚构案例研究，引发外界审查。报告旨在探讨人工智能如何提高非洲农业产业的生产力，由埃森哲与马德里IE大学合作发布。埃森哲否认错误由AI造成，但事件可能影响公司声誉。GPTZero报告指出，咨询行业广泛使用AI引发担忧，虚构引用对信息源构成威胁。", source: "IT之家", url: "https://www.ithome.com/1/023/845.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI发布新网络安全模型", desc: "OpenAI发布了新的网络安全模型。该模型旨在应对AI实验室在保护数字基础设施方面的工作受到的审查。具体而言，这一新模型在技术规格和覆盖范围上尚未详细披露，但它的推出无疑将加强OpenAI在网络安全领域的实力。与此前相比，OpenAI的此番动作有望进一步推动网络安全技术的发展和应用。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/05/openai-released-a-new-cybersecurity-model-is-that-enough/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Axiom Math验证数学证明", desc: "Axiom Math 推出验证服务，其AI代理正式验证了数学领域的最大图书馆之一——Stacks Project。此举旨在应对AI在数学领域大量未经检查的证明。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/05/axiom-math-wants-to-keep-ai-slop-out-of-mathematics/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Chainalysis客户信息被盗", desc: "区块链分析公司Chainalysis表示，黑客已通过网络安全漏洞窃取了所有用户的敏感个人信息，包括姓名、用户名、密码散列和实时令牌。此次攻击可能对黑客来说是一次重大胜利，因为Chainalysis和公共来源都透露了其众多知名客户，包括政府机构如FBI、美国移民海关执法局和美国空军，以及私人公司如微软、Coinbase和巴克莱银行。目前尚不清楚数据泄露是否暴露了所有客户信息。", source: "Ars Technica", url: "https://arstechnica.com/security/2026/11/chainalysis-says-hackers-stole-credentials-and-tokens-for-all-of-its-customers/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Meta推出Muse AI聊天功能", desc: "Meta公司发布了一项新功能，其AI代理现在可以以可定制的动画形象接听电话，这一功能发布在即将推出的类似Tamagotchi的可穿戴设备之前，该设备旨在让Muse AI活跃起来。这一更新使得美国用户能够通过视频聊天与他们的Muse AI形象进行互动。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/05/meta-says-us-users-can-now-video-chat-with-their-muse-ai-avatar/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Meta警告数据中心反动可能阻碍AI扩张", desc: "Meta公司发布警告，指出日益增长的政治反对声音可能威胁到未来的人工智能投资，因为社区对大型基础设施项目，如数据中心，的抵制日益强烈。随着政治反对声音的增长，Meta公司担心这将对未来的人工智能投资构成威胁，尤其是在数据中心等大型基础设施项目上。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/05/metas-warns-that-election-backlash-against-data-centers-could-make-ai-expansion-harder/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "百图生科与11家伙伴战略合作，AI生物计算覆盖医药研发及农业育种", desc: "百图生科主办第三届“国际生物计算创新峰会2026”，与11家伙伴战略合作，聚焦AI生物计算在医药研发及农业育种的应用。峰会汇聚约300名代表，涵盖世界模型、可穿戴生物传感等议题，推动香港科研成果转化。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/X7HwwQTEXJhiVVzK.html" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Ramp数据显示AI支出停滞，Anthropic接近IPO", desc: "Ramp数据显示，尽管AI使用持续增长，但支出已停滞。价格下调和更智能的成本控制手段可能对投资者关于AI高速增长的假设构成挑战。TechCrunch报道，随着Anthropic即将进行IPO，AI领域的投资增长放缓，显示出市场对AI超高速增长的预期可能过于乐观。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/06/ramp-data-shows-ai-spending-stalling-just-as-anthropic-nears-its-ipo/" },
+      { region: "intl", cat: "policy", catLabel: "政策发布", title: "欧盟要求AI文本水印，OpenAI新水印测试未达标", desc: "OpenAI发布了遵守欧盟新规的文本水印技术textGrain，但测试显示水印在文本编辑或低于150字时往往无法存活，缺乏明确法律标准，textGrain可能无法满足欧洲透明度规则，对公司和AI文本检测带来挑战。", source: "IEEE Spectrum", url: "https://spectrum.ieee.org/ai-watermark-openai-textgrain-europe" }
+    ]
+  },
+  {
     date: "2026-11-07",
     weekday: "星期六",
     regioned: true,
