@@ -2795,6 +2795,27 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-09",
+    weekday: "星期一",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，政策、技术、产业、资本各领域均有重要进展。　【国外】OpenAI融资超110亿美元，英伟达CEO黄仁勋承认婚外情，AI产业动态活跃。",
+    items: [
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "网信办发布互联网新技术新应用信息服务备案系统", desc: "国家互联网信息办公室发布了“互联网新技术新应用信息服务备案系统”，该系统于2026年11月9日正式上线，可一体化开展生成式人工智能、算法、深度合成、区块链等新技术新应用备案，原“互联网信息服务算法备案系统”和“区块链信息服务备案管理系统”同步停止使用。系统使用过程中如有疑问，可拨打电话010-82990521咨询。", source: "IT之家", url: "https://www.ithome.com/1/024/332.htm" },
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "腾讯发布混元大模型Hy4，主打性价比", desc: "腾讯发布了混元 Hy4 大模型，并计划开源模型权重，同时推出主打性价比的轻量版 Hy4 flash。Hy4 在开源模型中已进入第一梯队，但与顶尖闭源模型仍有差距。据国家数据局数据，我国日均 Token 调用量两年增长超 5000 倍，Agent 正成为新的生产力形态。", source: "极客公园", url: "http://www.geekpark.net/news/373644" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "支付宝分享AI办事实践，推动政策精准直达企业", desc: "支付宝在第八届世界浙商大会上分享了AI办事实践，依托“浙里政策惠企精准直达大模型”平台，运用人工智能技术实现惠企政策精准推送，通过“浙里政策惠企”小程序为企业提供个性化政策推荐服务。在“浙商创新创业AI进化论”专题活动中，支付宝数字民生事业部总经理李毅强分享了AI办事助手“晓政”的实践，推动民生服务智能化。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/41xBwd2JagAdaaxT.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "终端侧AI发展至多模态应用，高通AI产品技术负责人解读", desc: "高通公司AI产品技术中国区负责人万卫星在2026年11月7日上海表示，终端侧AI技术经过3至4年发展，正从单点应用走向智能体体验。终端侧AI已拓展至多模态应用，如影像、问答、图像生成等，但多数功能仍偏向单点功能。高通强调端云协同，提出“端侧优先”策略，以减少对网络的依赖，提供更及时稳定的响应。", source: "雷峰网", url: "https://www.leiphone.com/category/chips/aOKsujJpdDvRKj5S.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "火山引擎成为AI手机助手隐形底座，头部手机厂商合作", desc: "火山引擎成为AI手机助手的隐形底座，被头部手机厂商广泛采用。据InfoQ报道，每两家头部手机厂商中就有一家选择火山引擎。该平台提供强大的AI技术支持，助力手机厂商提升产品智能化水平。火山引擎的广泛应用，标志着AI技术在手机领域的深入融合。", source: "InfoQ", url: "https://www.infoq.cn/article/icMBWWjE3LTzEY1tHKr8?utm_source=rss&utm_medium=article" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "豆包工作个人版取消5小时额度限制，灵活安排使用时间", desc: "豆包工作于11月6日起取消个人版5小时额度限制，用户可在周额度内灵活安排使用时间。此前，豆包工作个人版采用5小时、7天双周期额度管理，取消限制后，用户可更自由地分配一周内的使用额度，如项目汇报前集中梳理资料、求职或述职阶段连续完成信息整理等。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/Ii6W43GghzJA7V1u.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "英伟达CEO黄仁勋承认婚外情，英伟达启动调查", desc: "英伟达CEO黄仁勋承认婚外情，启动国家安全调查；特斯拉更新AI加速器路线图，SI6算力达HW4的80倍，Dojo D3将面向太空部署。腾讯姚顺雨谈AI公司护城河，强调产品层而非模型层的重要性。", source: "极客公园", url: "http://www.geekpark.net/news/373687" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "微软CEO纳德拉畅想：未来可能有2000万个AI智能体与20万名员工协同工作", desc: "微软CEO萨蒂亚·纳德拉在领英联合创始人里德·霍夫曼的播客节目中畅想未来，表示微软可能拥有2000万个AI智能体与20万名员工协同工作。纳德拉认为，AI将成为企业的未来，并预测编程领域的演化预示所有工作的未来方向。他透露，自己已经同时打开了100个CLI会话，运行着100个智能体。", source: "IT之家", url: "https://www.ithome.com/1/024/243.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "微软申请新专利：AI实时修改直播说话内容并同步嘴型", desc: "微软近日提交了一项名为《利用人工智能近乎实时增强直播活动的视频或增强现实（AR）演示》的专利申请，该技术可近乎实时地修改直播说话内容并同步嘴型。专利编号为US 2026/0341309 A1，系统包含一个AI智能体，能实时监听音频，根据预设规则或观众个人资料识别需修改或删除的词语，并生成新的视频画面，让说话者的嘴部动作与修改后的语音保持一致。该系统可能替换口头填充词、口吃、发音错误、冒犯性词汇等，处理后的视频延迟约1至10秒播放。", source: "IT之家", url: "https://www.ithome.com/1/024/305.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI“重置大神”换人了？Tibo去救火，Andrew上位", desc: "OpenAI宣布内部人事调整，Tibo不再负责客服，转由Andrew Ambrosino协调产品体验。据路透社报道，Tibo被调去治理内部安全问题。交接过程中，双方通过传递一个按钮完成，该按钮连接OpenAI内部系统，可重置全球所有付费用户的Codex额度。", source: "雷峰网", url: "https://www.leiphone.com/category/yanxishe/u5N6lCUT0bEfanp1.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "英伟达CEO黄仁勋承认婚外情，英伟达启动调查", desc: "Nvidia宣布将对CEO黄仁勋及其与Megaspeed高管Alice Huang的关系展开调查。Alice Huang被报道被中国国家安全部招募以间谍身份监视公司。董事会发布声明称，鉴于近期报道，董事会将启动独立调查，由独立董事委员会监督，协助外部独立律师。董事会优先考虑美国国家安全。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1029562/nvidia-investigating-jensen-huang-relationship-chinese-spy" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Nvidia调查黄仁勋与中国间谍关系", desc: "据《纽约时报》报道，中国国家情报机构国家安全部（MSS）招募了Megaspeed公司高管Alice Huang，以刺探英伟达CEO黄仁勋的信息。Alice Huang与AI芯片行业高层人士有联系，包括技嘉等公司领导。此举旨在获取美国AI芯片信息，并可能影响英伟达将最先进芯片提供给中国。", source: "The Verge", url: "https://www.theverge.com/tech/1029338/nvidia-ceo-jensen-huang-china-spy" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "百图生科与11家伙伴战略合作，AI生物计算覆盖医药研发及农业育种", desc: "百图生科主办第三届“国际生物计算创新峰会2026”，宣布与11家伙伴启动合作，聚焦AI生物计算，覆盖医药研发及农业育种，包括与香港大学推进“乳腺癌虚拟细胞大模型”项目，以及与香港浸会大学筹建“AI中医药联合实验室”，合作网络延伸至日本、新加坡及“一带一路”沿线市场，加速香港科研成果转化。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/X7HwwQTEXJhiVVzK.html" }
+    ]
+  },
+  {
     date: "2026-11-08",
     weekday: "星期日",
     regioned: true,
