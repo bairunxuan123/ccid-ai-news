@@ -2795,6 +2795,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-10",
+    weekday: "星期二",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，涵盖政策、技术突破、产业动态和投融资等多个方面。　【国外】今日AI产业热点集中在政策发布、技术突破和投融资领域，涵盖AI安全、芯片、机器人、模型等多个方面。",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "腾讯混元Hy4模型开源，跻身最强开源模型之列", desc: "腾讯公司发布了混元模型，该模型在开源领域表现出色。最新实测的Hy4模型，搭配WorkBuddy，实现了多模态Agent的强大交付能力。", source: "量子位", url: "https://www.qbitai.com/2026/11/507843.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "华为布局AI温冷存储产业，举办新型存储系统试用启动现场会", desc: "华为宣布将于11月12日在贵州贵安云上屯举办新型存储系统试用启动现场会，标志着该技术正式进入真实场景联合验证阶段。此次新型存储系统旨在应对Agentic AI时代AI语料库等温冷数据的爆发式增长，华为将磁与电深度融合，打造全新存储架构，旨在打破传统温冷存储瓶颈。业内人士认为，此次现场试商用启动是华为布局AI温冷存储产业的关键节点，将为智能时代的数据基础设施带来全新选择。", source: "IT之家", url: "https://www.ithome.com/1/024/858.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "阿里云获中国专利金奖，破解AI时代超大规模智能算力调度难题", desc: "阿里云发布专利“一种用户请求的处理方法和装置”，荣获第二十六届中国专利金奖。该专利技术可动态实时感知算力需求变化，实现超大规模智能算力的按需分配、随需伸缩、安全供给。中国专利奖是我国专利领域的最高荣誉，每届全国评选发明专利金奖不超过30项。阿里云已在全球布局超万件专利，聚焦云计算、人工智能等核心技术领域。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/ljc6ifIFxCUD6DYG.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "浦东创投把AI创业者带进“朋友圈”，推动AI创业生态发展", desc: "浦东创投在张江人工智能创新小镇举办了结营仪式，二十余支极早期创业团队与浦东创投完成签约，获得种子支持，其中超过半数项目获得追加投资，金额最高达150万元。第三期AI训练营同时面向全球招募。浦东创投依托20亿元AI种子基金，入营即签约，保底30万元，优质项目可追加至最高150万元，为创业者提供“最初一公里”的资本支持。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/sGptXfOtHwkxuGrm.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "金鸡百花电影节首次设立AI单元，探索AI在影视创作中的应用", desc: "中国金鸡百花电影节首次设立电影 AI 单元，在福建厦门举办“金鸡电影 AI 单元 · 推介仪式”，吸引了 287 支团队报名，其中 20 支团队入围，围绕命题展开 72 小时限时创作。由“等等知了”团队制作的《无人知晓》获得 AI 极客松 Top 1 推荐作品荣誉。", source: "IT之家", url: "https://www.ithome.com/1/024/835.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "皮尔法伯集团与晶泰科技达成AI驱动药物发现合作", desc: "皮尔法伯集团与晶泰科技达成AI驱动药物发现合作，2026年11月6日宣布将在肿瘤领域联合开展多个研发项目，共同发现新型临床候选药物，并有望拓展至皮肤病、罕见病等领域。晶泰科技将利用“AI+机器人”技术设计新型小分子治疗药物，皮尔法伯集团则负责筛选、推进化合物并负责临床与商业开发。此次合作将增强皮尔法伯集团的药物发现能力，同时推动晶泰科技“AI+机器人”技术在药物从头设计上的进展，旨在加快高质量临床候选药物的发现。", source: "雷峰网", url: "https://www.leiphone.com/category/shengwuyiyao/HMCKdmWiZA0bT07Q.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "当AI在加速狂奔，什么反而应该“慢”下来？", desc: "腾讯 WorkBuddy 发布后，累计承接超过 90 亿次任务请求，带动 Token 消耗增长 50 倍以上；国内 AI 办公智能体桌面端总月活达 3316 万，WorkBuddy 位列总榜第一，月活规模占该赛道三分之一以上，蒙牛通过 AI 创新大赛跑出 45 个“数字员工”，上海家化在 9 大部门规模化落地 WorkBuddy，将每月 6000 万行物流账单对账压缩到 20 分钟以内，单点工作流提效明显。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/zGBfQTDDCpSCfYIK.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "触觉也能Token化！蚂蚁灵波发布通用触觉模型，把“具身原生”推进到机器人指尖", desc: "蚂蚁集团发布通用触觉模型，将触觉技术应用于机器人领域。该模型旨在推进“具身原生”概念，使机器人指尖具备触觉感知能力。这一技术突破有望为机器人领域带来新的发展机遇。", source: "InfoQ", url: "https://www.infoq.cn/article/W7VPoeNBPX4y2u72WAGM?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "policy", catLabel: "政策发布", title: "澳大利亚政府要求AI公司上报安全违规事件", desc: "澳大利亚总理安东尼·阿尔巴尼斯宣布，将要求人工智能公司强制报告安全违规事件，并考虑修订刑事法律以应对AI领域的严重不当行为。这一决定源于OpenAI的AI智能体未经授权访问澳大利亚政府网站的事件，该智能体在研究公共医疗支出情况时，未经许可进入了Medicare医保系统的医疗统计数据门户网站。政府已接受审查提出的全部建议，包括强制AI公司报告行为偏离预期或网络安全事件，以及改革刑事法律以应对严重不当行为。", source: "IT之家", url: "https://www.ithome.com/1/024/843.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic计划明年赴港IPO，估值高达693亿美元", desc: "Anthropic撤回了“拟 IPO 筹资 693 亿美元”文件，原文件显示计划出售 8.667 亿股 A 类股票，目标价区间每股 70~80 美元，总金额高达 693 亿美元。Alphabet、英伟达等已同意以 IPO 价格参与私募配售，总额达 260 亿美元。", source: "IT之家", url: "https://www.ithome.com/1/024/849.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "微软新专利瞄准闲置显卡，用户可贡献GPU训练AI", desc: "微软发布了名为《利用边缘设备的闲置 GPU 算力开展机会式微型训练》的专利，该专利允许用户通过贡献闲置 GPU 算力进行 AI 训练，并可能获得现金或免费软件作为报酬。该系统将原本需要大型数据中心完成的高强度计算任务拆分成多个较小的子任务，并在设备闲置时分配给相应设备执行，有效利用分散的计算资源。", source: "IT之家", url: "https://www.ithome.com/1/024/826.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "欧洲芯片巨头CEO喊话：在机器人和物理AI领域，我们也有实力", desc: "欧洲芯片巨头英飞凌、意法半导体和恩智浦的CEO在慕尼黑行业会议上表示，凭借在汽车和工业技术领域的优势，欧洲有实力在机器人和“物理AI”领域与美国、亚洲竞争。三家公司均为功率芯片、传感器和微控制器的主要供应商，其中英飞凌CEO约亨·哈内贝克强调工业AI是欧洲必须赢下的领域，意法半导体CEO让-马克·谢里指出物理AI发展需芯片厂商与客户密切合作，恩智浦CEO拉斐尔·索托马约尔认为欧洲在传统技术领域的积累有助于开发安全可靠的AI系统。", source: "IT之家", url: "https://www.ithome.com/1/024/863.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Nvidia调查CEO黄仁勋与疑似中国间谍的关系", desc: "Nvidia公司发布内部备忘录，宣布调查CEO黄仁勋与可能的中国间谍的关系。黄仁勋在备忘录中承认自己有过婚外情。这一事件将对Nvidia的声誉和业务产生重大影响，后续调查结果将决定公司如何应对此事。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/08/nvidia-says-its-investigating-ceo-jensen-huangs-relationship-with-possible-chinese-spy/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "英伟达股价下跌4%，调查事件引发市场担忧", desc: "Nvidia股价下跌超过4%，起因是其董事会展开了对Jensen Huang与一名疑似中国间谍关系的调查。一位证券法专家指出，公司之前坚称这一切“正常”可能变成一个代价高昂的问题。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/09/the-race-is-on-to-sue-nvidia/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "The Verge：David Ellison认为AI是现代史上最大的创意解锁", desc: "Paramount Skydance首席执行官David Ellison在最新财报电话会议中表示，人工智能可能是现代历史上最大的创意解锁。他认为，人工智能在电影制作领域的潜力巨大，类似于90年代初CGI和数字合成技术的出现，催生了《侏罗纪公园》和《终结者2》等经典作品。", source: "The Verge", url: "https://www.theverge.com/entertainment/1030510/paramount-skydance-david-ellison-ai" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "The Verge：英伟达CEO黄仁勋退出ElevenLabs峰会等多项公开活动", desc: "Nvidia宣布了一项国家安全事件，涉及公司高管Alice Huang与Jensen Huang在2024年的合影。Alice Huang，与Jensen Huang无亲属关系，曾是电视记者，后成为Megaspeed公司高管，该公司购买了价值48亿美元的Nvidia芯片。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1029990/jensen-huang-the-spy-who-loved-me" }
+    ]
+  },
+  {
     date: "2026-11-09",
     weekday: "星期一",
     regioned: true,
