@@ -2785,6 +2785,27 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-11",
+    weekday: "星期三",
+    regioned: true,
+    summary: "【国内】今日AI产业政策密集发布，技术突破与产业动态并进，投融资活跃。　【国外】AI行业政策密集出台，技术突破与融资并购活跃。",
+    items: [
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "国务院办公厅印发《关于适应人工智能技术发展助力构建就业友好型发展方式的意见》", desc: "国务院办公厅发布了《关于适应人工智能技术发展助力构建就业友好型发展方式的意见》，文件号为国办发〔2026〕29号。该意见旨在贯彻落实党中央、国务院关于促进就业的重要指示精神，强调就业是民生之本。文件指出，随着人工智能技术的快速发展，要积极构建就业友好型发展方式，以适应新时代就业需求。", source: "中国政府网", url: "https://www.gov.cn/gongbao/2026/issue_13086/202611/content_7085636.html" },
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "腾讯发布Hy4大模型，主打性价比的轻量版Hy4 flash也一起亮相", desc: "腾讯于11月4日正式发布混元Hy4大模型，该模型权重将近期开源，同时推出主打性价比的轻量版Hy4 Flash。Hy4定位为首次跻身最强开源模型之列，其在开源模型中已进入第一梯队，但与全球顶尖闭源模型的差距仍明显。据国家数据局数据，我国日均Token调用量两年增长超5000倍，Hy4的实测能力包括长程Agent、多模态理解与视觉代码等。", source: "极客公园", url: "http://www.geekpark.net/news/373644" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "AI短剧混战：大厂争夺的是剧本，还是下一代流量入口", desc: "字节跳动、腾讯、快手、百度等巨头纷纷布局AI短剧赛道，QuestMobile数据显示，2026年9月短剧视频总使用时长净增长达133.29亿小时，红果免费短剧月活跃用户超4.3亿。四巨头路径各异，字节跳动全产业链布局，AI生成内容在自家流量池验证后批量生产。", source: "钛媒体", url: "https://www.tmtpost.com/8201130.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "阿里分拆平头哥上市，拟通过全球发售平头哥H股的方式进行", desc: "阿里巴巴集团近日宣布，根据香港联交所上市规则，已向港交所提交分拆全资子公司平头哥（上海）技术股份有限公司独立上市的建议。平头哥成立于2018年，承载阿里全部自研芯片业务，产品覆盖数据中心“算力、存储、网络”三大核心环节。此次分拆拟通过全球发售平头哥H股的方式进行，IPO具体规模尚未确定。", source: "钛媒体", url: "https://www.tmtpost.com/8200942.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "三个月估值涨十倍的芯片热潮里，5000万也没让他创业", desc: "雷峰网报道，芯片创业热潮中，张博士拒绝了5000万元投资，选择留在场外。与此同时，王晓峰带领团队专注于LPU芯片研发，尽管面临时间压力，但估值已从几亿元涨至近十亿元。与张博士的谨慎态度形成对比，王晓峰的团队在融资和项目推进上取得了显著进展。", source: "雷峰网", url: "https://www.leiphone.com/category/chipdesign/6mjibhXfWFoLrabg.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "IDC预测2030年全球数据中心机柜量达5800万架", desc: "IDC发布《全球半年度数据中心设施跟踪报告》，预测2030年全球数据中心机柜数量将达5800万架，能源消耗从2025年的519太瓦时增长至2030年的1308太瓦时，资本支出从2025年的2,760亿美元增至2030年的6,550亿美元。全球数据中心供给面临电力、电网接入等制约，资源紧缺与容量利用不足问题并存，中国市场尤为突出。", source: "IT之家", url: "https://www.ithome.com/1/025/483.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "百度文心5.5 Flash Preview发布", desc: "百度发布文心5.5 Flash Preview，总参数量达2800亿，支持最长100万Token的上下文，在编程、3D建模、知识工作、内容创作等方面表现突出。模型针对游戏开发场景进行专项训练，并适配主流开发工具，在3D建模与设计能力上显著提升。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/sqz0hf4DoTPX5mqI.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "北京建立具身智能机器人企业上市“一对一”服务机制", desc: "北京市经济和信息化局发布《北京市具身智能机器人产业高质量发展行动方案（2026-2028年）》，提出建立具身智能机器人企业上市“一对一”服务机制，培育不少于200家科技和创新型中小企业，支持视觉语言动作模型（VLA）、世界模型（WM）、强化学习等多技术路线布局，推动实现从“感知”到“认知”的跃升。", source: "IT之家", url: "https://www.ithome.com/1/025/432.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "苹果限制Apple Intelligence云端AI使用额度", desc: "苹果公司计划对部分Apple Intelligence云端AI功能实施使用额度限制，用户可通过付费订阅iCloud+套餐扩容。受限制的功能包括Siri AI、图乐园、照片应用中的智能编辑工具等。此前，苹果已在Logic Pro中推出额外AI用量包，售价约合334.3元人民币。苹果表示，具体限制将根据功能类型、请求复杂度等因素动态调整。", source: "IT之家", url: "https://www.ithome.com/1/025/502.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "美国州长冻结数据中心项目，AI发展受影响", desc: "OpenAI 高管讨论重设数据中心容量预期。2026年11月，美国多地数据中心项目暂停，包括得州、俄亥俄州、佐治亚州等，至少21个项目被取消。Anthropic招股书中也提及暂停令风险。若美国数据中心全部建不成，对AI产业影响深远。", source: "极客公园", url: "http://www.geekpark.net/news/373816" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "纽约州AI安全法规生效，OpenAI等需注册报告", desc: "OpenAI和Anthropic面临新的监管要求，纽约即将实施全面的AI安全法。该法案要求主要开发者如OpenAI和Anthropic进行注册、披露安全实践，并报告关键事件，否则将面临罚款。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/10/openai-anthropic-face-new-oversight-as-new-yorks-ai-safety-law-takes-effect/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Nvidia面临治理危机，专家热议", desc: "Nvidia近期遭遇危机，引发企业治理专家广泛关注。据TechCrunch报道，专家表示目前发生的状况前所未见。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/10/nvidias-crisis-has-corporate-governance-experts-reaching-for-the-popcorn/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Google发布Gemini 4 Carbon，主打代理群功能", desc: "Google发布了最新AI模型Gemini 4 Carbon，该模型在两周前已向部分“网络安全防御者”开放。Carbon被Google称为“最强模型”，可与Anthropic和OpenAI的顶尖系统相媲美。相较于上个月推出的Argon，Carbon“进一步推动了前沿”，但Argon仍将是大多数软件工程和知识工作的理想选择。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1030787/google-gemini-4-carbon-public-rollout" }
+    ]
+  },
+  {
     date: "2026-11-10",
     weekday: "星期二",
     regioned: true,
