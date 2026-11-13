@@ -2795,6 +2795,27 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-13",
+    weekday: "星期五",
+    regioned: true,
+    summary: "【国内】今日国内AI产业动态丰富，涵盖政策、技术突破、产业动态和投融资等多个方面。　【国外】今日AI产业动态丰富，涵盖政策、技术突破、产业动态和投融资等多个方面。",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "MiniMax开源SOTA生图模型，原生4K，一张两毛", desc: "MiniMax公司发布了开源SOTA生图模型“源神”，原生支持4K分辨率，生成一张图片仅需两毛钱。该模型在图像生成领域具有显著优势，较此前同类模型具有更高的效率和更低的成本。", source: "量子位", url: "https://www.qbitai.com/2026/11/509440.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "百度智能云与普渡机器人达成战略合作，聚焦具身模型训练等四大方向", desc: "百度智能云与普渡机器人达成战略合作，共同聚焦具身模型训练、真实场景数据等四大方向。百度智能云将为普渡提供模型训练所需的基础设施与云服务支撑，普渡将依托自身技术体系，自主开展具身基座模型训练，建设完善多元场景数据体系，并推进智能体平台能力升级。目前，普渡机器人业务覆盖全球85个国家和地区，服务超5万家终端客户，累计出货超13万台。此次合作，普渡将依托百度百舸AI计算平台，完善算力基础设施，并持续开展PuduFM模型训练与迭代，结合全球商业部署积累的真实场景数据，建设高质量数据体系，推动智能能力在不同形态机器人及应用场景中复用。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/AXjuWVSD7DdsPxls.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "国星宇航“星算”计划03组卫星下线，目标2800颗算力卫星组网", desc: "国星宇航近日在浙江台州基地成功下线“星算”计划03组5颗算力卫星，计划近期择机发射。这些卫星将与01组、02组在轨卫星协同组网，共同构建由2800颗算力卫星组成的未来算力网络。该计划在2024年世界互联网大会乌镇峰会期间首次发布，旨在成为全球首个太空计算星座。", source: "IT之家", url: "https://www.ithome.com/1/026/676.htm" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "10个月融资20轮，第三方AI Infra为何越有争议越抢手", desc: "无问芯穹、清程极智、趋境科技等国内第三方AI Infra企业上月相继宣布完成新一轮融资，2026年前10个月累计完成20轮融资。雷峰网梳理发现，这些企业融资速度和频次明显变快，资本正争抢头部玩家，呈现“一九效应”。与此同时，海外新云厂商如CoreWeave面临争议，国内资本对第三方AI Infra的长期商业价值存在分歧。", source: "雷峰网", url: "https://www.leiphone.com/category/chips/ouA8GvSp9LIhZPmp.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "上海警方通报AI生成虚假账单事件", desc: "上海黄浦警方通报，一互联网酒类销售公司负责人赵某某为提升销量，组织人员利用AI软件篡改和平饭店账单，制作虚假视频传播。涉案人员15人，其中4人被采取刑事强制措施，11人被行政处罚。警方强调将依法查处编造传播虚假信息行为，维护企业合法权益。", source: "IT之家", url: "https://www.ithome.com/1/026/764.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "腾讯AI李牧青离职，出任AI公司联席CEO", desc: "腾讯云AI全球业务负责人李牧青正式离职，出任教育AI科技公司启鸣达人联席CEO。李牧青本科、硕士毕业于上海交通大学，曾任UCLA访问学者，曾主导AI产业化体系建设，在腾讯期间带领团队在二十多个行业推进大模型与AI落地，推动AI产品与解决方案深度契合当地需求，实现本地化。此次出任启鸣达人联席CEO，有望为教育行业带来创新。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/xfpQo71RiPDWJHvS.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "豆包工作接入更多模型，推出限时额度优惠", desc: "豆包工作于11月12日接入Kimi 3.1 Pro、GLM 5.3、DeepSeek V4.1 Flash等多款第三方模型，并推出限时特惠计划。用户可根据实际工作需要，选择相应模型完成任务。此前，豆包工作已向企业客户开放第三方模型，并在模型选择页面更新标注了各模型的额度消耗倍率。在简单小额任务免费的基础上，豆包工作将推出全新限时优惠活动，用户在工作日及节假日的指定优惠时段使用参与活动的模型，可享受额度消耗优惠。此外，豆包工作已针对豆包2.1 Lite和DeepSeek V4.1 Flash推出限时优惠，下调这两款模型的额度消耗倍率。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/5Y2bdtPv21ZnFJCY.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "玩家靠停产傲腾内存跑通2.8万亿参数AI模型", desc: "网友u/IndividualSurvival在Reddit社区分享，成功使用停产英特尔傲腾持久内存运行2.8万亿参数的Kimi K3 AI模型，每秒输出1.5词元。该网友使用傲腾持久内存200系列，40核第三代英特尔至强可扩展处理器，并采用1比特量化、压缩模型数据后，速度提升至每秒1.5个词元。", source: "IT之家", url: "https://www.ithome.com/1/026/759.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "谷歌发布 Gemini Decision 1 模型", desc: "谷歌发布首款决策模型 Gemini Decision 1，在9项测试中夺得7项第一，准确率高达92.2%。这一成果显著提升了决策模型的性能，为后续研究和应用提供了有力支持。", source: "InfoQ", url: "https://www.infoq.cn/article/E7QKIMUz3h0G0IE5Paii?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Nvidia CEO 黄仁勋辞职", desc: "NVIDIA宣布Jensen Huang辞职，引发业界对其在开源AI领域的承诺疑问。黄仁勋离职后，NVIDIA对开源AI的支持，包括对Hugging Face的收购、开源权重模型以及反对限制的倡导，都成为关注焦点。在领导层过渡期间，NVIDIA的这些举措备受瞩目。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/12/jensen-huangs-exit-puts-nvidias-support-for-open-source-in-question/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic 启动 IPO 路演", desc: "Anthropic启动IPO路演，估值已缩水至6000亿美元。量子位报道，尽管全球市场普遍降温，Anthropic却逆势而行，展开IPO路演。这一举措显示出公司在人工智能领域的强劲发展势头。", source: "量子位", url: "https://www.qbitai.com/2026/11/509381.html" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Nvidia 推出 LiteRT Tensor API", desc: "谷歌发布LiteRT Tensor API，用于构建、定制与优化端侧机器学习模型。该API旨在提升模型性能，并支持更广泛的定制化需求。此API的推出，将为机器学习模型的发展带来新的可能性，有望进一步推动端侧机器学习技术的应用。", source: "InfoQ", url: "https://www.infoq.cn/article/joYjCTbwWFSkbACK5lje?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "英伟达员工发起挽留行动，97%员工希望黄仁勋回归", desc: "英伟达员工发起挽留行动，内部投票显示超97%员工希望黄仁勋回归CEO职位。员工自发组织投票，超过1600条评论要求董事会让黄仁勋回归，其中多名员工表示难以接受黄仁勋离职。黄仁勋自1993年英伟达成立以来一直领导公司，上周日宣布辞职。", source: "IT之家", url: "https://www.ithome.com/1/026/735.htm" }
+    ]
+  },
+  {
     date: "2026-11-12",
     weekday: "星期四",
     regioned: true,
