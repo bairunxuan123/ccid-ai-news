@@ -2795,6 +2795,25 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-15",
+    weekday: "星期日",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，国产芯片融资潮涌，AI录音硬件市场潜力巨大，中金公司与蚂蚁集团战略合作，AI赋能财富管理。　【国外】英伟达高层变动引发行业关注，AI初创企业融资面临变局。",
+    items: [
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "沐曦与优必选共同发起的曦选创智完成5亿元天使轮融资", desc: "沐曦与优必选共同发起的曦选创智宣布完成5亿元天使轮融资，智能网卡厂商沐创、碳化硅功率模块厂商利普思也相继披露新融资。10月31日至11月6日，国内集成电路领域披露融资约111亿元，占当周全部已披露融资金额的一半以上。今年三季度，半导体领域VC／PE投资规模约1092亿元，同比增长91％。多家企业把新产品或新工艺的量产节点定在2027年前后，资本既在支持已有产品扩大交付，也在提前投入尚未形成销售的新架构与新工艺。", source: "钛媒体", url: "https://www.tmtpost.com/8205694.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "DeepSeek开放全家桶API，官方App功能均可自由组合调用", desc: "DeepSeek公司发布了全家桶API，官方App功能均可自由组合调用。这一举措意味着用户可以根据需求灵活调用不同功能，提升使用体验。相较于之前的版本，DeepSeek的API功能更为丰富，预计将进一步提升用户满意度。", source: "量子位", url: "https://www.qbitai.com/2026/11/510003.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "京博控股集团与千问办公达成战略合作，共创化工行业AI Native标杆", desc: "京博控股集团与千问办公达成战略合作，将基于千问办公打造AI Native组织，双方将围绕科研创新、生产运营优化等核心场景展开合作。京博控股集团是中国500强企业，向全球50余个国家和地区提供高性能新材料、高端化学品等，依托千问办公，京博将在化工、新材料等核心生产场景，探索用Agent重塑流程架构，实现增收提效；另一方面，京博将借助千问办公沉淀管理经验，提升公司整体运营效率。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/TVkq6K4xkcX9zKSN.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "联想重新定义词元工厂，年产2000万亿Token，成本狂降70%", desc: "联想公司发布了词元工厂，年产2000万亿Token，成本降低70%，重新定义了绿电进Token出的模式。这一创新举措预计将对行业产生深远影响，较此前预测的产量有显著提升。", source: "量子位", url: "https://www.qbitai.com/2026/11/510094.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "华为麒麟9050芯片新一代巴龙AI Modem发布", desc: "华为官方今日发布麒麟 9050 系列芯片新一代巴龙 AI Modem，首创融合通信架构，业界首发四卡三待，支持智能选网、地铁模式和极速回网功能，较 A 手机 18 Pro Max 火车游戏卡顿降低 48%，演唱会传图耗时降低 46%，地铁刷短视频卡顿降低 32%，户外回网等待降低 83%。麒麟 9050 系列作为首款逻辑折叠的 τ 芯片，将开启未来 10 年新征程。", source: "IT之家", url: "https://www.ithome.com/1/027/292.htm" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "Kimi估值500亿美元，月之暗面急着拆掉海外架构", desc: "Kimi开发商月之暗面计划终止开曼控股公司运作，回购早期投资者股份，将资金重新投入中国境内运营实体，为港股IPO做准备。公司最新一轮融资估值约500亿美元，考虑2027年第一季度登陆港交所，募资规模最高可能达到50亿美元。此举标志着月之暗面成为中国AI创业公司冲击公开市场的重要代表。", source: "钛媒体", url: "https://www.tmtpost.com/8205584.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "猫粮要保鲜，饮水要恒温，淘宝出海宠物智能用品跑出新增长", desc: "淘宝天猫宠物行业已有超半数品牌进入海外市场，其中宠物智能设备海外成交增速领跑全行业，智能喂食器、智能饮水机、智能储粮桶和宠物可穿戴设备等品类的海外成交额均实现两位数同比增长。得益于中国强大的供应链基础，中国品牌在全球智能宠物设备行业已占据三分之一市场份额，喵享家等品牌在半年内海外订单超过一万笔，成交额近五千万，其中海外成交额占比近两成。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/Fs1xk6Oh4bie2guE.html" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "谷歌推出LiteRT Tensor API", desc: "谷歌推出LiteRT Tensor API，用于构建、定制与优化端侧机器学习模型，该API旨在提升模型性能和效率。这一技术发布为开发者提供了新的工具，有助于他们在端侧设备上实现更高效的机器学习应用。", source: "InfoQ", url: "https://www.infoq.cn/article/joYjCTbwWFSkbACK5lje?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "40%游戏从业者使用AI，55%持批评态度", desc: "游戏开发者大会（GDC）发布《游戏行业现状：2026年11月》，调查2600多名从业者，40%使用生成式AI，55%持批评态度。57%使用者每日使用AI工具，73%用于资料调研、头脑风暴，56%编写代码，但创意工作应用较少。版权问题、取代人类及专业能力削弱是主要担忧。", source: "IT之家", url: "https://www.ithome.com/1/027/323.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "谷歌收购Hugging Face", desc: "Hugging Face CEO承诺在黄仁勋离职后继续为开源AI而战，引发对英伟达129亿美元收购案的疑问。Hugging Face的CEO承诺在黄仁勋离职后继续为开源AI而战，引发对英伟达129亿美元收购案的疑问。Hugging Face的CEO承诺在黄仁勋离职后继续为开源AI而战，引发对英伟达129亿美元收购案的疑问。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/12/hugging-face-ceo-vows-to-keep-fighting-for-open-source-ai-after-jensen-huangs-exit/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "英伟达市值蒸发超3万亿，33年首换帅", desc: "英伟达宣布，公司创始人黄仁勋辞职，标志着33年来的首次换帅。此次变动导致公司市值蒸发超3万亿。具体来看，黄仁勋在任期间带领英伟达取得了显著成就，但新任CEO的任命及未来战略方向尚待揭晓。", source: "量子位", url: "https://www.qbitai.com/2026/11/509995.html" }
+    ]
+  },
+  {
     date: "2026-11-14",
     weekday: "星期六",
     regioned: true,
