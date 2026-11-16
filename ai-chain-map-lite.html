@@ -2795,6 +2795,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-16",
+    weekday: "星期一",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，涵盖政策、技术、产业和资本等多个方面。　【国外】英伟达高层变动引发行业关注，AI政策、技术突破与产业动态活跃。",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "我国牵头的首个智能制造仿真技术国际标准正式发布", desc: "国际标准化组织（ISO）近日正式发布由我国牵头制定的《自动化系统与集成异构制造平台仿真协同环境要求第 1 部分：参考模型与流程》国际标准。该标准针对智能制造系统仿真构建与集成的痛点，首次提出了一套完整的接口标准、元模型规范与参考流程体系，覆盖全产品层级、全生命周期阶段的仿真活动，为联合仿真项目提供统一技术指引。来自中国、美国、法国、德国、韩国、俄罗斯等10余个国家的专家共同参与研制。", source: "IT之家", url: "https://www.ithome.com/1/027/733.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "百度世界2026：百度推出大模型交易平台词元所", desc: "度小满发布轩辕4.5金融增强大模型，采用自进化（RSI）技术，推理成本降低至通用顶级模型十分之一。该模型与香港科技大学、香港生成式人工智能研发中心（HKGAI）合作，旨在助力中小金融机构以可控成本实现AI在风控、信审、客户服务等环节的应用。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/JDoXug7VZqSjkQrQ.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "华为云：80% 中国具身智能企业选择昇腾云，行业排名第一", desc: "华为云发布了CloudRobo具身智能平台，已有80%的中国具身智能企业选择昇腾云，覆盖重点高校。该平台汇聚超16500个专业开发者、230多家企业和高校，沉淀1500+行业资产，覆盖多个场景。昇腾原生具身世界模型CloudRobo-WM1.2在评测中均位列Top 1。", source: "IT之家", url: "https://www.ithome.com/1/027/690.htm" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "超聚变募80亿冲IPO，服务器老二为何盯上能源？算力下一战，拼的是供电", desc: "超聚变数字技术股份有限公司成功通过深交所上市审核委员会审议，拟募资80亿元，其中研发项目8.9亿元，聚焦供电架构与智能算力。公司前身华为x86服务器业务剥离时，团队携带FusionServer、KunLun与FusionPoD等产品系列。2025年能源智慧解决方案收入1811.16万元，占比0.28%。五年前华为成立数字能源技术有限公司，将数据中心能源业务重构，今年4月四部门行动方案出台，推动业务转型。", source: "钛媒体", url: "https://www.tmtpost.com/8206373.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "DeepSeek开放全家桶API", desc: "DeepSeek公司发布全家桶API，官方App功能均可自由组合调用，此举将官方App功能组合的灵活性提升至新高度。API的开放，使得开发者可以灵活组合DeepSeek的官方App功能，为用户提供更加丰富和个性化的应用体验。相较于之前的版本，这一更新将极大地扩展DeepSeek的应用场景和用户群体。", source: "量子位", url: "https://www.qbitai.com/2026/11/510003.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "Token出海赚的钱，跟不上飙升的存储成本了", desc: "硅谷知名风险投资机构门罗风投发布了《2026年企业AI现状报告》，显示美国企业89%的开源模型支出付给了中国模型，其中Kimi占61%，DeepSeek占15%，GLM占11%。尽管开源模型在Token使用量上已占近五分之一的份额，但仅占企业模型总体支出的4%。高昂的存储成本使得Token出海收益难以覆盖，引发市场关注。", source: "钛媒体", url: "https://www.tmtpost.com/8204368.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "华为云发布CloudRobo-WM1.2", desc: "华为云发布并开源昇腾原生具身世界模型CloudRobo-WM1.2，该模型采用共享世界模型骨干网络实现预测增强的世界表征，基于世界模型原生DualAct架构，在RoboTwin 2.0、LiberoPro 2.0两个评测基准中均排名第一。华为云表示，昇腾云在具身智能市场格局中排行中国第一，已有80%的中国具身智能企业选择昇腾云。", source: "IT之家", url: "https://www.ithome.com/1/027/684.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "AI演员代言美瞳广告被罚，虚假宣传需警惕", desc: "广州我的影视文化传媒有限公司发布虚假医疗广告，代言AI演员方桃子宣称“戴了一天都很舒服”，涉及未取得《医疗广告审查证明》的第三类医疗器械“NUTNUTLOOK 坚果力”美瞳产品，被罚款6.82万余元。", source: "IT之家", url: "https://www.ithome.com/1/027/711.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "DeepSeek发布全新AI模型", desc: "印度芯片初创公司Bharat Semi成功获得2400万美元种子轮融资，其AI赋能的传感器技术已获得包括通用原子公司在内的多家企业认可。该轮融资将助力Bharat Semi在全球AI传感器市场的发展。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/15/indian-chip-startup-bharat-semi-lands-24m-seed-round-as-it-eyes-global-ai-sensor-market/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "英伟达发布新一代GPU RTX 4090", desc: "深圳企业智平方在2026年APEC领导人会议周期间，在大会新闻中心投放7台人形机器人，为超5000名中外媒体记者提供咖啡、冰淇淋、软饮等服务。这批机器人由人形机器人使用人类常用咖啡机、冰淇淋机和果汁机制作完成，累计约2000名志愿者对机器人进行安全与压力测试。智平方透露，目前已有超过三分之一、接近一半的APEC经济体与公司有不同程度的商业沟通合作，未来一年希望合作经济体数量超过一半、争取三分之二以上。", source: "IT之家", url: "https://www.ithome.com/1/027/735.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "英伟达CEO黄仁勋辞职，市值蒸发超3万亿", desc: "英伟达宣布黄仁勋辞职，开启33年来的首次换帅，市值蒸发超3万亿。这一人事变动标志着公司领导层的重大调整，对公司的未来发展产生深远影响。", source: "量子位", url: "https://www.qbitai.com/2026/11/509995.html" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "DeepSeek推出AI模型搜索平台，价格仅为OpenAI的1/8", desc: "DeepSeek官方App全套能力开放API，联网搜索价格不到OpenAI、Claude的8%，此举标志着DeepSeek在人工智能领域的进一步拓展。该API的开放将使得更多开发者能够利用DeepSeek的技术，降低使用成本，提高搜索效率。与OpenAI、Claude等竞争对手相比，DeepSeek的价格优势明显，有望吸引更多用户。", source: "InfoQ", url: "https://www.infoq.cn/article/NWmk4epBL0jPAUtpKSKb?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "苹果计划明年发布首款智能眼镜，AI健康研究加速", desc: "苹果公司发布了新应用，旨在研究人们如何使用人工智能进行健康研究。该应用将解答日常医疗问题，以收集用户数据，了解AI在健康领域的应用情况。这一举措有助于苹果进一步探索人工智能技术在医疗领域的潜力。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/15/apple-launches-new-app-to-study-how-people-use-ai-for-health/" },
+      { region: "intl", cat: "policy", catLabel: "政策发布", title: "欧盟发布AI伦理指南，要求AI系统具备透明度", desc: "苹果公司发布了一项名为“Apple Health AI Usage Study”的研究，旨在更好地理解人们如何与对话式AI健康工具互动以及其响应的实际效用。这项研究由苹果公司与临床AI平台OpenEvidence合作进行，OpenEvidence基于《新英格兰医学杂志》等医学信息源生成答案。参与者将使用一款新的iOS应用提出医疗问题，并根据准确性、详细程度和相关性等标准对响应进行评分。", source: "The Verge", url: "https://www.theverge.com/tech/1033355/apples-new-study-looks-to-improve-the-effectiveness-of-ai-health-tools" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "马斯克呼吁AI开发者自我管理内存，Rust也难以应对AI制造复杂性", desc: "马斯克在演讲中提出“真男人自己管理内存”的观点，强调Rust语言虽有助于管理内存，但仍无法完全解决AI制造复杂性。三十年系统老将对此发出警告，引发业界关注。这一观点对于AI系统开发和管理提出了新的挑战和思考。", source: "InfoQ", url: "https://www.infoq.cn/article/FWqT2oGIEl9zlyJ7HXZF?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "丰田联手小马智行，广州开启示范运营L4级自动驾驶服务", desc: "小马智行与丰田合作研发并量产的第七代铂智 4X Robotaxi 在广州正式投入示范运营，面向公众开放 L4 级自动驾驶服务。小马智行与丰田已在北上广深四座一线城市落地 Robotaxi 服务，2023 年 8 月共同投资 10 亿元成立合资公司骓丰智能科技有限公司，加快铂智 4X Robotaxi 车型的概念设计与量产研发。今年 2 月，量产版铂智 4X Robotaxi 正式下线，并迅速转入公开道路自动驾驶测试。", source: "IT之家", url: "https://www.ithome.com/1/027/643.htm" }
+    ]
+  },
+  {
     date: "2026-11-15",
     weekday: "星期日",
     regioned: true,
