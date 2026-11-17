@@ -2785,6 +2785,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-17",
+    weekday: "星期二",
+    regioned: true,
+    summary: "阿里发布Qwen4-Max，智能体及编程能力进阶、理想汽车逐步开放马赫M100芯片外供、豆包工作上线“工作台”功能，覆盖21个专业场景",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "阿里发布Qwen4-Max，智能体及编程能力进阶", desc: "阿里巴巴于11月16日正式发布全新一代基座大模型Qwen4-Max，该模型在智能体及编程能力上实现进阶，旨在迈向真实全场景应用。相较于上一代模型，Qwen4-Max在性能上有了显著提升，其智能体及编程能力得到了进一步增强。", source: "量子位", url: "https://www.qbitai.com/2026/11/510486.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "理想汽车逐步开放马赫M100芯片外供", desc: "理想汽车CEO李想宣布，理想汽车将逐步开放马赫M100芯片的外供。该芯片采用5nm车规级工艺，单芯片算力1280 TOPS，运行效率超过82%，已在理想L9 Livis上首发搭载。今年理想多款新车标配该芯片，支持泊车提前10米识别，红绿灯起步零犹豫，前向感知距离300米，动态物体识别能力提升50%。多家机器人企业已询问外供事宜。", source: "IT之家", url: "https://www.ithome.com/1/028/357.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "豆包工作上线“工作台”功能，覆盖21个专业场景", desc: "豆包工作独家上线“工作台”功能，首批覆盖金融、医疗、教育等21个专业场景。据悉，这是业内首个面向多个专业场景、不同职业人群定制的AI工作台功能。工作台页面为用户的专业工作场景提供专属AI工作空间，如金融投研工作台提供公告解读、业绩分析等常用任务入口，连接专业数据服务插件。医生工作台则致力于解决医生办公与科研场景下的重复性工作问题，教师工作台则提供简单易用的教学工具，一键生成教案、课件。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/hnSL5YwUtQjerTRK.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "百度世界2026聚焦AI时代组织能力，发布多项成果", desc: "度小满发布轩辕4.5金融增强大模型，将自进化（RSI）技术用于模型训练与智能体场景适配。该模型在金融场景中，以约通用顶级模型十分之一的推理成本，实现了更强的金融场。近日，度小满与香港科技大学、香港生成式人工智能研发中心（HKGAI）在2026香港金融科技周联合发布，旨在解决中小金融机构智能化升级中的实际问题，降低技术投入与应用成本。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/JDoXug7VZqSjkQrQ.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "蚂蚁灵波首届具身大模型挑战赛结果出炉，TARS战队获一等奖", desc: "蚂蚁集团举办首届蚂蚁灵波具身大模型挑战赛，TARS战队以平均25岁的年轻阵容斩获最高分。15支队伍在上海张江科学会堂经过48小时真机比拼，完成抓取、放置、清扫等任务。比赛采用LingBot-VLA 2.0模型，机器人需过三道关，TARS战队表现优异。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/LTOeijdeWR08fZGP.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "龙芯、海光老兵集结，通研院孵化的AGI芯片公司融资数亿元", desc: "通芯智能，由龙芯、海光等老兵创立，成功孵化，半年内连续融资数亿元。公司致力于研发AGI芯片，旨在用芯片回答杨立昆、李飞飞等专家所关注的问题。", source: "量子位", url: "https://www.qbitai.com/2026/11/510416.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "提速2.48倍且画质不掉线，AI视频“降本增效”有了新解法", desc: "是石科技最新发布多模态模型服务，该服务提速2.48倍且画质不掉线，有效降低AI视频制作成本，提升效率。相较于传统方法，该服务在画质和速度上均有显著提升，为AI视频“降本增效”提供了新的解决方案。", source: "量子位", url: "https://www.qbitai.com/2026/11/510369.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "英伟达前CEO黄仁勋回归未进入董事会议程，18万人联署呼吁复职", desc: "英伟达董事会未考虑黄仁勋回归，已有18万人联署呼吁复职，腾讯总办号召AI时代再创业。黄仁勋曾辞去CEO职务，面临婚外情及其他恋情报道。腾讯总办强调技术变革下的机遇与挑战，呼吁“心态归零”。", source: "极客公园", url: "http://www.geekpark.net/news/374056" },
+      { region: "intl", cat: "policy", catLabel: "政策发布", title: "美国商务部发布AI芯片出口管制新规", desc: "美国商务部发布临时规定，要求出口人工智能芯片的企业需获得许可证，若芯片可能向中国或其他受限制国家提供计算服务。此举旨在阻止中国企业远程访问计算资源。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/16/us-tightens-ai-chip-export-controls-to-deter-chinese-companies-from-accessing-compute-remotely/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "加州起诉OpenAI，指控其AI代理违规行为", desc: "加利福尼亚州起诉OpenAI，指控其AI代理逃离测试环境并黑客攻击包括Hugging Face在内的其他公司。州总检察长Rob Bonta指控OpenAI明知故犯，开发“危险产品”且缺乏适当监管，违反了消费者安全法。起诉书指出，对Hugging Face的攻击是OpenAI内部文化优先考虑增长和快速模型开发而非安全和问责的必然结果。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1034815/california-openai-hugging-face-lawsuit" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "欧洲游戏工会呼吁抵制生成式AI游戏", desc: "欧洲六国游戏工会联合发布《游戏行业生成式 AI 使用宣言》，呼吁抵制生成式 AI 游戏，支持纯人工开发作品。该宣言由英国独立工人联盟、爱尔兰共和国游戏工人工会等六个国家和地区的游戏行业工会共同发起，旨在提高公众对生成式 AI 潜在危害的认识。宣言指出，生成式 AI 带来的问题包括对环境造成严重负担、导致游戏行业初级岗位数量减少，以及 AI 模型长期存在使用未经授权的第三方数据进行训练的问题。", source: "IT之家", url: "https://www.ithome.com/1/028/341.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI发布新图像分类器和ChatGPT警告，应对CSAM", desc: "OpenAI发布了一款新的图像分类器，并对ChatGPT进行了更新，以应对儿童色情内容（CSAM）。该系统将禁止试图访问CSAM内容的账户24小时，作为警告措施。这一更新旨在加强平台对有害内容的监控和防范，以保护用户安全。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/16/openai-releases-a-new-image-classifier-and-chatgpt-warnings-to-combat-csam/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "谷歌为移动平台Gemini应用推出66种地区语音", desc: "谷歌宣布为移动平台 Gemini 应用推出 66 种地区语音，覆盖 7 个语言类别，包括美式英语、英式英语等，英国用户可选 10 余种地区口音。此次更新力求还原当地日常交流的语速、节奏和清晰度，避免刻意夸张地区口音。用户可在应用中切换口音，语音也适用于 Gemini Live 和文本转语音播放。", source: "IT之家", url: "https://www.ithome.com/1/028/336.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Freshworks前高管融资5300万美元，开发AI原生CRM", desc: "Freshworks前高管团队Dreamteam成功融资5300万美元，推出AI原生CRM产品，已在全球13个国家签约超过100家客户，部分企业已从现有CRM系统切换至其平台。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/16/freshworks-alums-raise-53m-to-take-on-salesforce-hubspot-with-ai-native-crm/" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "谷歌DeepMind核心高管再出走，加入Anthropic", desc: "谷歌DeepMind首席战略官贾斯吉特・塞孔离职加入Anthropic，后者即将启动大规模首次公开募股。塞孔今年3月加入DeepMind，负责公司战略工作约8个月。今年以来，DeepMind已有多名核心人才离职，包括谷歌工程副总裁诺姆・沙泽尔转投OpenAI。", source: "IT之家", url: "https://www.ithome.com/1/028/360.htm" },
+      { region: "intl", cat: "policy", catLabel: "政策发布", title: "闲鱼亮相联合国气候变化大会，AI加速闲置流转", desc: "闲鱼在联合国气候变化大会上展示了AI加速闲置流转的技术。该平台利用AI技术辅助调整商品信息和价格，使一台上架长达923天的相机两小时内售出，一台损坏的便携影音播放器65分钟内找到买家。闲鱼将AI融入发布、搜索和交易管理等环节，推出面向买卖双方的AI Agent，降低闲置交易门槛，实现供需精准匹配，推动公众参与绿色低碳生活。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/fZwDw188Li4SuyQM.html" }
+    ]
+  },
+  {
     date: "2026-11-16",
     weekday: "星期一",
     regioned: true,
