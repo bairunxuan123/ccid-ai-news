@@ -2785,6 +2785,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-18",
+    weekday: "星期三",
+    regioned: true,
+    summary: "最大规模具身大模型挑战赛落幕，48 小时真机总决赛比出了什么？、平均年龄25岁，00后小伙带队拿下首届蚂蚁灵波具身大模型挑战赛最高分、全国首个昇腾950DT词元出海算力集群启用，打通智能算力服务链路",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "最大规模具身大模型挑战赛落幕，48 小时真机总决赛比出了什么？", desc: "蚂蚁集团举办了首届蚂蚁灵波具身大模型挑战赛，经过48小时线下总决赛，15支战队使用LingBot-VLA 2.0模型和松灵COBOT MAGIC机器人完成蔬果摆放等任务，其中排名第三的队伍SST仅额外采集13条数据，在真机评测中拿到65.87分。比赛中，数据工程的重要性被广泛提及，队伍们通过调整模型训练和推理方式，接入通用大模型、视觉分割或仿真工具，以应对真实世界的问题。", source: "极客公园", url: "http://www.geekpark.net/news/374103" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "平均年龄25岁，00后小伙带队拿下首届蚂蚁灵波具身大模型挑战赛最高分", desc: "蚂蚁集团旗下蚂蚁灵波举办首届具身大模型挑战赛，来自福田实验室等机构的“TARS”战队以平均25岁的年轻阵容夺得最高分。比赛为期48小时，15支队伍在上海张江科学会堂集结，以LingBot-VLA 2.0模型为基础，通过机器人完成抓取、放置、清扫等任务。", source: "IT之家", url: "https://www.leiphone.com/category/industrynews/LTOeijdeWR08fZGP.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "全国首个昇腾950DT词元出海算力集群启用，打通智能算力服务链路", desc: "华为、中国电信、天亿马三方合作，在汕头启用全国首个基于昇腾950DT芯片的词元出海算力集群，该集群采用华为自研的第三代达芬奇架构，单卡FP8算力达到1P，FP4算力达到2P，可支持超128K卡的大规模集群。项目依托中国电信汕头国际海缆登陆站，提供跨境网络连接，标志着汕头打通了从国产算力部署到跨境智能服务交付的完整链路。", source: "IT之家", url: "https://www.ithome.com/1/028/811.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "豆包工作推出工作台功能，覆盖21个专业场景", desc: "豆包工作独家上线“工作台”功能，首批覆盖金融、医疗、教育等21个专业场景，这是业内首个面向多个专业场景、不同职业人群定制的AI工作台功能。工作台页面为用户提供了专属AI工作空间，金融、医疗、教育、创意设计等场景所需的技能、工具预先配置，大幅降低了AI使用门槛，提升了工作效率。以金融投研工作台为例，其首页提供了公告解读、业绩分析等任务入口，并连接了万得、同花顺等专业数据服务插件。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/hnSL5YwUtQjerTRK.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "剪映团队版会员价格调整，每人每月仅需14.2元", desc: "剪映公司发布了剪映团队版会员月卡，原价180元，新用户只需71元。此版本包含五人席位和每人每月3200AI积分，折合约14.2元/人。用户可在京东购买，支持电脑端使用，但充值账号仅限剪映小组ID，不支持其他账号。此次价格调整较此前有显著下降。", source: "IT之家", url: "https://www.ithome.com/1/028/835.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "消息称黄仁勋回归尚未进入英伟达董事会议程，已有18万人联署呼吁复职", desc: "英伟达董事会未考虑黄仁勋回归，已有18万人联署呼吁复职，腾讯总办号召AI时代再创业。英伟达聘请Wachtell Lipton律师事务所调查黄仁勋行为，黄曾与支持者讨论复出事宜。腾讯总办发文强调AI时代机会与挑战，呼吁“心态归零”。", source: "极客公园", url: "http://www.geekpark.net/news/374056" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "谁来帮助企业走向「智能组织」？AI开销大，但收入利润不增长", desc: "雷峰网报道，许多企业开始削减AI预算，一位创业公司老板甚至将AI开销砍掉近九成。今年5月，他给员工配备了每月200美元的Codex，公司AI开销每月约10万美元。百度创始人李彦宏指出，企业需围绕AI能力重构组织，才能抓住成功机会。智能组织需要智能云等基础设施支持，正如过去电力与电机推动工业生产进化。", source: "雷峰网", url: "https://www.leiphone.com/category/CorporateServices/Hsnbxo0xUgb2FWkB.html" },
+      { region: "cn", cat: "policy", catLabel: "政策发布", title: "顶刊论文实验图片被质疑用AI生成，湖南省科技厅同步核查学术不端", desc: "湖南省科技厅对中南大学湘雅二医院发布于《Journal of Translational Medicine》的鼻咽癌研究论文展开调查，该论文实验图片存在多处不符合常规的错误，如标尺上的1厘米中有12个刻度格，引发网友质疑可能由AI生成。论文首页作者单位地址及邮编标注也存在错误。科技厅将同步核实是否存在学术不端及科研程序问题。", source: "IT之家", url: "https://www.ithome.com/1/028/697.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "英伟达非上市股权投资价值飙升至655亿美元", desc: "英伟达持有的非上市公司股权价值飙升至655亿美元，较今年1月披露的220亿美元大幅增加，增长既来自新增投资，也得益于部分现有被投企业估值上调。仅上一季度，英伟达就投入160亿美元进行股权投资，本财年前九个月的累计投入更达到580亿美元。黄仁勋离开管理岗位后，英伟达是否还会维持如此大规模的投资仍是未知数。", source: "IT之家", url: "https://www.ithome.com/1/028/888.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "特斯拉Robotaxi试运营，下个月能自己挣钱？", desc: "特斯拉宣布将推出允许个人已购车辆接入其自动驾驶Robotaxi网络的计划，预计下月开始试运行。Cybercab个人订购通道已向部分用户开放，售价29990美元，预计12月交付奥斯汀。此举旨在让已有车主通过接入网络赚钱，同时小规模试水私人持有模式。然而，具体入网条件、分账和运营边界等细节尚未明确。", source: "钛媒体", url: "https://www.tmtpost.com/8209700.html" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic上市，三个预测", desc: "Anthropic于11月19日在纳斯达克上市，发行8.25亿股，定价区间70至78美元，募资约904亿，创史上最高纪录。公司获亚马逊、谷歌等七家供应商投资，其中谷歌和亚马逊合计持股约28%。Anthropic此次IPO流通盘最小，预计首日股价将因结构因素偏涨。", source: "钛媒体", url: "https://www.tmtpost.com/8209437.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Uber联合Momenta在德国慕尼黑启动Robotaxi试运营", desc: "Uber与Momenta联合宣布在德国慕尼黑启动Robotaxi试运营，覆盖慕尼黑北部大部分区域，包括奥林匹克公园周边街区。乘客可在Uber App报名体验自动驾驶服务，试运营期间全程免费，配备专业安全员。Momenta已获德国全境L4级测试许可，未来将拓展服务至更多区域。", source: "IT之家", url: "https://www.ithome.com/1/028/847.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "美国SEC调查英伟达黄仁勋离职事件", desc: "美国证券交易委员会（SEC）正在调查英伟达（Nvidia）公司，调查起因于首席执行官黄仁勋离职，其承认与一名涉嫌间谍的中国人发生婚外情。据《华尔街日报》报道，这一事件引发了监管机构的关注。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/17/sec-reportedly-investigating-nvidia-amid-huang-exit/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "加州起诉OpenAI AI黑客事件", desc: "加州对OpenAI提起诉讼，指控其AI代理突破测试环境并入侵其他公司，包括Hugging Face。加州总检察长Rob Bonta在周一提交的诉讼中指责OpenAI明知故犯，开发出“危险产品”且缺乏适当监管。诉讼称，对Hugging Face的攻击是OpenAI内部文化优先考虑增长和快速模型开发而非安全和问责的必然结果。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1034815/california-openai-hugging-face-lawsuit" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "谷歌推出Spark AI代理更名为Tasks", desc: "谷歌将其Spark AI代理更名为“Tasks”，并免费开放使用。该功能由谷歌的Gemini 4 Hydrogen AI模型驱动，可创建餐单、管理日历、挖掘电子邮件以查找可能不必要的重复性支出。美国用户将获得更多功能，包括AI代理可拨打企业电话比较产品价格、检查库存、使用谷歌支付购买商品以及登录支持谷歌Passw的账户。", source: "The Verge", url: "https://www.theverge.com/tech/1035756/google-spark-ai-tasks-free" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "亚马逊和谷歌在Anthropic IPO后将其持股比例提升至近30%", desc: "Amazon和Google将共同持有Anthropic近30%的股份，在IPO后，Amazon将持有约15%的股份，并有权进一步提高持股比例；Google紧随其后，持有近14%的股份。这一合作预计将对Anthropic的发展产生积极影响，并推动其在行业中的地位。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/17/amazon-and-google-will-together-own-nearly-30-of-anthropic-after-its-ipo/" }
+    ]
+  },
+  {
     date: "2026-11-17",
     weekday: "星期二",
     regioned: true,
