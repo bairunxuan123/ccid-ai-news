@@ -2785,6 +2785,27 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-20",
+    weekday: "星期五",
+    regioned: true,
+    summary: "【国内】国内AI产业迎来多项技术突破与政策支持，产业动态活跃。　【国外】AI行业投融资活跃，技术突破不断，政策法规逐步完善。",
+    items: [
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "腾讯为AI付全款，三季度Non-IFRS经营盈利下降6%", desc: "腾讯控股发布2026年第三季度业绩，将AI基建投入完整体现在利润表、现金流和资产负债表上。三季度收入2073.36亿元，同比增长8%，Non-IFRS经营盈利同比下降6%至680.73亿元，经营利润率从上年同期的38%回落到33%。AI在云业务和营销服务中贡献了收入增量，但投入远超产出，拖累了利润。单季自由现金流净流出691亿元，公司账面从二季度末582亿元净现金转为137亿元净负债。若剔除新AI产品贡献，Non-IFRS经营盈利为833亿元，同比增长8%，经营利润率稳定在40%。", source: "钛媒体", url: "https://www.tmtpost.com/8212483.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "商汤20%资源投入AI，林达华谈拼手速与长期竞争力", desc: "商汤科技在人工智能领域持续发力，今年初其Seko团队推出了面向创作者的短剧制作平台。据联合创始人林达华透露，该平台用户增长了7到8倍，产出了播放量过亿的短剧。商汤科技坚持将20%的资源投入预研工作，这一策略有助于其在大模型市场上的长期竞争力。", source: "雷峰网", url: "https://www.leiphone.com/category/ai/0u1BjHIMazUFuNZc.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "联想AI相关业务收入突破700亿元，占整体营收近四成", desc: "联想集团发布2026/27财年第二季度业绩，季度营收首次突破2000亿元，同比增长近50%；调整后净利润同比增长166%。AI相关业务收入突破700亿元，占整体营收近四成；ISG基础设施方案业务集团和SSG方案服务业务集团，合计贡献三大业务集团运营利润总额的61%，较去年同期提升28%。这标志着联想已不再仅依赖PC市场，AI驱动的基础设施与方案服务成为利润增长核心。", source: "钛媒体", url: "https://www.tmtpost.com/8211786.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "吉利旗下芯位科技筹备建设芯位大学，主动对接人工智能科技", desc: "吉利控股集团旗下芯位科技筹备建设芯位大学，由吉利人才集团支持本硕博学科建设，全面开放产业应用场景，面向全球招生培养本土化人才。芯位大学定位为非盈利公益性大学，主动对接人工智能科技，探索人工智能时代与大学创新发展的可行性，旨在成为高水平全球型新型研究型大学。", source: "IT之家", url: "https://www.ithome.com/1/029/913.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "北汽押注千TOPS算力芯片，舱驾融合还有多远？", desc: "北汽集团与新紫光集团宣布深化合作，旗下北汽研究总院与紫光同芯将联合研发高算力舱驾控一体车规级SoC芯片，单颗芯片算力目标达到1000TOPS，并支持面向不同车型需求的灵活扩展，计划于2028年实现首发车型量产。相比单纯追求更高算力，如何让计算资源适配不同车型、降低系统成本，并最终形成规模化交付能力，或许更能反映这项合作的实际价值。", source: "钛媒体", url: "https://www.tmtpost.com/8210564.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "DeepSeek限额：免费用户成了AGI的“拦路虎”？", desc: "DeepSeek发布限额策略，限制免费用户使用额度。网页版和App免费用户超过7天不活跃的长对话无法继续使用，新对话单次输入的文字上限被压缩到4万字左右。此举背离了互联网产品满足用户需求的趋势，引发行业关注。", source: "钛媒体", url: "https://www.tmtpost.com/8212022.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "最大规模具身大模型挑战赛落幕，48 小时真机总决赛比出了什么？", desc: "蚂蚁集团举办了首届蚂蚁灵波具身大模型挑战赛，15支战队在48小时内使用LingBot-VLA 2.0模型和松灵COBOT MAGIC机器人完成蔬果摆放等任务，其中排名第三的队伍SST仅额外采集了13条数据，最终在真机评测中拿到65.87分。比赛凸显了数据工程的重要性，参赛队伍通过不同方法提升模型性能，展现了通用大模型与具身模型的协同潜力。", source: "极客公园", url: "http://www.geekpark.net/news/374103" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "谷歌发布Gemini 4 Neon模型", desc: "谷歌DeepMind发布了Gemini 4 Neon模型，这是Gemini 4系列的第4款元素模型，7周内推出4款。模型精准卡在“甜点”位，硬核智商接近旗舰，成本仅为竞争对手一半。Reddit开发者给出一边倒好评，称其“便宜得离谱又强得可怕”。每月19.99美元订阅Google AI Pro的用户即可使用。11月密集发布模型与工具矩阵，谷歌AI重返牌桌中央。", source: "极客公园", url: "http://www.geekpark.net/news/374196" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic上市首日市值1.27万亿", desc: "Anthropic 挂牌上市，首日收盘大涨 17%，市值达 1.27 万亿美元，募资 813 亿美元，成为史上最大规模 IPO。吴泳铭透露千问已在平头哥芯片训练下一代模型，苹果自研 AI 智能体被曝，行业竞争加剧。", source: "极客公园", url: "http://www.geekpark.net/news/374235" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "英伟达计划收购Inception", desc: "英伟达计划收购AI初创公司Inception，交易估值至少超过5亿美元。Inception成立于2024年，总部位于美国加州帕洛阿尔托，主要研发“扩散式大语言模型”（dLLM），2025年2月发布Mercury，自称是全球首个商用规模的扩散式大语言模型。", source: "IT之家", url: "https://www.ithome.com/1/029/886.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "谷歌发布Gemini 4 Argon模型", desc: "谷歌发布了用于机器人控制、仿真和策略优化的Gemini 4 Argon，该技术旨在提升机器人性能和智能化水平。这一发布标志着谷歌在机器人技术领域的进一步探索和创新。", source: "InfoQ", url: "https://www.infoq.cn/article/S4LH5Z9zcbLokm5uNSKR?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Meta发布AI代理Muse，引发数据泄露担忧", desc: "Meta发布的AI代理Muse在对话中出现了错误，员工表示出现了他们从未发送的育儿请求消息、从未询问的职业建议、从未下过的产品订单以及不属于他们的银行账户余额。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/19/metas-ai-agent-muse-is-mixing-up-conversations-and-exposing-private-data-report-says/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "谷歌推出Gemini Decision 1模型", desc: "谷歌发布Gemini Decision 1，向TypeSafe Jev发起挑战。这款多模态决策模型无需生成文本，仅需计算概率和置信度，支持文本、图像、音频、视频和PDF混合输入，可在同一上下文中处理至多1000项独立判断。在7项共享基准中，Gemini Decision 1赢下5项，但每100万输入Token收费0.10美元，是Jev的约2.38倍。", source: "雷峰网", url: "https://www.leiphone.com/category/ai/wctgzdX4CN2RVxCm.html" }
+    ]
+  },
+  {
     date: "2026-11-19",
     weekday: "星期四",
     regioned: true,
