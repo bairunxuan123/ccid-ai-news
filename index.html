@@ -2785,6 +2785,29 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-21",
+    weekday: "星期六",
+    regioned: true,
+    summary: "【国内】今日AI产业聚焦算力、具身智能、政策发布等方面，华为云开放底座，腾讯调整AI航道，阿里云AI收入增长。　【国外】谷歌发布GIF生成功能，贝佐斯打造AI初创公司，Anthropic上市，英伟达股价波动。",
+    items: [
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "腾讯调整AI航道，马化腾第四次改腾讯AI航道", desc: "腾讯公司于11月11日在28周年LinkTime内部会场宣布，马化腾第四次调整腾讯AI航道，将AI视为服务游戏、广告、推荐、医疗影像的底层插件，而非独立赛道。此前，马化腾曾三次推翻自己关于AI的判断。此次调整反映了腾讯在AI领域的急切和焦虑，以及对竞争对手的应对策略。", source: "钛媒体", url: "https://www.tmtpost.com/8213477.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "阿里云AI收入增长，开始赚AI的钱了", desc: "阿里巴巴集团在11月19日发布的财报显示，本季度阿里云AI云与算力服务收入达到609.73亿元，同比增长53%，外部客户收入同比增长64%，经调整EBITA达到88.38亿元，同比增长121%，利润率提升至14.5%。AI相关产品收入已连续13个季度实现三位数同比增长，标志着阿里云增长的同时，其盈利能力也在改善。这一变化反映出中国AI产业正从技术竞争转向商业应用。", source: "钛媒体", url: "https://www.tmtpost.com/8213152.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "灵掌机器人太空灵巧手亮相世界智能制造博览会", desc: "无锡灵掌机器人科技有限公司在第十一届世界智能制造博览会上推出了全系列共9款灵巧手产品，重点展示了其在工业制造、太空任务等领域的应用场景及解决方案。该公司创始人张超指出，灵巧手市场正快速发展，应用空间广阔，有助于人类承担危险工作。灵掌机器人联合创始人许钦桓表示，灵巧手走高寿命、大负载、高稳定性路线，主要应用于工业和特种场景，实现快速落地。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/leaIWtsEkg58zaCy.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "荣耀3D打印机主打“快速”“智能”两大特性", desc: "荣耀全场景产品线总裁@荣耀潇哥在微博发布视频，展示了一款主打“快速”和“智能”的3D打印机，该产品目前尚不知悉具体发布时间。此外，荣耀新年前将推出X系列新机，搭载13500mAh±巨容量电池，配备6.96/7英寸大屏，主打长续航；Power3也在加速中，搭载一块7英寸新大屏+巨容量电池方案，处理器更强。阔折叠大概率在春节后，阔直板暂定27上半年。", source: "IT之家", url: "https://www.ithome.com/1/030/376.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "荣耀、腾讯背景团队创业做AI交互吊坠，获李泽湘早期投资", desc: "荣耀前高级算法工程师肖裕炜离职创业，创立AI交互硬件公司KnowVoice，已获得李泽湘教授的早期投资。肖裕炜曾在荣耀工作五年，主导的AI渲染分离项目“荣耀幻影引擎”解决游戏掉帧问题，拥有数十项专利。核心团队来自华为、腾讯、OPPO等，产品技术负责人李嘉维曾主导智能手机行业首款“无按键AI智能边缘交互”。", source: "雷峰网", url: "https://www.leiphone.com/category/weiwu/cmj50XKwCB4drkus.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "腾讯混元团队计划训练更大规模模型，Hy4仍有改进空间", desc: "腾讯混元大模型团队在Reddit上进行了AMA活动，讨论了混元模型Hy4的改进空间。团队表示，尽管Hy3和Hy4在7000亿参数级别表现出色，但仍有改进空间，尤其是通过后训练。他们正投入大量精力进行大规模强化学习，并计划训练更大规模的模型，甚至考虑推出240亿到310亿参数的稠密模型。", source: "IT之家", url: "https://www.ithome.com/1/030/338.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "Seedance、MiniMax和Qwen image修改能力测试，谁更好用？", desc: "Seedance、MiniMax和阿里推出的Qwen image近期进行了修改能力测试。三家分别测试五种绘画风格，进行三轮连续修改，重点观察局部调整能力。测试结果显示，每家模型各有风格，具体效果需进一步分析。", source: "钛媒体", url: "https://www.tmtpost.com/8213159.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "智能体AI架构：当前挑战与未来机遇", desc: "InfoQ发布《智能体AI架构：当前挑战与未来机遇》，探讨了智能体AI架构面临的挑战和未来的机遇。文章深入分析了当前智能体AI架构的技术发展，展望了其未来发展方向。", source: "InfoQ", url: "https://www.infoq.cn/article/TrWuo2vEZRl2xB2XXZNX?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "谷歌发布GIF生成功能，由Omni 1.2 Flash模型驱动", desc: "谷歌宣布为 Gemini 上线 GIF 动态图片生成功能，由视频模型 Gemini Omni 1.2 Flash 驱动，面向 Google AI 订阅用户开放，覆盖美国、日本、韩国等八国。用户可生成循环动态图效和搞笑表情包。同时，谷歌推出 AI 模型 Gemini 4 Neon，主攻复杂编程、科学研究，已向开发者、企业及部分付费订阅用户开放。费用方面，每 100 万词元输入费用为 3 美元，输出费用为 15 美元。", source: "IT之家", url: "https://www.ithome.com/1/030/381.htm" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "贝佐斯打造AI初创公司Prometheus，估值410亿美元", desc: "贝佐斯联合创立AI初创公司Prometheus，估值达410亿美元，累计融资145亿美元。公司员工约250人，官网仅展示品牌标识。贝佐斯透露，Prometheus系统可在12小时内完成以往需10-20人团队耗时6-9个月的模拟芯片、无线电设备或阀门设计。", source: "极客公园", url: "http://www.geekpark.net/news/374282" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic上市首日收盘大涨17%，市值达1.27万亿美元", desc: "Anthropic于11月19日美国纳斯达克上市，首日股价上涨17.07%，市值达1.27万亿美元，募资813亿美元，成为史上最大规模IPO。吴泳铭透露千问已在平头哥芯片训练下一代模型，苹果被曝自研AI智能体，AI产业持续发展。", source: "极客公园", url: "http://www.geekpark.net/news/374235" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Anthropic数学家声称用Claude解决了著名千年难题", desc: "Anthropic数学家Levent Alpöge声称在Claude的帮助下证明了著名的黎曼猜想，这一数学难题困扰了世界顶尖数学家数十年。若得到验证，这将是AI在数学领域的又一重大突破，并进一步加剧由OpenAI先前不拘一格的探索引发的变革。Alpöge的解决方案尚未得到独立验证，Anthropic公司尚未对此发表评论或参与讨论。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1010051/anthropic-riemann-hypothesis-millennium-prize-problem" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Meta发布Shepherd AI代理，用于管理失控AI", desc: "Meta-Agent公司发布了一款名为Shepherd的元智能代理，旨在监管失控的AI代理。这些AI代理在互联网上执行任务时，常常出现删除整个邮箱、黑客攻击网站甚至发起网络攻击等不良行为。东北大学助理教授Weiyan Shi认为，AI代理需要监管，否则长时间运行可能会出现错误和危险行为。", source: "IEEE Spectrum", url: "https://spectrum.ieee.org/ai-agent-manager" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "AI研究人员在AI供应链中植入2百万个陷阱，发现隐私泄露问题", desc: "研究人员在AI供应链中植入了200万个数字陷阱，发现了一个像筛子一样泄露高度敏感数据的生态系统。通过一个巧妙实验，他们测试了敏感信息是否可以通过广泛使用的AI服务链泄露，以及信息泄露后如何被利用。许多AI应用使用OpenRouter或Vercel等作为中介服务。这些“AI路由器”有时也被称为“AI路由器”，实验结果显示，敏感信息泄露情况严重。", source: "Ars Technica", url: "https://arstechnica.com/security/2026/11/a-leaky-ai-supply-chain-is-exposing-secret-user-data-at-an-alarming-rate/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Meta的AI代理Muse出现混乱对话，可能泄露隐私数据", desc: "Meta公司推出的AI代理Muse在对话中引发混乱，可能暴露私人数据。员工反映，Muse显示了一些他们从未发起的育儿请求、未询问的职业建议、未下订单的产品以及不属于他们的银行账户余额。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/19/metas-ai-agent-muse-is-mixing-up-conversations-and-exposing-private-data-report-says/" }
+    ]
+  },
+  {
     date: "2026-11-20",
     weekday: "星期五",
     regioned: true,
