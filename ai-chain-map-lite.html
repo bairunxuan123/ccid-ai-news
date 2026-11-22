@@ -2795,6 +2795,27 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-22",
+    weekday: "星期日",
+    regioned: true,
+    summary: "【国内】国内AI产业动态丰富，涵盖政策、技术突破、产业动态和投融资等多个方面。　【国外】AI领域政策、技术、产业动态和投融资活动活跃，Anthropic上市引发关注。",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "灵掌机器人太空灵巧手亮相世界智能制造博览会", desc: "无锡灵掌机器人科技有限公司在第十一届世界智能制造博览会上展示了9款灵巧手产品，重点展示了其在工业制造、太空任务等领域的应用。公司创始人张超介绍，灵巧手是连接智能决策与物理执行的关键末端，市场需求持续释放。灵巧手可应用于工业产线、危险环境、太空航天器维修等场景，有助于人类承担危险、艰难的工作。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/leaIWtsEkg58zaCy.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "腾讯AI吞噬百亿利润，资本开支猛增226%", desc: "腾讯发布2026年第三季度财报，营收2073.4亿元，同比增长8%，但Non-IFRS经营利润同比下降6%，归母净利润下降6%。本季度资本开支达814亿元，同比增长527%，研发投入323.6亿元，同比增长42%。AI业务对Non-IFRS经营利润造成约152亿元净影响，自由现金流为负691亿元。", source: "极客公园", url: "http://www.geekpark.net/news/374302" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "荣耀、腾讯背景团队创业做AI交互吊坠，获李泽湘投资", desc: "荣耀前高级算法工程师肖裕炜离职创业，创立AI交互硬件公司KnowVoice，已获得李泽湘教授早期投资。肖裕炜曾主导GPU-Turbo-X SE系统工程师，负责渲染技术与端侧高性能优化，拥有数十项国内外专利。核心团队来自华为、腾讯、OPPO等企业及高校，产品技术负责人李嘉维有产品交互设计与量产经验。", source: "雷峰网", url: "https://www.leiphone.com/category/weiwu/cmj50XKwCB4drkus.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "腾讯Chatterfly输入法安卓版内测，支持AI功能", desc: "腾讯公司推出了Chatterfly输入法安卓版，并已开启内测，iOS版即将发布。该输入法具备语音转写、自动翻译等AI功能，能理解上下文，识别不同意图和场景，执行用户任务。主要特性包括语音输入自动成稿、一键翻译、全场景AI打字、AI润色加工以及AI指令快速执行任务。", source: "IT之家", url: "https://www.ithome.com/1/030/576.htm" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "华为昇腾算力训出双榜SOTA具身世界模型", desc: "华为云发布了双榜SOTA的具身世界模型，该模型在训练效率、数据规模、部署成本和场景落地速度等方面展现出卓越性能。国产算力的成熟使得具身竞争维度从芯片性能扩展至多维战场。", source: "量子位", url: "https://www.qbitai.com/2026/11/511610.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "清华团队打造最强国产Token工厂，联合华为昇腾五年冲刺十万卡", desc: "清华大学团队联合华为昇腾，致力于打造最强国产Token工厂，计划五年内冲刺十万卡。该项目将结合华为昇腾的技术优势，旨在提升国产芯片的性能和效率，推动国产芯片的发展。", source: "量子位", url: "https://www.qbitai.com/2026/11/511679.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "美国AI音乐巨头进军视频生成，底层模型来自中国MiniMax", desc: "美国AI音乐平台Suno推出视觉创作工具Visuals，底层模型采用中国MiniMax。该工具旨在为用户提供更丰富的视觉创作体验。与此前相比，Suno的视觉创作工具将进一步提升用户创作效率。", source: "量子位", url: "https://www.qbitai.com/2026/11/511722.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "新浪新闻2026探索大会在京举行，共探智能时代共生新图景", desc: "新浪新闻与微博联合主办的“新浪新闻·2026探索大会”于11月19日在北京举行。此次大会以“虚实交融共探智能时代共生新图景”为主题，旨在探讨智能时代的发展趋势和未来图景。", source: "量子位", url: "https://www.qbitai.com/2026/11/511603.html" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI发布GPT-6.2，性能翻倍", desc: "OpenAI发布了GPT-6.2 Astra模型，该模型在16项任务上的成功率较GPT-6 Astra翻倍，并实现了可变形物体操控的全球首通。", source: "量子位", url: "https://www.qbitai.com/2026/11/511779.html" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic上市，募资超800亿美元", desc: "Anthropic正式在纳斯达克挂牌，募资约813.4亿美元，创全球IPO募资纪录。上市首日开盘价111.50美元，收盘涨约17%，估值站上万亿美元级别。此次上市同步落地了一笔260亿美元的私募配售，谷歌、英伟达、AMD、博通、美光、微软和台积电等七家企业参与认购。Anthropic招股书披露的9009亿美元算力与基础设施承诺，暴露了AI芯片竞争、上游供应链采购方式以及算力融资模式的变化。", source: "钛媒体", url: "https://www.tmtpost.com/8213769.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "特斯拉更新Robotaxi应急方案", desc: "特斯拉更新了Robotaxi应急人员交互方案，Cybercab应急计划版本升级至1.3，Model Y Robotaxi应急计划更新至1.6。新硬件配置确认，新增允许车辆在高速公路上行驶的说明，并删除了关于特斯拉拥有所有车辆的表述。从2026年11月起生产的所有Cybercab将在后备厢盖内集成星链设备，提高网络连接可靠性。", source: "IT之家", url: "https://www.ithome.com/1/030/575.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "苹果招聘AI工程师，开发自家AI智能体", desc: "苹果公司正在开发自己的AI代理，能够执行包括浏览网页、跨应用工作、编写代码和调用服务等多种任务。据彭博社发现的已撤下招聘信息显示，苹果正在寻找一名工程师领导这一AI代理的创建。苹果的AI代理将使其与Meta的Muse、OpenAI的Dots、Anthropic的Duet以及谷歌的Tasks等产品竞争。", source: "The Verge", url: "https://www.theverge.com/tech/1038227/apple-ai-agent-engineer-job-listing" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "Google发布Gemini 4 Argon，用于机器人控制、仿真和策略优化", desc: "谷歌发布了用于机器人控制、仿真和策略优化的Gemini 4 Argon。该技术旨在提升机器人性能，具体细节未提及。较此前产品，Gemini 4 Argon有望带来显著改进。", source: "InfoQ", url: "https://www.infoq.cn/article/S4LH5Z9zcbLokm5uNSKR?utm_source=rss&utm_medium=article" }
+    ]
+  },
+  {
     date: "2026-11-21",
     weekday: "星期六",
     regioned: true,
