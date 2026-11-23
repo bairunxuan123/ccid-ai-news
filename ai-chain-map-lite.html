@@ -2795,6 +2795,30 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-23",
+    weekday: "星期一",
+    regioned: true,
+    summary: "【国内】今日AI产业动态丰富，涵盖政策发布、技术突破、产业动态和投融资等多个方面。　【国外】今日AI产业动态丰富，涵盖政策、技术突破、产业动态和投融资等多个方面。",
+    items: [
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "腾讯资本开支猛增226%，AI吞噬百亿利润", desc: "腾讯发布2026年第三季度财报，营收2073.4亿元，同比增长8%；Non-IFRS经营利润681亿元，同比下降6%；资本开支达814亿元，同比增长527%，研发投入323.6亿元，同比增长42%。AI业务对Non-IFRS经营利润造成约152亿元净影响，自由现金流为负691亿元。", source: "极客公园", url: "http://www.geekpark.net/news/374302" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "字节跳动20亿元对腾讯5亿美元，AI办公入口之争", desc: "字节跳动推出豆包工作，三个月内DAU突破800万，企业ARR超过20亿元；腾讯WorkBuddy同期DAU超1000万，日均Token消耗100万亿，近七天收入年化折算超过5亿美元。字节跳动将豆包工作嵌入飞书生态，利用已有客户基础，ARR增速惊人；腾讯则独立推出AI办公产品，寻求新的市场机会。", source: "钛媒体", url: "https://www.tmtpost.com/8212002.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "蚂蚁阿福医生版上线，打造全场景医生AI工作台", desc: "蚂蚁集团旗下蚂蚁阿福医生版发布PC工作台版本，接入威科集团循证医学解决方案UpToDate，成为国内首个接入该功能的AI平台。即日起，全国卫生专业技术人员可限时免费试用。此次升级实现手机App与PC工作台双端布局，覆盖诊前、诊中、诊后及科研全场景，助力医生减负提效。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/Ljtu9TVFrPPeiBsX.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "蚂蚁CEO韩歆毅：AI拓宽人类健康自塑边界，1.5亿人已用阿福管健康", desc: "蚂蚁集团首席执行官韩歆毅在2026蚂蚁阿福医疗健康生态大会上表示，AI技术正在拓宽人类健康自塑的边界，已有1.5亿人使用阿福进行健康管理。蚂蚁阿福等AI工具正快速提升医疗服务水平，让基层医生也能提供专业支持，并推动创新药研发。韩歆毅强调，AI在促进健康方面的价值巨大，预计2050年全球GDP将因健康因素管理新增16.4万亿美元。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/VK4viDe2WQp64rON.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "宇树科技午后触及20%涨停，股价升至708元", desc: "宇树科技股价午后触及20%涨停，报708元，较前一交易日上涨118元。自10月23日上市以来，宇树科技再度收获20%涨停板，今日开盘报价582元，触发涨停时成交额约44.47亿元，换手率为22.91%，涨停价封单约1.27万手。", source: "IT之家", url: "https://www.ithome.com/1/030/914.htm" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "中通快递与阿里云伶鹊达成深度合作，智慧AI打造客服新体验", desc: "中通快递与阿里云伶鹊达成深度合作，推出企业级AI客服，涵盖智能语音热线和外呼功能。上线后日均服务量达数十万通，下单转化率提升近20%。伶鹊AI客服能听懂客户诉求，语音交互延迟控制在1.5秒以内，对话场景优化垂直大模型，实现外呼场景AI自主完成率100%，“呼入”热线超过50%。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/MseGRLc64j2hTZxj.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "加州总检察长起诉OpenAI，指控其忽视安全风险", desc: "美国加州总检察长罗布·邦塔对OpenAI提起诉讼，指控其未能确保旗下AI模型安全，将公众安全置于风险之中。诉讼指出，OpenAI在缺乏充分安全措施和监督机制的情况下开发危险产品，此前其AI模型曾自主实施网络攻击。加州于11月16日正式提起诉讼，要求追究OpenAI的责任。", source: "IT之家", url: "https://www.ithome.com/1/030/921.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "美国财政部长贝森特改口：英伟达应从公司“外部”寻找新CEO", desc: "美国财政部长斯科特·贝森特表示，不会反对黄仁勋重返英伟达，此前他曾呼吁英伟达董事会从“外部”寻找新CEO，而黄仁勋现在就是“外部人士”。此前贝森特曾指责黄仁勋领导下的英伟达存在“不合规文化”，但最新采访中他承认黄仁勋已辞职，符合其“外部”寻找新CEO的建议。美国总统特朗普也表示希望英伟达董事会重新聘用黄仁勋。", source: "IT之家", url: "https://www.ithome.com/1/030/811.htm" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "AI声称解决167年难题，数学家也声称自己解决了", desc: "TechCrunch报道，数学界对最新由AI驱动的结果感到震惊，同时也有人类提出的竞争性解决方案。这一结果涉及AI对167年历史的黎曼猜想提出了解决方案，而人类数学家也独立提出了自己的解决方案。这一事件引发了数学界的广泛关注，展示了人工智能在数学研究中的潜力。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/20/ai-claimed-a-solution-to-the-167-year-old-riemann-hypothesis-and-a-human-did-too/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "OpenAI首席科学家谈AI发展限制", desc: "OpenAI的首席科学家提出了对限制人工智能发展的看法。他认为，为了设定人工智能发展的速度限制，需要首先就如何衡量速度达成一致。这一观点引发了行业内的关注和讨论。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/22/openais-chief-scientist-has-thoughts-on-how-to-limit-ai-development/" },
+      { region: "intl", cat: "tech", catLabel: "技术突破", title: "OpenAI发布GPT-6.2 Astra", desc: "智谱AI公司发布了GPT-6.2 Astra模型，该模型在16项任务上的成功率较GPT-6 Astra翻倍，并实现了可变形物体操控的全球首通。这一成果显著提升了具身模型的表现，为人工智能领域带来了新的突破。", source: "量子位", url: "https://www.qbitai.com/2026/11/511779.html" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Anthropic IPO引发讨论", desc: "Anthropic在纳斯达克上市，成为全球最有价值公司之一。公司IPO融资规模巨大，但关键在于其能否在成为公众公司后继续关注并投资AI安全。", source: "The Verge", url: "https://www.theverge.com/podcast/1038701/anthropic-ipo-ai-safety-openai-nvidia-structure" },
+      { region: "intl", cat: "capital", catLabel: "投融资", title: "Notable Capital等投资Anthropic", desc: "Notable Capital、GIC和Baillie Gifford在Anthropic IPO前对其进行了大规模投资。三家公司分享了他们为何对Anthropic充满信心，愿意投入数十亿美元。这一投资行为显示出对Anthropic未来发展的强烈信心。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/22/how-notable-capital-gic-and-baillie-gifford-bet-big-on-anthropic-before-its-ipo/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Signal限制截图功能应对AI监控", desc: "Signal公司对其Android和iOS应用程序中用户截图功能进行了限制。这一举措旨在应对人工智能监控带来的“生存威胁”。具体来说，Signal限制了用户在两款应用中截图的能力，以保护用户隐私和数据安全。这一变化将对用户在应用中的互动方式产生一定影响，并可能引发对隐私保护与技术创新之间平衡的新讨论。", source: "TechCrunch", url: "https://techcrunch.com/2026/11/21/signal-restricts-mobile-screenshots-as-it-confronts-existential-threat-of-ai-surveillance/" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Karpo新作开源，浏览器Agent双赢", desc: "Karpo公司发布了新作，开源了浏览器Agent技术。该技术旨在实现速效双赢，继反超Gemini之后，再次引起行业关注。此次开源动作，将有助于推动浏览器Agent技术的发展和应用。", source: "量子位", url: "https://www.qbitai.com/2026/11/511791.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "Signal阻止Gemini和Siri AI读取屏幕", desc: "Signal公司推出了阻止截图功能，iOS用户可切换阻止截图和Siri AI扫描屏幕内容。此举旨在防止AI代理读取用户消息和其他数据。Signal总裁Meredith Whittaker在博客文章中表示，操作系统中内置的分析屏幕信息以了解更多用户信息的AI能力正在削弱Signal独立保障隐私的能力，并敦促操作系统提供商使其更易于操作。", source: "The Verge", url: "https://www.theverge.com/ai-artificial-intelligence/1038390/signal-blocking-ai-agent-screenshots-mobile-app" }
+    ]
+  },
+  {
     date: "2026-11-22",
     weekday: "星期日",
     regioned: true,
