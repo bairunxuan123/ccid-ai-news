@@ -2795,6 +2795,158 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-24",
+    weekday: "星期二",
+    regioned: true,
+    summary: "【国内】AI办公竞争加剧，医疗AI应用升级，芯片产业持续发展。　【国外】AI产业动态活跃，英伟达高层回归，AI应用场景拓展，技术突破与政策引导并行。",
+    items: [
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "腾讯WorkBuddy日活破千万，AI办公市场争夺战升级",
+        desc: "腾讯和字节跳动在AI办公领域展开激烈竞争。腾讯发布WorkBuddy，日活超1000万，日均消耗100万亿Token，收入超5亿美元；字节跳动豆包工作DAU突破800万，企业客户年度收入超20亿元。两家公司通过数据展示产品深度、增长速度和商业化效率，标志着AI办公赛道进入实战阶段。",
+        source: "钛媒体",
+        url: "https://www.tmtpost.com/8214502.html"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "蚂蚁阿福同款大模型开源，全球医生一台电脑就能解锁专业医疗AI能力",
+        desc: "蚂蚁集团旗下阿福App宣布新一轮升级，解锁越来越多健康服务新本领。蚂蚁阿福同款大模型宣布开源，全球医生一台电脑就能解锁专业医疗AI能力。较此前，AI应用范围进一步扩大。",
+        source: "量子位",
+        url: "https://www.qbitai.com/2026/11/511998.html"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "蚂蚁阿福医生版上线“循证金标准”UpToDate，打造全场景医生AI工作台",
+        desc: "蚂蚁集团发布了阿福医生版PC工作台，并接入威科集团循证医学临床决策支持解决方案UpToDate，成为国内首个接入该功能的AI平台。即日起，全国医生、护士及药师等卫生专业技术人员均可限时免费试用。此次升级实现了手机App加PC工作台的双端布局，旨在帮助医生减负提效，提高工作效率。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/industrynews/Ljtu9TVFrPPeiBsX.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "中通快递与阿里云伶鹊合作，智慧AI打造客服新体验",
+        desc: "中通快递与阿里云伶鹊深度合作，推出企业级AI客服，涵盖智能语音热线和外呼两大功能。上线后，日均服务量达数十万通，下单转化率提升近20%。伶鹊AI客服可识别用户诉求，引导修改信息，提高快递员送件效率数倍。通过对话分析和优化，中通客服对话场景的AI自主完成率已达100%，呼入热线超过50%，通话时长更短，问题解决更快。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/industrynews/MseGRLc64j2hTZxj.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "豆包工作、千问办公、WorkBuddy，AI办公产品同质化趋势明显",
+        desc: "豆包工作宣布接入多款第三方模型，并上线21个专业工作台；千问办公升级至2.1.0版本，接入10款模型，包括自家新旗舰模型Qwen4-Max；腾讯WorkBuddy支持多模型切换，并开放Buddy应用平台。三家公司在AI办公领域动作密集，均推出类似功能，包括桌面端入口、多模型货架、个人版订阅和企业版席位等。",
+        source: "钛媒体",
+        url: "https://www.tmtpost.com/8214460.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "百度智能云企业级Agent安全落地，AI应用场景拓展",
+        desc: "百度智能云推出企业级Agent安全落地实践，旨在解决Agent应用中的安全问题。该实践详细介绍了如何确保Agent在企业和个人用户中的安全使用，为用户提供更可靠的服务。此举有助于推动智能Agent在各个领域的广泛应用，提升用户体验。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/dzgleaOZ3ILx5cztUtXw?utm_source=rss&utm_medium=article"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "蚂蚁CEO韩歆毅：AI拓宽人类健康自塑边界，1.5亿人已用阿福管健康",
+        desc: "蚂蚁集团首席执行官韩歆毅在2026蚂蚁阿福医疗健康生态大会上表示，AI正在拓宽人类健康自塑的边界，已有1.5亿人使用阿福进行健康管理，AI与健康的深度融合正当其时，AI促进健康蕴含巨大需求空间。蚂蚁阿福等AI工具正快速提升医疗服务水平，让基层和偏远地区的医生也能获得专业支持，群众也能得到专业健康咨询。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/industrynews/VK4viDe2WQp64rON.html"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "意法半导体计划2025-2028年实现STM32芯片收入翻倍",
+        desc: "意法半导体计划在2025~2028年期间实现STM32系列MCU/MPU收入翻倍，预计到2030年其在通用MCU领域的份额将从当前的23%增长至25~30%。意法半导体预计数据中心业务将在2026年带来13亿美元营收，2027年有望突破20亿美元。此外，公司还在扩大中国市场份额，本土化供应链是其具体举措之一。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/031/179.htm"
+      },
+      {
+        region: "intl",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "谷歌AI智能体优化量子算法，最高提速290倍",
+        desc: "谷歌DeepMind团队与Google Quantum AI团队发布联合研究成果，利用多组Gemini 4智能体协同工作，结合形式化数学验证工具Lean，成功优化多项量子算法，降低部分量子计算任务的资源需求。该研究借助Gemini 4智能体团队优化经典量子算法，生成效率极高的量子电路，未来可用于聚变能源、药物设计等复杂科学问题的模拟。团队已在GitHub开源相关Lean库、问题定义文件与验证的解决方案，每个优化结果都经过形式化定理证明器Lean的数学验证。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/031/232.htm"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "三星扩大西安工厂NAND产能，布局AI数据中心",
+        desc: "三星电子计划将位于中国陕西西安的半导体工厂打造成面向人工智能（AI）数据中心企业级固态硬盘（eSSD）的核心生产基地，重点扩大第九代垂直 NAND 闪存（V9）产能。截至今年第二季度，三星西安一厂（X1）和二厂（X2）的晶圆月投入能力均为 5 万片，合计达到 10 万片。三星计划升级 X2 洁净室内的电镀工艺设备，并将生产线调整为以最新第九代垂直 NAND（V9）工艺为主，V9 月产能预计达到 5 万至 6 万片。相关设备预计于 2027 年 2 月左右进场，扩产改造计划于同年 11 月完成。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/031/258.htm"
+      },
+      {
+        region: "intl",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "亚马逊收购Decart AI优化技术，布局Trainium芯片销售",
+        desc: "亚马逊收购了Decart的AI优化技术和研究团队，交易金额高达75亿美元。此举标志着亚马逊在准备销售Trainium芯片的同时，进一步加强了其在人工智能领域的布局。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/11/23/amazon-snaps-up-decarts-ai-optimization-tech-for-7-5b-as-it-prepares-to-sell-trainium-chips/"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "OpenAI携手思科开源Shirudo，Linux系统无需重启即可修复漏洞",
+        desc: "OpenAI与思科携手发布开源安全运行时Shirudo，基于eBPF技术为Linux系统提供无需重启的临时漏洞防护，已通过Java4Shell攻击拦截测试。该技术可观察内核与网络活动，精准控制可疑行为，测试中成功阻止了针对运行中Elasticsearch服务的Java4Shell漏洞利用尝试，且服务未重启。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/031/245.htm"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "马斯克承认AI研发落后，出租SpaceXSI算力获利",
+        desc: "SpaceX 首席执行官埃隆・马斯克承认公司在人工智能（AI）研发方面落后于竞争对手，决定出租数据中心算力给Anthropic、谷歌等企业，每月可带来数十亿美元收入。自5月以来，SpaceX已向这些企业出租算力，同时也在开发Grok聊天机器人等自有AI产品，但马斯克认为公司目前尚未达到竞争对手水平。他曾在内部群聊中表达不满，并警告员工浪费资源的行为。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/031/246.htm"
+      },
+      {
+        region: "intl",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "OpenAI发布GPT-6.2 Astra，性能提升、价格降低",
+        desc: "OpenAI发布了GPT-6.2 Astra和GPT-6.2 Sol模型，性能提升6.2分，Token减少22%，API价格降20%。新模型更主动判断工作完成方式，如调用工具、操作计算机等，任务成本减少近一半。GPT-6.2 Astra面向复杂专业任务，GPT-6.2 Sol侧重日常工作与高效率执行。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/ai/MR1Osv9r2Rtr4V7F.html"
+      },
+      {
+        region: "intl",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "Anthropic CEO出售股票套现2.8亿美元",
+        desc: "Anthropic CEO 达里奥 · 阿莫代伊在IPO上市当天出售了337.8万股股票，成交价格为每股83美元，套现约2.8亿美元。截至11月23日，Anthropic股价下跌1.27美元，总市值约1.15万亿美元。此外，Anthropic从阿莫代伊持有的股份中扣留了345,011股，用于履行其已归属限制性股票单位所涉及的所得税预扣及缴纳义务。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/031/253.htm"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "SpaceX起诉SpaceX，Grok AI深伪违反消费者保护法",
+        desc: "俄勒冈州和弗吉尼亚州分别起诉SpaceX，指控其忽视行业标准安全措施，虚假宣传其X社交媒体平台和Grok AI功能的安全性。俄勒冈州总检察长丹·雷菲尔德和弗吉尼亚州总检察长杰·琼斯在周一分别提起诉讼，称SpaceX故意忽视围绕AI生成性化深伪的日益增长担忧，将Grok的薄弱保护措施描述为“不是失败而是特性”。",
+        source: "The Verge",
+        url: "https://www.theverge.com/ai-artificial-intelligence/1040255/x-grok-ai-deepfakes-oregon-virginia-lawsuit"
+      }
+    ]
+  },
+  {
     date: "2026-11-23",
     weekday: "星期一",
     regioned: true,
