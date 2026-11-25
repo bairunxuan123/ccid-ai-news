@@ -2795,6 +2795,131 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-25",
+    weekday: "星期三",
+    regioned: true,
+    summary: "【国内】人工智能产业在技术突破、产业动态、政策发布和投融资方面均有显著进展，涵盖了AI芯片、数据平台、具身智能等领域。　【国外】AI产业持续发展，技术突破与产业动态并存，政策与资本动作活跃。",
+    items: [
+      {
+        region: "cn",
+        cat: "policy",
+        catLabel: "政策发布",
+        title: "市场监管总局：牵头研制29项AI基础共性国际标准",
+        desc: "市场监管总局牵头研制全球首个生成式AI治理国际标准提案，涉及29项基础共性国际标准和49项行业应用国际标准。该提案聚焦数据治理、人机交互等关键领域，包括智慧城市、智能制造等行业。我国专家联合多国共同参与，近400名专家注册，预测性维护系列标准第1部已正式发布。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/031/838.htm"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "蚂蚁OceanBase发布湖库一体AI数据平台OceanLake",
+        desc: "蚂蚁集团发布湖库一体AI数据平台OceanLake，核心引擎OceanBase向全球开源。该平台旨在加速中国AI数据平台崛起，核心引擎OceanBase向全球开源，预计将推动更多创新应用。",
+        source: "量子位",
+        url: "https://www.qbitai.com/2026/11/512330.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "百度智能云等发起香港前沿科技产业发展联盟",
+        desc: "百度智能云等机构共同发起香港前沿科技产业发展联盟，旨在依托大湾区产业基础和香港国际化优势，聚焦人工智能等领域，搭建技术、场景、资本与国际资源的对接平台。该联盟将推动具身智能等企业开展技术验证、场景落地和海外合作，助力企业提升迭代效率、降低研发成本。百度智能云将重点推进建设具身智能AI基础设施，加强场景链接，参与行业标准建设，推动具身智能规模化发展。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/industrynews/uFuwhvMHGUY0Qeu0.html"
+      },
+      {
+        region: "cn",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "摩尔线程计划回购5-10亿元股份",
+        desc: "摩尔线程抛出两大动作，计划在未来一年内拿出5亿至10亿元回购公司股份，同时最多拿出45亿元闲置募资做稳健理财。公司股价较去年高点下跌近七成，市值蒸发超3000亿。此举旨在向市场释放信心，并盘活账上的闲置资金。",
+        source: "钛媒体",
+        url: "https://www.tmtpost.com/8216343.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "蚂蚁OceanBase发布AI数据平台：统一管理多模态数据",
+        desc: "蚂蚁集团旗下OceanBase发布AI数据平台OceanLake，旨在统一管理多模态数据，支持离线、在线一体化计算。该平台基于“湖库一体、多模融合、Agent友好、开源开放”原则，宣布向全球开源核心引擎AI数据库。杨冰指出，企业智能化转型面临数据生产力释放的困境，需挖掘私有数据价值，统一治理多模态数据，整理乱数据。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/industrynews/vo7BI6hIy3wL6Mi4.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "蚂蚁阿福加速打通AI健康服务闭环",
+        desc: "蚂蚁集团旗下蚂蚁阿福发布新版App，上线实时视频“看健康”功能，升级“AI健康管家”，并推出AI健康手环和戒指。在11月23日的2026蚂蚁阿福医疗健康生态大会上，蚂蚁百灵医疗健康模型家族LingSante首次亮相，两款核心模型同步开源。此次大会发布覆盖模型、应用、硬件、医生服务与产业合作，旨在以C端健康应用为入口，将AI能力延伸至院外健康管理，连接医生、医院、硬件厂商、保险及其他服务方，建立连续运行的健康服务体系。蚂蚁集团CEO韩歆毅强调，AI提升医疗服务“下限”和“上限”，助力“少生病、少生大病”。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/medigital/P6Ota0mqLwk8wsN2.html"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "文心5.5 Flash Preview正式开源",
+        desc: "文心 5.5 Flash Preview正式开源，采用Apache 2.0协议，由量子位发布。此版本在功能和技术上有所提升，开源协议有利于促进技术交流与合作。后续计划将根据社区反馈进行优化升级。",
+        source: "量子位",
+        url: "https://www.qbitai.com/2026/11/512354.html"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "华为折叠机外屏伴随式AI新交互将至",
+        desc: "华为正式发布Mate X8大折旗舰手机，并带来小艺伴随式AI。该AI支持外屏伴随式新交互，HarmonyOS 7.0.0.135及以上版本可用。小艺伴随式AI提供全文摘要、长文导读等服务，用户可随时询问。外屏使用时，双击底部小艺导航条即可唤起伴随式AI，支持底部伴随、大屏伴随、极简伴随三种形态切换。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/031/886.htm"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "英伟达黄仁勋回归，董事会全票同意",
+        desc: "英伟达CEO黄仁勋复职后首次主持全员大会，向员工道歉并承认违反公司行为准则，表示开始接受心理治疗，承诺调整往日强硬管理风格。黄仁勋称，自己复职并不意味着凌驾于公司行为准则之上，违反行为准则的处理需结合事实、情形和多方面评估。他强调，英伟达董事会决定邀请他回归，并非因美国政府最高层要求，且复职不会带来国家安全风险。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/031/914.htm"
+      },
+      {
+        region: "intl",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "OpenAI GPT-6 无需“外援”设计蛋白质，实验室验证有效",
+        desc: "OpenAI发布预印本论文，称GPT-6系列模型无需依赖专用生物模型，仅靠推理和通用编程工具，就能设计新的蛋白质三维结构和氨基酸序列。在实验室测试中，GPT-6.2设计结构制作了322个微型结合蛋白，35个（占比约10.9%）显示出结合迹象。GPT-6.2为6个抗体的结合环设计了新序列，182个设计中70%仍能结合IL-4Rα。在计算测试中，GPT-6.2准确率约93%，较此前技术有显著提升。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/031/902.htm"
+      },
+      {
+        region: "intl",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "亚马逊收购Decart，软件助力缩小与英伟达的差距",
+        desc: "亚马逊公司宣布以约75亿美元收购Decart，旨在提升其Trainium芯片的效率。此次收购是亚马逊缩小与英伟达在硅芯片领域的差距的重要举措。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/11/24/amazons-decart-acquisition-is-a-bet-on-using-software-to-narrow-the-gap-with-nvidia-in-the-ai-chip-race/"
+      },
+      {
+        region: "intl",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "Anthropic 上市后股价下跌，对AI初创企业构成压力",
+        desc: "Anthropic上市后股价跌破发行价，引发市场对AI初创公司估值的担忧。据TechCrunch报道，Anthropic的上市后股价下跌，显示出投资者对其未来发展的不确定性。这一情况可能对AI初创公司的估值产生压力。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/11/24/anthropic-shares-fall-below-ipo-price-a-worrying-sign-for-ai-startups/"
+      },
+      {
+        region: "intl",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "OceanBase发布AI数据平台OceanLake，CEO杨冰谈多模态发展",
+        desc: "OceanBase发布AI数据平台OceanLake！该平台采用多模态技术，CEO杨冰表示，OceanBase此次押注多模态，如同当年押注分布式技术一样充满信心。OceanLake的发布标志着OceanBase在数据领域的技术创新和拓展。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/qEXNRNufkiFkiUEU9aae?utm_source=rss&utm_medium=article"
+      }
+    ]
+  },
+  {
     date: "2026-11-24",
     weekday: "星期二",
     regioned: true,
