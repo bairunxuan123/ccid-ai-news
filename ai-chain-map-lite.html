@@ -2795,6 +2795,158 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-26",
+    weekday: "星期四",
+    regioned: true,
+    summary: "【国内】国内AI产业持续发展，技术突破与产业动态活跃，政策支持与资本运作并行。　【国外】AI产业动态涵盖政策、技术突破、产业动态和投融资等方面，展现行业最新进展。",
+    items: [
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "商汤SenseNova U1.6发布，国产AI摄影作品引发关注",
+        desc: "商汤科技发布了SenseNova U1.6。这款AI产品在技术上具有显著突破，其性能参数达到了1.6。相较于以往产品，SenseNova U1.6的性能有了显著提升，为行业带来了新的发展机遇。",
+        source: "量子位",
+        url: "https://www.qbitai.com/2026/11/512748.html"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "九章云极发布物理AI工厂与生态开放计划，聚焦算力唤醒真实世界",
+        desc: "九章云极DataCanvas发布物理AI工厂与生态开放计划，于11月25日在深圳举办的2026物理AI行业峰会暨九章云极智算生态大会上提出，旨在解决物理AI从实验室到产线的产业化问题。会议聚焦物理AI工厂和生态建设，强调标准化对物理AI规模化落地的重要性，龙华区作为大湾区机器人产业核心承载区，已建成数字孪生底座和具身智能训练场。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/chips/Qz3QPf26nVIVA0ga.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "九章云极携手多方战略合作，物理AI工厂生态协作走进真实场景",
+        desc: "北京九章云极科技股份有限公司与深圳市龙华区工业和信息化局等五方签署物理AI工厂项目战略合作协议，旨在构建“场景—研究—基础设施”协作链。项目围绕物理AI工厂，旨在打造一体化项目，龙华区提供真实产线场景，清程智汇带来科研力量，怡亚通供应链提供产业配套。此举有助于物理AI从实验室走向产线，推动产业链协作。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/chips/JWelmQaWCBCTOJi3.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "中国算力采购信心指数启动，九章云极核心共建算力市场先行指标",
+        desc: "中国经济信息社新华指数研究院副院长周宇涵宣布启动“中国算力采购信心指数”，九章云极科技股份有限公司作为核心共建单位参与。该指数采用景气扩散方法，通过问卷收集关键信息，覆盖算力品类、采购规模等维度，旨在反映算力市场景气程度与变化趋势。此前，九章云极已参与全球算力价格指数编制。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/chips/G3lWNUyVJphxOTU2.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "逐际动力与商汤大装置达成合作，支撑机器人仿真训练与测试",
+        desc: "逐际动力与商汤大装置达成合作，共同推进具身智能研发流程，以高质量算力全面支撑机器人仿真训练与测试。此次合作旨在贯通从研发到测试的完整流程，通过商汤大装置提供的强大算力支持，将有效提升机器人训练与测试的效率和质量。",
+        source: "量子位",
+        url: "https://www.qbitai.com/2026/11/512683.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "小米继续加码AI，MiMo业务面临利润压力",
+        desc: "小米集团发布2026年第三季度财报，收入1072.4亿元，同比下降5.2%，经调整净利润48.8亿元，同比下降56.8%。财报显示，存储等核心器件成本上涨、行业竞争加剧，导致毛利率下降至20.2%。尽管如此，小米持续加大AI投入，前三季度研发开支约274亿元，其中AI相关研发费用占比超过30%。MiMo大模型API调用量及AI相关收入持续增加，逐步进入手机、汽车和家庭场景。",
+        source: "钛媒体",
+        url: "https://www.tmtpost.com/8217008.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "蚂蚁OceanBase再造AI数据平台，探索芯片研发上云方案",
+        desc: "蚂蚁集团旗下数据库OceanBase发布AI数据平台，历经16年研发。该平台旨在提升数据处理效率，具体技术细节尚未公布。此举标志着蚂蚁在数据库领域的进一步拓展。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/2YvROKs0CHz1yR4Wi02o?utm_source=rss&utm_medium=article"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "芯片研发上云，沐曦与火山引擎合作，测试效率提升40%",
+        desc: "沐曦股份与火山引擎合作，将科学计算从IDC托管迁移至云上，测试效率提升40%，并逐步迁移开发者平台和内部IT业务。火山引擎提供高主频云服务器等资源，沐曦股份资源弹性、计算性能与成本平衡，芯片设计研发能力边界拓展。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/industrynews/qpNTm1Kc6QN6mVY3.html"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "韩国发布考场反作弊系统Detect AI",
+        desc: "韩国东西发电的内部创业项目孵化的无人机探测企业SKIP推出了AI考场作弊探测与阻断系统“Detect AI”，该系统主要探测AI智能眼镜、针孔摄像头等作弊设备，12月9日将首秀。系统通过频谱分析技术，接收周边无线通信信号，筛出可能被用于作弊的电子设备，且不会干扰考场正常通信，避免个人信息被侵害。此成果来自韩国东西发电体系化的内部创业培育与商业化支持，此前技术已用于国家重要安保设施防护。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/032/542.htm"
+      },
+      {
+        region: "intl",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "AMD与中科慧灵完成人形机器人端侧AI验证",
+        desc: "AMD联合中科慧灵完成人形机器人端侧AI验证，探索“大小脑”双处理器架构。该架构在端侧AI验证中表现出色，验证了双处理器架构的优越性。此次合作有望推动人形机器人AI技术的发展。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/stLpgV1kNHuvr21qRH9x?utm_source=rss&utm_medium=article"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "OpenAI合并Chat和Work，重测ChatGPT用户限制",
+        desc: "OpenAI将推出单一使用计费器，作为将Chat和Work体验结合的一部分。该计费器将覆盖ChatGPT的所有用户，预计将使频繁使用ChatGPT的用户更快达到使用限制。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/11/25/openai-says-heavy-chatgpt-users-may-hit-limits-sooner-as-it-merges-chat-and-work/"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "美国纽约州暂停AI聊天玩具销售",
+        desc: "美国纽约州州长凯西・霍楚尔签署法案，暂停具备联网与AI对话能力的玩具在该州的制造、分销和销售，期限为5年。该法案针对内置互联网接入、集成AI能力的毛绒玩偶与玩具，违规厂商每日最高罚15000美元。法案实施后，家长们需警惕市面上可能伤害孩子的玩具，呼吁技术迭代与法律同步调整。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/032/540.htm"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "亚马逊与Meta洽谈合作，或将开放商城给Muse AI购物助手",
+        desc: "亚马逊与Meta正在洽谈合作，计划让Meta旗下AI智能体Muse直接接入亚马逊电商平台。双方已开展多轮磋商，目前谈判卡在商品搜索结果展示和广告业务安排等核心议题上。亚马逊曾对Muse实施屏蔽，但此次合作谈判显示出态度反转。亚马逊CEO安迪·贾西曾表示，通过外部AI智能体下单的用户规模不大，而亚马逊担心第三方AI购物智能体会冲击自身广告收入，并削弱直接触达用户的能力。该合作协议最终需两家公司CEO批准才能落地。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/032/515.htm"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "OpenAI联手AMD，在旗舰GPU中抠出14%物理极限",
+        desc: "OpenAI 与 AMD 合作，在旗舰 GPU 中实现了 14% 的物理极限提升。从自研推理芯片 Jalapeño 到商用流片，大模型接管前端微架构，仅用不到 5 个月完成约 1 年工程进展。模型直接修改 SystemVerilog RTL，在既有设计上取得幅度达 14% 的 PPA 改进，相关优化已在实物硅片上得到验证。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/ai/9tAw4Cw8AcxtFzUm.html"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "Anthropic CEO反驳AI控制权让渡指控",
+        desc: "Anthropic CEO Dario Amodei 强烈反驳了竞争对手关于他倾向于将人类控制权交给AI的指控，尽管领先的AI公司正日益自动化其研究和模型开发。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/11/25/anthropics-dario-amodei-calls-accusations-of-surrendering-human-control-to-ai-absurd/"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "Netflix基于运维数据打造知识图谱，实现AI可观测性",
+        desc: "Netflix发布基于运维数据的知识图谱，实现AI可观测性。该图谱通过分析大量运维数据，提升AI系统的可观测性，优化运维效率。此举有助于Netflix在技术运维领域取得进一步突破。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/lVQK4fTxIJYZL2sZee2O?utm_source=rss&utm_medium=article"
+      }
+    ]
+  },
+  {
     date: "2026-11-25",
     weekday: "星期三",
     regioned: true,
