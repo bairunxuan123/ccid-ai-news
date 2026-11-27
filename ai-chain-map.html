@@ -2785,6 +2785,158 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-27",
+    weekday: "星期五",
+    regioned: true,
+    summary: "【国内】AI产业在政策、技术、产业动态和投融资方面均有显著进展，涵盖服务贸易规划、AI客服、芯片收购、机器人技术等多个领域。　【国外】AI产业持续发展，技术突破与政策监管并进，企业并购与融资活跃。",
+    items: [
+      {
+        region: "cn",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "商务部等八部门印发《服务贸易发展“十五五”规划》",
+        desc: "商务部等八部门印发《服务贸易发展“十五五”规划》，明确到2030年服务贸易规模占外贸总额比重提升，提出7方面25项重点任务，包括培育服务贸易新动能、促进数字化智能化绿色化发展等。英伟达暂停向四个东南亚国家出货服务器，四大商业银行与上市公司签订股票回购增持贷款合同超6000亿元。",
+        source: "钛媒体",
+        url: "https://www.tmtpost.com/8219586.html"
+      },
+      {
+        region: "cn",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "信邦智能拟以28.56亿收购英迪芯微，寻求车规芯片业务新增长",
+        desc: "信邦智能发布重大资产重组草案修订稿，拟以28.56亿元收购英迪芯微100%股权，其中16.93亿元以股份支付，11.63亿元以现金支付。此次收购作价高于信邦智能自身市值，被视为“蛇吞象”式并购。英迪芯微部分股东借此退出，信邦智能希望借此寻找新的收入来源，而英迪芯微则希望借上市公司平台融资。",
+        source: "钛媒体",
+        url: "https://www.tmtpost.com/8219524.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "小米第三季度利润下滑56.8%，加大研发投入聚焦AI和汽车",
+        desc: "小米集团发布2026年第三季度财报，单季收入1072亿元，同比下滑5.2%；经调整净利润48.8亿元，同比下滑56.8%。公司持续加大研发投入，前三季度研发投入274亿，同比增长16.5%，其中23亿投向汽车和AI。尽管股价波动较大，但小米对AI投入按计划推进，明年ASP预计再提升。",
+        source: "钛媒体",
+        url: "https://www.tmtpost.com/8219233.html"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "腾讯AI成果登Nature，挑战药物研发前沿难题",
+        desc: "腾讯生命科学实验室发布AI for Science研究成果，其AI平台ORIDTP成功设计高活性双靶点治疗性多肽，并在减重降糖、肿瘤免疫方向完成验证。该平台将扩散生成模型、双目标强化学习等技术应用于药物研发，每轮实验仅需测试约15条多肽，较传统模式效率大幅提升。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/033/125.htm"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "华为发布星驰辅助驾驶系统，与乾崑智驾同源同资源",
+        desc: "华为在2026乾崑生态大会上发布了星驰辅助驾驶系统。该系统与乾崑智驾技术同源，共享云端算力和数据资源，并遵循相同研发流程和质量管理体系。星驰辅助驾驶与乾崑智驾在具体功能和体验上有所差异，但安全算法、稳定性和可靠性保持不变。华为表示，乾崑智驾ADS历经5代演进，主要面向自动驾驶，而星驰专注于辅助驾驶。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/033/124.htm"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "华为与奕境汽车、宁德时代共建智能换电生态，首款智能换电车型落地",
+        desc: "华为乾崑、奕境汽车、宁德时代共同宣布，全球首款智能换电车型正式落地奕境品牌。华为乾崑智能汽车解决方案与宁德时代、时代电服开展智能换电合作，打造乾崑智驾完整智能充换电生态。华为智能汽车解决方案BU CEO靳玉志在华为乾崑生态大会上发布智能补能解决方案，支持智能补能体系，提供电池安全服务。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/033/081.htm"
+      },
+      {
+        region: "cn",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "机器人量产背后，物理AI开始算新账：研发底座何必各自建？",
+        desc: "九章云极正尝试从算力供应商向物理AI开发平台延伸，通过物理AI工厂、生态联盟和标准化接口，参与这场产业分工的重构。2026年，人形机器人加速走出实验室，中国人形机器人出货量已超过4万台。每掌握一项新技能，背后可能是一整套研发流程的反复运转，如智能机器人完成抓取动作需经过数据采集、仿真、训练和真机验证。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/chips/HQvbSEUnkDy0Tos9.html"
+      },
+      {
+        region: "cn",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "讯飞语音大模型能力全解，从语音基座到语音应用",
+        desc: "科大讯飞发布语音大模型，全面解析从语音基座到语音应用的能力。该模型在语音识别、语音合成等方面展现出卓越性能，为语音技术发展注入新动力。后续计划将进一步拓展应用场景，推动语音技术普及。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/minibook/h1BlHGoTKyeLgs0KmAhe?utm_source=rss&utm_medium=article"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "美国42州总检察长联手阻止Character.AI出售用户聊天数据",
+        desc: "美国42个州的州检察官联盟试图阻止Character.AI在破产清算过程中出售用户聊天数据。该联盟指控Character.AI计划拍卖超过2100万美国账户的私人聊天历史，其中超过210万账户属于未成年人，且未对被出售对话的人提供任何保护措施。Character.AI在经历多年丑闻和法律挑战后，于10月份申请破产。",
+        source: "The Verge",
+        url: "https://www.theverge.com/policy/1042620/character-ai-sale-state-ags-block-selling-users-chats"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "381个AI直播验证P=NP，GitHub服务器崩溃",
+        desc: "量子位成功进行了381个AI直播冲刺，验证通过了2400多条引理，已运行超过一万次会话，这一壮举使得GitHub服务器承受巨大压力。",
+        source: "量子位",
+        url: "https://www.qbitai.com/2026/11/513021.html"
+      },
+      {
+        region: "intl",
+        cat: "industry",
+        catLabel: "产业动态",
+        title: "Uber推出安全AI框架，进行全生命周期治理",
+        desc: "Uber发布安全AI框架，对AI智能体进行全生命周期治理。该框架旨在提升AI系统的安全性，确保其在各个阶段都能得到有效管理。这一举措将有助于提升Uber在自动驾驶等领域的竞争力。",
+        source: "InfoQ",
+        url: "https://www.infoq.cn/article/xA3g2i0VtTZIOVePMedY?utm_source=rss&utm_medium=article"
+      },
+      {
+        region: "intl",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "Anthropic上市，Uber预算看Claude如何赚钱",
+        desc: "Anthropic在纳斯达克上市，今年前三季度近八成收入来自按使用量计费的业务。Uber曾推广其编程工具Claude Code，导致2026年AI预算提前用完。此次上市股票价值约813亿美元，创下全球IPO纪录。Uber调整了模型调用方式，为编程工具设定费用上限。",
+        source: "钛媒体",
+        url: "https://www.tmtpost.com/8218636.html"
+      },
+      {
+        region: "intl",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "亚马逊收购Decart优化栈，交易金额或达75亿美元",
+        desc: "亚马逊本周初宣布购买Decart优化栈（DOS）背后的专有技术，并带走了三位联合创始人和他们的研究与工程团队，交易金额高达75亿美元。此前，Anthropic和英伟达都曾对Decart进行过投资，并尝试以约60亿美元和更高的估值收购，但均未能达成协议。Decart的旗舰产品Lucy能实时修改直播画面，而亚马逊的收购不仅高于Decart5月融资时的40亿美元估值，也几乎是两年前种子轮融资时1亿多美元估值的九倍。",
+        source: "钛媒体",
+        url: "https://www.tmtpost.com/8218433.html"
+      },
+      {
+        region: "intl",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "Nvidia暂停向东南亚芯片出货，应对美国出口限制",
+        desc: "Nvidia宣布暂停向马来西亚、新加坡、泰国和印度尼西亚的制造合作伙伴运送服务器芯片，此举是在美国加强限制人工智能芯片流入中国的背景下进行的。这一决定意味着Nvidia将暂停向这些东南亚国家运送服务器芯片，以响应美国政府的政策调整。",
+        source: "TechCrunch",
+        url: "https://techcrunch.com/2026/11/26/nvidia-hits-pause-on-chip-shipments-to-southeast-asia/"
+      },
+      {
+        region: "intl",
+        cat: "tech",
+        catLabel: "技术突破",
+        title: "前苹果空间智能首席科学家权龙二次创业，成立Envision AI",
+        desc: "香港科技大学计算机科学与工程系教授、前苹果空间智能首席科学家权龙二次创业，成立空间与物理AI公司“Envision AI”，目标是打造基于大语言模型的通用空间物理原生基模，将文本、图像、空间与物理信息统一进同一套体系。权龙曾提出三维视觉领域的重要奠基性算法，是IEEE Fellow，谷歌学术引用量超过2.3万次，此次创业有望加速物理AI“ChatGPT时刻”的到来。",
+        source: "雷峰网",
+        url: "https://www.leiphone.com/category/academic/S12DTjaFWmIPkwCk.html"
+      },
+      {
+        region: "intl",
+        cat: "capital",
+        catLabel: "投融资",
+        title: "马斯克为采购存储芯片提出为三星工厂提供融资担保，被拒绝",
+        desc: "特斯拉CEO马斯克曾向三星提出长期存储芯片采购承诺，并主动提出为三星新芯片工厂提供融资担保，但被三星会长李在镕拒绝。据悉，芯片买家正长期驻守在韩国，一些人工智能巨头甚至将员工派驻在三星芯片制造工厂周边，以确保交付按计划推进。特斯拉和三星均未对此作出回应。",
+        source: "IT之家",
+        url: "https://www.ithome.com/1/033/116.htm"
+      }
+    ]
+  },
+  {
     date: "2026-11-26",
     weekday: "星期四",
     regioned: true,
