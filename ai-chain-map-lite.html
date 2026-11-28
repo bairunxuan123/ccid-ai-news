@@ -2795,6 +2795,27 @@ function closeReport() { document.getElementById("reportOverlay").classList.remo
 // ===== 每日动态数据 =====
 var NEWS_DATA = [
   {
+    date: "2026-11-28",
+    weekday: "星期六",
+    regioned: true,
+    summary: "【国内】今日国内AI产业动态丰富，涵盖政策发布、技术突破、产业动态和投融资等多个方面。　【国外】今日AI产业动态丰富，涵盖政策、技术突破、产业动态和投融资等多个方面。",
+    items: [
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "商汤大装置Token工厂获最高评级", desc: "商汤大装置Token工厂获得中国信通院Token工厂智算能力评估“全栈服务型·领先级”评级认证，标志着该装置在智算能力方面达到行业领先水平。该评级认证是对商汤大装置Token工厂在智算领域技术实力和综合服务能力的认可。", source: "量子位", url: "https://www.qbitai.com/2026/11/513346.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "首个带跨任务空间记忆的原生基模开源", desc: "量子位发布消息，首个带跨任务空间记忆的原生基模开源，机器人端侧即可运行。该模型具备地图随时修改和跨任务记忆的能力。这一技术突破，为机器人领域带来了新的发展机遇。", source: "量子位", url: "https://www.qbitai.com/2026/11/513227.html" },
+      { region: "cn", cat: "capital", catLabel: "投融资", title: "闪科光联完成数千万元天使轮融资", desc: "闪科光联完成数千万元天使轮融资，由励石创投、商汤国香、长石资本、厚雪资本等多家机构联合投资。公司成立于2026年9月，核心团队拥有20年以上光电芯片、先进封装、高速光模块经验。闪科光联以MicroLED光互连技术为核心，致力于提供低成本、低功耗、高带宽密度的互连方案，瞄准AI算力基础设施中的连接瓶颈。", source: "雷峰网", url: "https://www.leiphone.com/category/ai/ilqJyKclWkhaWIps.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "DeepSeek APP更新账单，网友：要收费了？", desc: "DeepSeek APP突然更新账单，网页App双端亮出聊天账单，引发网友热议。此次更新似乎预示着该应用将开始收费，具体收费标准和方式尚未公布。这一变化可能会影响用户的使用习惯和付费意愿。", source: "量子位", url: "https://www.qbitai.com/2026/11/513305.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "人形机器人开发者集合，众擎开放大小脑", desc: "众擎科技发布人形机器人开发者集合计划，推出10亿产业级生态支持计划。该计划旨在通过真机验证的成果，为下一支团队提供开发起点。此举将推动人形机器人产业的进一步发展。", source: "量子位", url: "https://www.qbitai.com/2026/11/513352.html" },
+      { region: "cn", cat: "tech", catLabel: "技术突破", title: "腾讯混元发布Hy3D 3.6，提升3D生成质量", desc: "腾讯混元发布Hy3D 3.6版本，该版本在高模表面处理上实现了更整洁、结构更清晰、刻画更细腻的突破。此版本将3D生成的竞争焦点从“能看”转向“能用”，标志着技术进步的重要一步。", source: "量子位", url: "https://www.qbitai.com/2026/11/513155.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "美团AI经营工作台“妙手”服务200万商家，营收1156亿", desc: "美团发布2026年三季报，实现收入1156亿元，同比增长21.6%，净利润同比转正。AI经营工作台“妙手”服务超200万商家，研发投入77亿元。外卖行业平均客单价回升，核心本地商业板块营收783亿元，同比增长16.8%。", source: "雷峰网", url: "https://www.leiphone.com/category/industrynews/iJ0tw7k1kHDs5zjT.html" },
+      { region: "cn", cat: "industry", catLabel: "产业动态", title: "钛动科技与腾讯云战略合作，拓展AI应用场景", desc: "钛动科技与腾讯云达成战略合作，共同探索AI技术在企业全球增长中的应用。此次合作旨在利用AI技术为企业提供有用的解决方案，推动企业全球化进程。具体合作内容包括共同研发AI产品，以及在全球范围内推广AI解决方案。这一合作预计将为企业带来新的增长空间，助力企业实现全球化目标。", source: "量子位", url: "https://www.qbitai.com/2026/11/513194.html" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "美国42州总检察长联合阻止Character.AI出售用户聊天记录", desc: "42个州的总检察长试图阻止Character.AI在破产清算过程中出售用户聊天记录。该联盟指控公司计划拍卖超过2100万美国用户的私人聊天历史，其中超过210万账户属于未成年人，且未对被出售对话的人提供任何保障。Character.AI在经历了多年的丑闻和法律挑战，包括迪士尼的诉讼后，于10月份申请破产。", source: "The Verge", url: "https://www.theverge.com/policy/1042620/character-ai-sale-state-ags-block-selling-users-chats" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "DoorDash利用AI智能体将生鲜杂货复购延迟从16秒降至2秒", desc: "DoorDash推出了AI智能体，将生鲜杂货复购延迟从16秒降至2秒。这一技术改进显著提升了用户体验，实现了快速响应。相较于之前的复购延迟，DoorDash的新技术几乎将等待时间缩短了十分之九。", source: "InfoQ", url: "https://www.infoq.cn/article/2uDBVKjk3kJXRb6CqQfu?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "policy", catLabel: "政策发布", title: "联合国发布全球AI可持续发展指南", desc: "雅砻江流域水电开发有限公司与华为联合打造的“AI 赋能绿色能源方案”荣获“2026 年全球可持续工业 AI 解决方案奖”，该方案落地于全球最大水光互补电站——雅砻江柯拉光伏电站，该项目于2023年6月并网发电，标志着全球首个百万千瓦级“水光互补”电站正式投产。", source: "IT之家", url: "https://www.ithome.com/1/033/914.htm" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "谷歌更新SRE著作，拥抱AI时代", desc: "谷歌更新了SRE著作，拥抱AI时代。此次更新涵盖了AI技术在SRE领域的应用，预计将覆盖全球数百万开发者。与之前相比，此次更新内容更为丰富，技术规格更高，有助于推动SRE领域的发展。", source: "InfoQ", url: "https://www.infoq.cn/article/vD2gdB9ER7QgjD0W5wds?utm_source=rss&utm_medium=article" },
+      { region: "intl", cat: "industry", catLabel: "产业动态", title: "英伟达支付2.9亿美元和解挖矿显卡官司", desc: "英伟达同意支付2.9亿美元和解金，了结历时8年的证券集体诉讼。投资者指控公司在2018年加密货币挖矿热潮期间误导股东对其游戏业务收入中挖矿需求实际占比的判断。和解中未承认不当行为，涉及2017年至2018年显卡紧缺和专用挖矿显卡P106-100销售。", source: "IT之家", url: "https://www.ithome.com/1/033/835.htm" }
+    ]
+  },
+  {
     date: "2026-11-27",
     weekday: "星期五",
     regioned: true,
